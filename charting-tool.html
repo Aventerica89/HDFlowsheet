@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charting Snippet Builder</title>
+    <style>
+        :root {
+            --header-bg: #007bc2; /* Matches the blue header */
+            --copy-btn-bg: #637ce6; /* Matches the purple/blue button */
+            --copy-btn-hover: #4e64c4;
+            --clear-btn-bg: #e2e6ea;
+            --clear-btn-hover: #dbe0e5;
+            --bg-color: #f4f6f9;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ccc; /* darker background to make modal pop */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+            margin: 0;
+            padding-top: 50px;
+        }
+
+        /* Main Card Container */
+        .snippet-builder-card {
+            background-color: white;
+            width: 500px;
+            max-width: 95%;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Header Section */
+        .card-header {
+            background-color: var(--header-bg);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .clipboard-icon {
+            font-size: 1.4rem;
+        }
+
+        .close-btn {
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Body Section */
+        .card-body {
+            padding: 20px;
+            border: 2px solid #5aaaff; /* Outer blue border from image */
+            margin: 15px;
+            border-radius: 8px;
+        }
+
+        .label-text {
+            color: #1a3c8a;
+            font-weight: bold;
+            display: block;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        /* Text Area */
+        textarea {
+            width: 100%;
+            height: 80px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 10px;
+            font-family: inherit;
+            resize: vertical;
+            margin-bottom: 15px;
+            border-left: 4px solid #4a90e2; /* Blue accent line on left */
+        }
+
+        textarea:focus {
+            outline: 2px solid #4a90e2;
+        }
+
+        /* Action Buttons Row */
+        .action-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+
+        .btn-copy {
+            background-color: var(--copy-btn-bg);
+            color: white;
+            flex: 2;
+        }
+
+        .btn-copy:hover {
+            background-color: var(--copy-btn-hover);
+        }
+
+        .btn-clear {
+            background-color: var(--clear-btn-bg);
+            color: #555;
+            flex: 1;
+        }
+
+        .btn-clear:hover {
+            background-color: var(--clear-btn-hover);
+        }
+
+        /* Special Recurring Snippet Button */
+        .recurring-snippet-btn {
+            width: 100%;
+            background-color: #e3f2fd;
+            border: 1px dashed #1976d2;
+            color: #0d47a1;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.2s;
+            margin-bottom: 20px;
+        }
+
+        .recurring-snippet-btn:hover {
+            background-color: #bbdefb;
+            transform: translateY(-1px);
+        }
+
+        .recurring-snippet-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* Divider */
+        hr {
+            border: 0;
+            height: 1px;
+            background: #eee;
+            margin: 20px 0;
+        }
+
+        /* Snippet Grid */
+        .snippet-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .snippet-item {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: left;
+            transition: background 0.1s;
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        .snippet-item:hover {
+            background-color: #f0f4f8;
+            border-color: #bcccdc;
+        }
+        
+        /* Section Headers inside the snippet list */
+        .section-header {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: #888;
+            font-weight: bold;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="snippet-builder-card">
+        <div class="card-header">
+            <h2><span class="clipboard-icon">📋</span> Charting Snippet Builder</h2>
+            <span class="close-btn" onclick="alert('In a real app, this would close the modal.')">&times;</span>
+        </div>
+
+        <div class="card-body">
+            <label class="label-text">Generated Note:</label>
+            
+            <textarea id="noteArea" placeholder="Select options below to build your charting note..."></textarea>
+
+            <div class="action-row">
+                <button class="btn btn-copy" id="copyBtn" onclick="copyToClipboard()">
+                    📄 Copy to Clipboard
+                </button>
+                <button class="btn btn-clear" onclick="clearNote()">
+                    🗑️ Clear
+                </button>
+            </div>
+
+            <button class="recurring-snippet-btn" onclick="addSnippet('Access visible and secure. Care ongoing.')">
+                + Add: "Access visible and secure. Care ongoing."
+            </button>
+
+            <hr>
+            
+            <div style="font-size: 0.9em; color: #666; margin-bottom: 10px;">Click phrases to add them:</div>
+
+            <div class="snippet-options">
+                
+                <div class="section-header">Vitals & Status</div>
+                <button class="snippet-item" onclick="addSnippet('Hypertension')">Hypertension</button>
+                <button class="snippet-item" onclick="addSnippet('T to 37 for BP support.')">T to 37 for BP support.</button>
+                <button class="snippet-item" onclick="addSnippet('Hypotension')">Hypotension</button>
+                <button class="snippet-item" onclick="addSnippet('MAP remains > 70.')">MAP remains > 70.</button>
+                <button class="snippet-item" onclick="addSnippet('T already at 36.0.')">T already at 36.0.</button>
+                <button class="snippet-item" onclick="addSnippet('No changes / Stable.')">No changes / Stable.</button>
+
+                <div class="section-header">Patient Comfort & Activity</div>
+                <button class="snippet-item" onclick="addSnippet('Pt resting comfortably in chair watching TV.')">Pt resting comfortably in chair watching TV.</button>
+                <button class="snippet-item" onclick="addSnippet('Pt resting comfortably in chair playing with phone.')">Pt resting comfortably in chair playing with phone.</button>
+                <button class="snippet-item" onclick="addSnippet('Tolerating treatment well without intervention.')">Tolerating treatment well without intervention.</button>
+                <button class="snippet-item" onclick="addSnippet('Pt sleeping comfortably with head back and legs elevated. Chest rising and falling appropriately. No signs of distress.')">Pt sleeping comfortably... (Full details)</button>
+            
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const noteArea = document.getElementById('noteArea');
+        const copyBtn = document.getElementById('copyBtn');
+
+        // Function to add text to the textarea
+        function addSnippet(text) {
+            // If there is already text, add a space before the new text
+            if (noteArea.value.length > 0 && !noteArea.value.endsWith(' ')) {
+                noteArea.value += " ";
+            }
+            noteArea.value += text;
+            
+            // Auto-scroll to bottom of textarea
+            noteArea.scrollTop = noteArea.scrollHeight;
+        }
+
+        // Function to clear the textarea
+        function clearNote() {
+            noteArea.value = "";
+            resetCopyButton();
+        }
+
+        // Function to copy to clipboard
+        function copyToClipboard() {
+            if (!noteArea.value.trim()) return;
+
+            navigator.clipboard.writeText(noteArea.value).then(() => {
+                // Visual feedback
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = "✅ Copied!";
+                copyBtn.style.backgroundColor = "#28a745"; // Green color
+                
+                setTimeout(() => {
+                   resetCopyButton();
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                alert("Failed to copy text.");
+            });
+        }
+
+        function resetCopyButton() {
+            copyBtn.innerHTML = "📄 Copy to Clipboard";
+            copyBtn.style.backgroundColor = ""; // Reset to CSS default
+        }
+    </script>
+</body>
+</html>
