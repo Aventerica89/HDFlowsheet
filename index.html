@@ -4272,10 +4272,11 @@
         }
         
         // UF Documentation calculations
-        function calcAdjustedGoal(goalUF) {
+        function calcTargetWeight(preWeight, goalUF) {
+            const preNum = parseFloat(preWeight);
             const goalNum = parseFloat(goalUF);
-            if (isNaN(goalNum) || !goalUF) return '';
-            return (goalNum - 0.4).toFixed(1);
+            if (isNaN(preNum) || isNaN(goalNum) || !preWeight || !goalUF) return '';
+            return (preNum - goalNum - 0.4).toFixed(1);
         }
         
         function calcTotalRemoved(pre, post) {
@@ -5473,10 +5474,6 @@
                                     <label class="field-label">📊 Actual UF (kg)</label>
                                     <input type="text" class="field-input calculated-field" value="${actualUF}" readonly placeholder="Auto">
                                 </div>
-                                <div class="field-group">
-                                    <label class="field-label">📊 Difference (kg)</label>
-                                    <input type="text" class="field-input calculated-field" value="${diff}" readonly placeholder="Auto">
-                                </div>
                             </div>
                             
                             <!-- UF Calculations for Documentation -->
@@ -5486,12 +5483,8 @@
                                     <input type="text" class="field-input calculated-field" value="${calcPreOverDW(patient.preWeight, patient.dryWeight)}" readonly placeholder="Auto">
                                 </div>
                                 <div class="field-group">
-                                    <label class="field-label">📊 Adjusted Goal (- 0.4 saline)</label>
-                                    <input type="text" class="field-input calculated-field" value="${calcAdjustedGoal(patient.goalUF)}" readonly placeholder="Auto">
-                                </div>
-                                <div class="field-group">
-                                    <label class="field-label">📊 Total Removed (kg)</label>
-                                    <input type="text" class="field-input calculated-field" value="${calcTotalRemoved(patient.preWeight, patient.postWeight)}" readonly placeholder="Auto">
+                                    <label class="field-label">📊 Target Weight (kg)</label>
+                                    <input type="text" class="field-input calculated-field" value="${calcTargetWeight(patient.preWeight, patient.goalUF)}" readonly placeholder="Auto">
                                 </div>
                                 <div class="field-group">
                                     <label class="field-label">📊 Post vs DW (kg)</label>
