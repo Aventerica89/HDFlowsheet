@@ -1236,6 +1236,15 @@
         .floating-btn.orange:hover {
             box-shadow: 0 6px 16px rgba(245, 158, 11, 0.5);
         }
+
+        .floating-btn.purple {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+        }
+
+        .floating-btn.purple:hover {
+            box-shadow: 0 6px 16px rgba(139, 92, 246, 0.5);
+        }
         
         /* Legacy support - redirect to new classes */
         .drawer-toggle-btn {
@@ -6120,6 +6129,9 @@
         </button>
         <button class="floating-btn orange" onclick="openQuickNotes()">
             📝 Quick Notes
+        </button>
+        <button class="floating-btn purple" onclick="saveToServer()">
+            💾 Save
         </button>
     </div>
     
