@@ -3005,7 +3005,145 @@
         function saveShifts() {
             localStorage.setItem('hd_selected_shifts', JSON.stringify(state.selectedShifts));
         }
-        
+
+        // ========== DATA MANAGEMENT FUNCTIONS ==========
+
+        function showSaveStatus(message, isError = false) {
+            const statusEl = document.getElementById('saveStatus');
+            if (statusEl) {
+                statusEl.textContent = message;
+                statusEl.style.color = isError ? '#ef4444' : '#10b981';
+                setTimeout(() => { statusEl.textContent = ''; }, 5000);
+            }
+        }
+
+        async function saveToServer() {
+            try {
+                showSaveStatus('Saving...');
+                const data = {
+                    patients: state.patients,
+                    technicians: state.technicians,
+                    currentSection: state.currentSection,
+                    selectedShifts: state.selectedShifts,
+                    savedAt: new Date().toISOString()
+                };
+
+                const response = await fetch('api/save.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) throw new Error('Server error');
+
+                const result = await response.json();
+                showSaveStatus(`Saved successfully at ${result.timestamp}`);
+            } catch (error) {
+                console.error('Save error:', error);
+                showSaveStatus('Failed to save. Check console for details.', true);
+            }
+        }
+
+        async function loadFromServer() {
+            if (!confirm('This will replace all current data. Continue?')) return;
+
+            try {
+                showSaveStatus('Loading...');
+                const response = await fetch('api/load.php');
+
+                if (response.status === 404) {
+                    showSaveStatus('No saved data found on server.', true);
+                    return;
+                }
+
+                if (!response.ok) throw new Error('Server error');
+
+                const data = await response.json();
+
+                // Restore state
+                if (data.patients) state.patients = data.patients;
+                if (data.technicians) {
+                    state.technicians = data.technicians;
+                    saveTechnicians();
+                }
+                if (data.currentSection) {
+                    state.currentSection = data.currentSection;
+                    saveSection();
+                }
+                if (data.selectedShifts) {
+                    state.selectedShifts = data.selectedShifts;
+                    saveShifts();
+                }
+
+                renderAll();
+                showSaveStatus(`Loaded data from ${data.savedAt || 'server'}`);
+            } catch (error) {
+                console.error('Load error:', error);
+                showSaveStatus('Failed to load. Check console for details.', true);
+            }
+        }
+
+        function exportToFile() {
+            const data = {
+                patients: state.patients,
+                technicians: state.technicians,
+                currentSection: state.currentSection,
+                selectedShifts: state.selectedShifts,
+                exportedAt: new Date().toISOString()
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `flowsheet-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showSaveStatus('File downloaded successfully');
+        }
+
+        function importFromFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (!confirm('This will replace all current data. Continue?')) {
+                event.target.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+
+                    // Restore state
+                    if (data.patients) state.patients = data.patients;
+                    if (data.technicians) {
+                        state.technicians = data.technicians;
+                        saveTechnicians();
+                    }
+                    if (data.currentSection) {
+                        state.currentSection = data.currentSection;
+                        saveSection();
+                    }
+                    if (data.selectedShifts) {
+                        state.selectedShifts = data.selectedShifts;
+                        saveShifts();
+                    }
+
+                    renderAll();
+                    showSaveStatus(`Imported from ${file.name}`);
+                } catch (error) {
+                    console.error('Import error:', error);
+                    showSaveStatus('Invalid file format.', true);
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
         // Settings Modal functions
         function openSettingsModal() {
             renderTechList();
@@ -6312,7 +6450,30 @@
                         </div>
                     </div>
                 </div>
-                
+
+                <!-- Data Management Section -->
+                <div class="theme-selector-section">
+                    <div class="theme-selector-title">💾 Data Management</div>
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <button class="btn-add" onclick="saveToServer()" style="flex: 1; padding: 12px;">
+                            💾 Save to Server
+                        </button>
+                        <button class="btn-add" onclick="loadFromServer()" style="flex: 1; padding: 12px; background: #10b981;">
+                            📂 Load from Server
+                        </button>
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <button class="btn-add" onclick="exportToFile()" style="flex: 1; padding: 12px; background: #6366f1;">
+                            📥 Export to File
+                        </button>
+                        <button class="btn-add" onclick="document.getElementById('importFile').click()" style="flex: 1; padding: 12px; background: #8b5cf6;">
+                            📤 Import from File
+                        </button>
+                        <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importFromFile(event)">
+                    </div>
+                    <div id="saveStatus" style="text-align: center; font-size: 0.85em; color: #6b7280; min-height: 20px;"></div>
+                </div>
+
                 <!-- Technicians Section -->
                 <div class="theme-selector-title">👤 Manage Technicians</div>
                 
