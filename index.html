@@ -5472,7 +5472,7 @@
                                 </div>
                                 <div class="field-group">
                                     <label class="field-label">📊 Actual UF (kg)</label>
-                                    <input type="text" class="field-input calculated-field" value="${actualUF}" readonly placeholder="Auto">
+                                    <input type="text" class="field-input calculated-field" value="${actualUF}" readonly tabindex="-1" placeholder="Auto">
                                 </div>
                             </div>
                             
@@ -5480,15 +5480,15 @@
                             <div class="field-grid" style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #e2e8f0;">
                                 <div class="field-group">
                                     <label class="field-label">📊 Pre Over DW (kg)</label>
-                                    <input type="text" class="field-input calculated-field" value="${calcPreOverDW(patient.preWeight, patient.dryWeight)}" readonly placeholder="Auto">
+                                    <input type="text" class="field-input calculated-field" value="${calcPreOverDW(patient.preWeight, patient.dryWeight)}" readonly tabindex="-1" placeholder="Auto">
                                 </div>
                                 <div class="field-group">
                                     <label class="field-label">📊 Target Weight (kg)</label>
-                                    <input type="text" class="field-input calculated-field" value="${calcTargetWeight(patient.preWeight, patient.goalUF)}" readonly placeholder="Auto">
+                                    <input type="text" class="field-input calculated-field" value="${calcTargetWeight(patient.preWeight, patient.goalUF)}" readonly tabindex="-1" placeholder="Auto">
                                 </div>
                                 <div class="field-group">
                                     <label class="field-label">📊 Post vs DW (kg)</label>
-                                    <input type="text" class="field-input calculated-field ${weightAlert ? 'danger' : ''}" value="${calcPostVsDW(patient.postWeight, patient.dryWeight)}" readonly placeholder="Auto">
+                                    <input type="text" class="field-input calculated-field ${weightAlert ? 'danger' : ''}" value="${calcPostVsDW(patient.postWeight, patient.dryWeight)}" readonly tabindex="-1" placeholder="Auto">
                                 </div>
                             </div>
 
