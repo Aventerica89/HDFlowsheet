@@ -1245,7 +1245,269 @@
         .floating-btn.purple:hover {
             box-shadow: 0 6px 16px rgba(139, 92, 246, 0.5);
         }
-        
+
+        /* Bottom Center Floating Button */
+        .floating-btn-bottom {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: white;
+            border: none;
+            padding: 16px 28px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.1em;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.5);
+            transition: all 0.3s ease;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .floating-btn-bottom:hover {
+            transform: translateX(-50%) translateY(-3px);
+            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.6);
+        }
+
+        /* Timestamp Modal */
+        .timestamp-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .timestamp-modal-overlay.active {
+            display: flex;
+        }
+
+        .timestamp-modal {
+            background: white;
+            border-radius: 16px;
+            width: 95%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .timestamp-modal-header {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: white;
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .timestamp-modal-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .timestamp-modal-time {
+            font-size: 0.85em;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+
+        .timestamp-modal-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 1.5em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .timestamp-modal-close:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .timestamp-modal-body {
+            padding: 25px;
+            max-height: calc(90vh - 200px);
+            overflow-y: auto;
+        }
+
+        .timestamp-section-title {
+            font-weight: 700;
+            color: #374151;
+            margin-bottom: 12px;
+            font-size: 0.95em;
+        }
+
+        .timestamp-patient-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .timestamp-patient-btn {
+            background: #f3f4f6;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 12px 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .timestamp-patient-btn:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .timestamp-patient-btn.selected {
+            border-color: #3b82f6;
+            background: #3b82f6;
+            color: white;
+        }
+
+        .timestamp-patient-chair {
+            font-weight: 700;
+            font-size: 0.85em;
+            margin-bottom: 4px;
+        }
+
+        .timestamp-patient-name {
+            font-size: 0.8em;
+            color: #6b7280;
+        }
+
+        .timestamp-patient-btn.selected .timestamp-patient-name {
+            color: rgba(255,255,255,0.9);
+        }
+
+        .timestamp-event-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .timestamp-event-btn {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 14px 12px;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .timestamp-event-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+        }
+
+        .timestamp-event-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .timestamp-log-section {
+            border-top: 2px solid #e5e7eb;
+            padding-top: 20px;
+        }
+
+        .timestamp-log-list {
+            background: #f9fafb;
+            border-radius: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .timestamp-log-item {
+            display: grid;
+            grid-template-columns: 80px 1fr 120px 40px;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid #e5e7eb;
+            gap: 10px;
+        }
+
+        .timestamp-log-item:last-child {
+            border-bottom: none;
+        }
+
+        .timestamp-log-time {
+            font-weight: 700;
+            color: #dc2626;
+            font-size: 0.9em;
+        }
+
+        .timestamp-log-patient {
+            font-size: 0.9em;
+            color: #374151;
+        }
+
+        .timestamp-log-event {
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #f59e0b;
+            text-align: right;
+        }
+
+        .timestamp-log-delete {
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            font-size: 1.1em;
+            padding: 4px;
+            border-radius: 4px;
+        }
+
+        .timestamp-log-delete:hover {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .timestamp-log-empty {
+            text-align: center;
+            padding: 30px;
+            color: #9ca3af;
+            font-style: italic;
+        }
+
+        .timestamp-selected-display {
+            background: #eff6ff;
+            border: 2px solid #3b82f6;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            color: #1e40af;
+            display: none;
+        }
+
+        .timestamp-selected-display.active {
+            display: block;
+        }
+
         /* Legacy support - redirect to new classes */
         .drawer-toggle-btn {
             display: none;
@@ -3034,6 +3296,7 @@
                     technicians: state.technicians,
                     currentSection: state.currentSection,
                     selectedShifts: state.selectedShifts,
+                    timestampLogs: timestampState.logs,
                     savedAt: new Date().toISOString()
                 };
 
@@ -3083,6 +3346,10 @@
                     state.selectedShifts = data.selectedShifts;
                     saveShifts();
                 }
+                if (data.timestampLogs) {
+                    timestampState.logs = data.timestampLogs;
+                    saveTimestampLogs();
+                }
 
                 renderAll();
                 showSaveStatus(`Loaded data from ${data.savedAt || 'server'}`);
@@ -3098,6 +3365,7 @@
                 technicians: state.technicians,
                 currentSection: state.currentSection,
                 selectedShifts: state.selectedShifts,
+                timestampLogs: timestampState.logs,
                 exportedAt: new Date().toISOString()
             };
 
@@ -3141,6 +3409,10 @@
                         state.selectedShifts = data.selectedShifts;
                         saveShifts();
                     }
+                    if (data.timestampLogs) {
+                        timestampState.logs = data.timestampLogs;
+                        saveTimestampLogs();
+                    }
 
                     renderAll();
                     showSaveStatus(`Imported from ${file.name}`);
@@ -3151,6 +3423,160 @@
             };
             reader.readAsText(file);
             event.target.value = '';
+        }
+
+        // ========== TIMESTAMP QUICK NOTES FUNCTIONS ==========
+
+        let timestampState = {
+            selectedPatientId: null,
+            logs: []
+        };
+
+        // Load timestamp logs from localStorage
+        function loadTimestampLogs() {
+            const saved = localStorage.getItem('hd_timestamp_logs');
+            if (saved) {
+                timestampState.logs = JSON.parse(saved);
+            }
+        }
+
+        // Save timestamp logs to localStorage
+        function saveTimestampLogs() {
+            localStorage.setItem('hd_timestamp_logs', JSON.stringify(timestampState.logs));
+        }
+
+        // Get Phoenix, AZ time
+        function getPhoenixTime() {
+            const options = {
+                timeZone: 'America/Phoenix',
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            };
+            return new Date().toLocaleTimeString('en-US', options);
+        }
+
+        // Update the current time display
+        function updateTimestampClock() {
+            const timeEl = document.getElementById('timestampCurrentTime');
+            if (timeEl) {
+                timeEl.textContent = `Current Time: ${getPhoenixTime()} (Phoenix, AZ)`;
+            }
+        }
+
+        // Open timestamp modal
+        function openTimestampModal() {
+            loadTimestampLogs();
+            timestampState.selectedPatientId = null;
+            document.getElementById('timestampModal').classList.add('active');
+            renderTimestampPatients();
+            renderTimestampLog();
+            updateTimestampClock();
+            updateEventButtons();
+
+            // Start clock update interval
+            window.timestampClockInterval = setInterval(updateTimestampClock, 1000);
+        }
+
+        // Close timestamp modal
+        function closeTimestampModal() {
+            document.getElementById('timestampModal').classList.remove('active');
+            if (window.timestampClockInterval) {
+                clearInterval(window.timestampClockInterval);
+            }
+        }
+
+        // Render patient buttons
+        function renderTimestampPatients() {
+            const grid = document.getElementById('timestampPatientGrid');
+            const patients = state.patients.filter(p => p.name);
+
+            if (patients.length === 0) {
+                grid.innerHTML = '<div class="timestamp-log-empty">No patients added yet</div>';
+                return;
+            }
+
+            grid.innerHTML = patients.map(p => `
+                <div class="timestamp-patient-btn ${timestampState.selectedPatientId === p.id ? 'selected' : ''}"
+                     onclick="selectTimestampPatient(${p.id})">
+                    <div class="timestamp-patient-chair">Chair ${p.chair}</div>
+                    <div class="timestamp-patient-name">${p.name}</div>
+                </div>
+            `).join('');
+        }
+
+        // Select a patient
+        function selectTimestampPatient(patientId) {
+            timestampState.selectedPatientId = patientId;
+            renderTimestampPatients();
+            updateEventButtons();
+
+            const patient = state.patients.find(p => p.id === patientId);
+            const display = document.getElementById('timestampSelectedDisplay');
+            const text = document.getElementById('timestampSelectedText');
+
+            if (patient) {
+                display.classList.add('active');
+                text.textContent = `Chair ${patient.chair} - ${patient.name}`;
+            }
+        }
+
+        // Enable/disable event buttons based on patient selection
+        function updateEventButtons() {
+            const buttons = document.querySelectorAll('.timestamp-event-btn');
+            const hasPatient = timestampState.selectedPatientId !== null;
+
+            buttons.forEach(btn => {
+                btn.disabled = !hasPatient;
+            });
+        }
+
+        // Log a timestamp event
+        function logTimestampEvent(eventType) {
+            if (!timestampState.selectedPatientId) return;
+
+            const patient = state.patients.find(p => p.id === timestampState.selectedPatientId);
+            if (!patient) return;
+
+            const logEntry = {
+                id: Date.now(),
+                time: getPhoenixTime(),
+                timestamp: new Date().toISOString(),
+                patientId: patient.id,
+                chair: patient.chair,
+                patientName: patient.name,
+                event: eventType
+            };
+
+            timestampState.logs.unshift(logEntry);
+            saveTimestampLogs();
+            renderTimestampLog();
+        }
+
+        // Delete a timestamp log entry
+        function deleteTimestampLog(logId) {
+            timestampState.logs = timestampState.logs.filter(log => log.id !== logId);
+            saveTimestampLogs();
+            renderTimestampLog();
+        }
+
+        // Render timestamp log
+        function renderTimestampLog() {
+            const list = document.getElementById('timestampLogList');
+
+            if (timestampState.logs.length === 0) {
+                list.innerHTML = '<div class="timestamp-log-empty">No timestamps logged yet</div>';
+                return;
+            }
+
+            list.innerHTML = timestampState.logs.map(log => `
+                <div class="timestamp-log-item">
+                    <div class="timestamp-log-time">${log.time}</div>
+                    <div class="timestamp-log-patient">Chair ${log.chair} - ${log.patientName}</div>
+                    <div class="timestamp-log-event">${log.event}</div>
+                    <button class="timestamp-log-delete" onclick="deleteTimestampLog(${log.id})">🗑️</button>
+                </div>
+            `).join('');
         }
 
         // Settings Modal functions
@@ -3867,6 +4293,7 @@
             const issueLabels = {
                 initiationTime: 'Initiation Time',
                 orderVerification: 'Order Verification',
+                accessEvalTime: 'Access Eval. Time',
                 txInitiated: 'Tx Initiated',
                 txEnded: 'Tx Ended',
                 blankVitalsNotes: 'Blank Vitals Notes',
@@ -5371,6 +5798,11 @@
                                             <input type="checkbox" ${patient.techCheck?.orderVerification ? 'checked' : ''}>
                                             <label>Order Verification</label>
                                         </div>
+                                        <div class="tech-check-item ${patient.techCheck?.accessEvalTime ? 'checked' : ''}"
+                                            onclick="toggleTechCheck(${patient.id}, 'accessEvalTime', event)">
+                                            <input type="checkbox" ${patient.techCheck?.accessEvalTime ? 'checked' : ''}>
+                                            <label>Access Eval. Time</label>
+                                        </div>
                                     </div>
                                 </div>
                                 
@@ -6134,7 +6566,53 @@
             💾 Save
         </button>
     </div>
-    
+
+    <!-- Bottom Center Floating Button -->
+    <button class="floating-btn-bottom" onclick="openTimestampModal()">
+        🩺 HD Flowsheet Quick Notes
+    </button>
+
+    <!-- Timestamp Modal -->
+    <div class="timestamp-modal-overlay" id="timestampModal">
+        <div class="timestamp-modal">
+            <div class="timestamp-modal-header">
+                <div>
+                    <div class="timestamp-modal-title">🩺 HD Flowsheet Quick Notes</div>
+                    <div class="timestamp-modal-time" id="timestampCurrentTime">Current Time: --:-- PM (Phoenix, AZ)</div>
+                </div>
+                <button class="timestamp-modal-close" onclick="closeTimestampModal()">×</button>
+            </div>
+            <div class="timestamp-modal-body">
+                <div class="timestamp-section-title">Select Patient:</div>
+                <div class="timestamp-patient-grid" id="timestampPatientGrid">
+                    <!-- Populated by JS -->
+                </div>
+
+                <div class="timestamp-selected-display" id="timestampSelectedDisplay">
+                    Selected: <span id="timestampSelectedText">None</span>
+                </div>
+
+                <div class="timestamp-section-title">Event (click to timestamp):</div>
+                <div class="timestamp-event-grid" id="timestampEventGrid">
+                    <button class="timestamp-event-btn" onclick="logTimestampEvent('Hypotension')" disabled>Hypotension</button>
+                    <button class="timestamp-event-btn" onclick="logTimestampEvent('Hypertension')" disabled>Hypertension</button>
+                    <button class="timestamp-event-btn" onclick="logTimestampEvent('Imodium')" disabled>Imodium</button>
+                    <button class="timestamp-event-btn" onclick="logTimestampEvent('Tylenol')" disabled>Tylenol</button>
+                    <button class="timestamp-event-btn" onclick="logTimestampEvent('UF min')" disabled>UF min</button>
+                    <button class="timestamp-event-btn" onclick="logTimestampEvent('Temp up')" disabled>Temp up</button>
+                    <button class="timestamp-event-btn" onclick="logTimestampEvent('Temp down')" disabled>Temp down</button>
+                </div>
+
+                <div class="timestamp-log-section">
+                    <div class="timestamp-section-title">📋 Timestamp Log:</div>
+                    <div class="timestamp-log-list" id="timestampLogList">
+                        <div class="timestamp-log-empty">No timestamps logged yet</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Drawer Overlay -->
     <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
     
