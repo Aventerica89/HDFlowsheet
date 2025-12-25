@@ -4276,7 +4276,7 @@
             const preNum = parseFloat(preWeight);
             const goalNum = parseFloat(goalUF);
             if (isNaN(preNum) || isNaN(goalNum) || !preWeight || !goalUF) return '';
-            return (preNum - goalNum - 0.4).toFixed(1);
+            return (preNum - goalNum + 0.4).toFixed(1);
         }
         
         function calcTotalRemoved(pre, post) {
