@@ -946,6 +946,29 @@
         .calculated-field.warning { background: #fff3cd; color: #856404; }
         .calculated-field.danger { background: #f8d7da; color: #721c24; }
         .calculated-field.success { background: #d4edda; color: #155724; }
+
+        .click-to-copy {
+            cursor: pointer !important;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important;
+            border: 2px solid #3b82f6 !important;
+            transition: all 0.2s ease;
+        }
+        .click-to-copy:hover {
+            background: linear-gradient(135deg, #bfdbfe 0%, #93c5fd 100%) !important;
+            transform: scale(1.02);
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+        .click-to-copy:active {
+            transform: scale(0.98);
+        }
+        .click-to-copy-label {
+            color: #1e40af !important;
+        }
+        .click-to-copy-hint {
+            font-size: 0.7em;
+            color: #3b82f6;
+            margin-left: 5px;
+        }
         
         .alert-box {
             background: #f8d7da; border: 2px solid #dc3545;
@@ -4852,7 +4875,27 @@
             if (isNaN(preNum) || isNaN(goalNum) || !preWeight || !goalUF) return '';
             return (preNum - goalNum + 0.4).toFixed(1);
         }
-        
+
+        function copyTargetWeight(inputEl) {
+            const value = inputEl.value;
+            if (!value) {
+                alert('No target weight to copy');
+                return;
+            }
+            navigator.clipboard.writeText(value).then(() => {
+                const originalBg = inputEl.style.background;
+                inputEl.style.background = 'linear-gradient(135deg, #86efac 0%, #4ade80 100%)';
+                inputEl.value = '✓ Copied!';
+                setTimeout(() => {
+                    inputEl.value = value;
+                    inputEl.style.background = '';
+                }, 1000);
+            }).catch(err => {
+                console.error('Copy failed:', err);
+                alert('Failed to copy. Please copy manually.');
+            });
+        }
+
         function calcTotalRemoved(pre, post) {
             const preNum = parseFloat(pre);
             const postNum = parseFloat(post);
@@ -6062,8 +6105,8 @@
                                     <input type="text" class="field-input calculated-field" value="${calcPreOverDW(patient.preWeight, patient.dryWeight)}" readonly tabindex="-1" placeholder="Auto">
                                 </div>
                                 <div class="field-group">
-                                    <label class="field-label">📊 Target Weight (kg)</label>
-                                    <input type="text" class="field-input calculated-field" value="${calcTargetWeight(patient.preWeight, patient.goalUF)}" readonly tabindex="-1" placeholder="Auto">
+                                    <label class="field-label click-to-copy-label">📊 Target Weight (kg) <span class="click-to-copy-hint">📋 Click to copy</span></label>
+                                    <input type="text" class="field-input calculated-field click-to-copy" value="${calcTargetWeight(patient.preWeight, patient.goalUF)}" readonly tabindex="-1" placeholder="Auto" onclick="copyTargetWeight(this)">
                                 </div>
                                 <div class="field-group">
                                     <label class="field-label">📊 Post vs DW (kg)</label>
@@ -6418,9 +6461,36 @@
         function toggleDrawer() {
             const overlay = document.getElementById('drawerOverlay');
             const panel = document.getElementById('drawerPanel');
-            
+
             overlay.classList.toggle('open');
             panel.classList.toggle('open');
+
+            // Auto-fill BFR and UF Goal from active patient data when opening
+            if (panel.classList.contains('open') && state.activePatientId) {
+                const patient = state.patients.find(p => p.id === state.activePatientId);
+                if (patient) {
+                    // Auto-fill BFR if patient has bfr data
+                    if (patient.bfr) {
+                        const bfrValue = parseFloat(patient.bfr);
+                        if (!isNaN(bfrValue)) {
+                            drawerState.bfr = bfrValue;
+                            document.getElementById('bfrValue').textContent = bfrValue;
+                            const bfrSlider = document.querySelector('#category-treatment input[type="range"]');
+                            if (bfrSlider) bfrSlider.value = bfrValue;
+                        }
+                    }
+                    // Auto-fill UF Goal if patient has goalUF data
+                    if (patient.goalUF) {
+                        const ufValue = parseFloat(patient.goalUF);
+                        if (!isNaN(ufValue)) {
+                            drawerState.ufGoal = ufValue;
+                            document.getElementById('ufGoalValue').textContent = ufValue + ' kg';
+                            const ufSlider = document.querySelectorAll('#category-treatment input[type="range"]')[1];
+                            if (ufSlider) ufSlider.value = ufValue;
+                        }
+                    }
+                }
+            }
         }
         
         function toggleCategory(categoryName) {
@@ -6705,6 +6775,31 @@
                 </div>
             </div>
             
+            <!-- Pre Dialysis Category -->
+            <div class="snippet-category">
+                <div class="snippet-category-header" data-category="predialysis" onclick="toggleCategory('predialysis')">
+                    <span>🏥 Pre Dialysis</span>
+                    <span>▼</span>
+                </div>
+                <div class="snippet-category-body" id="category-predialysis">
+                    <div class="snippet-builder-option" onclick="toggleSnippetOption(this.textContent.trim())">
+                        Weight and goal reviewed and verified with pt.
+                    </div>
+                    <div class="snippet-builder-option" onclick="toggleSnippetOption(this.textContent.trim())">
+                        Pt denies any pains / SOB. No other voiced concerns.
+                    </div>
+                    <div class="snippet-builder-option" onclick="toggleSnippetOption(this.textContent.trim())">
+                        5 mg Midodrine given for BP support.
+                    </div>
+                    <div class="snippet-builder-option" onclick="toggleSnippetOption(this.textContent.trim())">
+                        T to 36.5 for BP support.
+                    </div>
+                    <div class="snippet-builder-option" onclick="toggleSnippetOption(this.textContent.trim())">
+                        T to 36.0 for BP support.
+                    </div>
+                </div>
+            </div>
+
             <!-- Treatment Initiated Category -->
             <div class="snippet-category">
                 <div class="snippet-category-header" data-category="treatment" onclick="toggleCategory('treatment')">
@@ -6742,7 +6837,23 @@
                     </div>
                 </div>
             </div>
-            
+
+            <!-- During Treatment Category -->
+            <div class="snippet-category">
+                <div class="snippet-category-header" data-category="duringtreatment" onclick="toggleCategory('duringtreatment')">
+                    <span>⏱️ During Treatment</span>
+                    <span>▼</span>
+                </div>
+                <div class="snippet-category-body" id="category-duringtreatment">
+                    <div class="snippet-builder-option" onclick="toggleSnippetOption(this.textContent.trim())">
+                        Pt experiencing cramping.
+                    </div>
+                    <div class="snippet-builder-option" onclick="toggleSnippetOption(this.textContent.trim())">
+                        UF to minimum.
+                    </div>
+                </div>
+            </div>
+
             <!-- Hypertension Category -->
             <div class="snippet-category">
                 <div class="snippet-category-header" data-category="hypertension" onclick="toggleCategory('hypertension')">
@@ -6782,13 +6893,22 @@
                 </div>
                 <div class="snippet-category-body" id="category-hypotension">
                     <div class="snippet-builder-option" onclick="toggleSnippetOption(this.textContent.trim())">
-                        Pt experienced hypotension during treatment.
+                        Pt experiencing hypotension during treatment.
+                    </div>
+                    <div class="snippet-builder-option" onclick="toggleSnippetOption(this.textContent.trim())">
+                        Pt BP low side.
                     </div>
                     <div class="snippet-builder-option" onclick="toggleSnippetOption(this.textContent.trim())">
                         Pt experienced > 20 pt SBP drop.
                     </div>
                     <div class="snippet-builder-option" onclick="toggleSnippetOption(this.textContent.trim())">
+                        Pt experiencing side effects d/t hypotension - dizzy / light headedness.
+                    </div>
+                    <div class="snippet-builder-option" onclick="toggleSnippetOption(this.textContent.trim())">
                         Pt denies any s/s of hypotension such as light headedness, chest pain or SOB.
+                    </div>
+                    <div class="snippet-builder-option" onclick="toggleSnippetOption(this.textContent.trim())">
+                        5 mg Midodrine given for BP support.
                     </div>
                     <div class="snippet-builder-option" onclick="toggleSnippetOption(this.textContent.trim())">
                         100mL NS bolus given for BP support.
@@ -6800,10 +6920,13 @@
                         UF to min for BP support.
                     </div>
                     <div class="snippet-builder-option" onclick="toggleSnippetOption(this.textContent.trim())">
-                        MAP remains > 70.
+                        T to 36.5 for BP support.
                     </div>
                     <div class="snippet-builder-option" onclick="toggleSnippetOption(this.textContent.trim())">
                         T already at 36.0.
+                    </div>
+                    <div class="snippet-builder-option" onclick="toggleSnippetOption(this.textContent.trim())">
+                        MAP remains > 70.
                     </div>
                 </div>
             </div>
