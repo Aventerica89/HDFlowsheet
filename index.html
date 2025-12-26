@@ -995,6 +995,90 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px;
         }
+
+        /* Enhanced QA Checklist Styles */
+        .qa-main-item {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .qa-main-item.expanded {
+            border-color: #3b82f6;
+        }
+        .qa-main-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .qa-main-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+        .qa-sub-items {
+            display: none;
+            margin-top: 10px;
+            padding-left: 26px;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 10px;
+        }
+        .qa-main-item.expanded .qa-sub-items {
+            display: block;
+        }
+        .qa-sub-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+        .qa-sub-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+        }
+        .qa-sub-item input[type="text"] {
+            flex: 1;
+            padding: 6px 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .qa-checkmark {
+            color: #10b981;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        /* Hospitalization background */
+        .patient-hospitalized {
+            background: #e0f2fe !important;
+        }
+        .patient-hospitalized .section-header {
+            background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%) !important;
+        }
+
+        /* Missed Tx yellow background */
+        .patient-missed-tx {
+            background: #fef9c3 !important;
+        }
+        .patient-missed-tx .section-header {
+            background: linear-gradient(135deg, #facc15 0%, #eab308 100%) !important;
+        }
+
+        /* Tab status colors */
+        .status-badge.yellow {
+            background: #fef08a !important;
+            color: #854d0e !important;
+        }
+        .patient-tab.hospitalized {
+            background: linear-gradient(135deg, #7dd3fc 0%, #38bdf8 100%) !important;
+        }
+        .patient-tab.missed-tx {
+            background: linear-gradient(135deg, #fde047 0%, #facc15 100%) !important;
+        }
         
         .btn {
             padding: 8px 16px; border: none; border-radius: 4px;
@@ -4607,14 +4691,35 @@
                     
                     // QA Checklist
                     preCheck: false,
+                    preCheckSubs: {
+                        machineCheck: false,
+                        preDialysis: false,
+                        orderVerify: false
+                    },
                     thirtyMinCheck: false,
                     medsComplete: false,
+                    medsSubs: {
+                        medsGiven: false,
+                        medsSheetSigned: false
+                    },
                     abxIDPN: false,
                     statLabs: false,
                     emailSent: false,
                     ettSigned: false,
                     missedTx: false,
-                    whiteboard: false,
+                    missedTxSubs: {
+                        rescheduled: false,
+                        calledOff: false,
+                        noCallNoShow: false
+                    },
+                    hospitalization: false,
+                    hospitalizationHospital: '',
+                    hospitalizationSubs: {
+                        hhPrep: false,
+                        hospEntered: false,
+                        whiteboard: false,
+                        eosrReport: false
+                    },
                     labsPrep: false,
                     endedEarly: '',
                     reschedule: '',
@@ -4697,8 +4802,13 @@
                 dryWeight: '', preWeight: '', goalUF: '', postWeight: '',
                 startTime: '', endTime: '',
                 preCheck: false, thirtyMinCheck: false, medsComplete: false,
+                preCheckSubs: { machineCheck: false, preDialysis: false, orderVerify: false },
+                medsSubs: { medsGiven: false, medsSheetSigned: false },
                 abxIDPN: false, statLabs: false, emailSent: false,
-                ettSigned: false, missedTx: false, whiteboard: false,
+                ettSigned: false, missedTx: false,
+                missedTxSubs: { rescheduled: false, calledOff: false, noCallNoShow: false },
+                hospitalization: false, hospitalizationHospital: '',
+                hospitalizationSubs: { hhPrep: false, hospEntered: false, whiteboard: false, eosrReport: false },
                 labsPrep: false, endedEarly: '', reschedule: '',
                 selectedSnippets: [], extraTxDay: '', extraTxSide: '', extraTxTime: '',
                 selectedPreSnippets: [], preDialysisComplete: false,
@@ -4766,7 +4876,53 @@
                 renderAll();
             }
         }
-        
+
+        // Toggle QA main item (expands/collapses sub-items)
+        function toggleQAMainItem(patientId, field, checked) {
+            const patient = state.patients.find(p => p.id === patientId);
+            if (patient) {
+                patient[field] = checked;
+                renderAll();
+            }
+        }
+
+        // Toggle QA sub-item and update checkmarks
+        function toggleQASubItem(patientId, subsField, subItem, checked) {
+            const patient = state.patients.find(p => p.id === patientId);
+            if (patient) {
+                // Initialize the subs object if it doesn't exist
+                if (!patient[subsField]) {
+                    patient[subsField] = {};
+                }
+                patient[subsField][subItem] = checked;
+
+                // Check if all sub-items are checked for checkmark display
+                if (subsField === 'preCheckSubs') {
+                    const allChecked = patient.preCheckSubs?.machineCheck &&
+                                       patient.preCheckSubs?.preDialysis &&
+                                       patient.preCheckSubs?.orderVerify;
+                    // Update Pre pill to yellow if machine check is done
+                    // The checkmark shows when all are done
+                }
+                if (subsField === 'medsSubs') {
+                    const allChecked = patient.medsSubs?.medsGiven &&
+                                       patient.medsSubs?.medsSheetSigned;
+                    // The checkmark shows when all are done
+                }
+
+                renderAll();
+            }
+        }
+
+        // Check if patient has any missed tx sub-items checked
+        function hasMissedTxChecked(patient) {
+            if (!patient.missedTx) return false;
+            return patient.missedTxSubs?.rescheduled ||
+                   patient.missedTxSubs?.calledOff ||
+                   patient.missedTxSubs?.noCallNoShow;
+        }
+
+
         // Handle tech selection in patient card - auto-fill pod
         function onTechSelectedInCard(patientId, techName) {
             const patient = state.patients.find(p => p.id === patientId);
@@ -5253,12 +5409,22 @@
             const tabsHTML = patients.map(p => {
                 const isActive = p.id === state.activePatientId;
                 const status = getEnhancedPatientStatus(p);
-                
+
+                // Pre badge: yellow if machine check done but not all, complete if all done
+                const allPreDone = p.preCheckSubs?.machineCheck && p.preCheckSubs?.preDialysis && p.preCheckSubs?.orderVerify;
+                const preBadgeClass = allPreDone ? 'complete' : (p.preCheckSubs?.machineCheck ? 'yellow' : 'pending');
+                const preCheckmarkText = allPreDone ? 'Pre ✓' : 'Pre';
+
+                // Meds badge: complete with checkmark if all sub-items done
+                const allMedsDone = p.medsSubs?.medsGiven && p.medsSubs?.medsSheetSigned;
+                const medsBadgeClass = allMedsDone ? 'complete' : (status.medsComplete ? 'complete' : 'pending');
+                const medsCheckmarkText = allMedsDone ? 'Meds ✓' : 'Meds';
+
                 // Status badges row
                 const statusRow = `
                     <div class="tab-row status-row">
-                        <span class="status-badge ${status.preCheck ? 'complete' : 'pending'}">Pre</span>
-                        <span class="status-badge ${status.medsComplete ? 'complete' : 'pending'}">Meds</span>
+                        <span class="status-badge ${preBadgeClass}">${preCheckmarkText}</span>
+                        <span class="status-badge ${medsBadgeClass}">${medsCheckmarkText}</span>
                         <span class="status-badge ${status.thirtyMinCheck ? 'complete' : 'pending'}">30m</span>
                         <span class="status-badge ${status.postComplete ? 'complete' : 'pending'}">Post</span>
                     </div>`;
@@ -5297,8 +5463,19 @@
                 
                 // Notes indicator
                 const notesIndicator = p.quickNotes ? '<span title="Has notes" style="opacity: 0.7;">📝</span>' : '';
-                
-                return `<div class="patient-tab ${isActive ? 'active' : ''}" onclick="switchPatient(${p.id})">
+
+                // Special status classes for tab
+                const hospitalized = p.hospitalization ? 'hospitalized' : '';
+                const missedTxClass = (p.missedTx && (p.missedTxSubs?.rescheduled || p.missedTxSubs?.calledOff || p.missedTxSubs?.noCallNoShow)) ? 'missed-tx' : '';
+
+                // Pre badge shows yellow if machine check is done but not all items
+                const preYellow = (p.preCheckSubs?.machineCheck && !(p.preCheckSubs?.machineCheck && p.preCheckSubs?.preDialysis && p.preCheckSubs?.orderVerify)) ? 'yellow' : '';
+                // Pre checkmark if all sub-items done
+                const preCheckmark = (p.preCheckSubs?.machineCheck && p.preCheckSubs?.preDialysis && p.preCheckSubs?.orderVerify) ? ' ✓' : '';
+                // Meds checkmark if all sub-items done
+                const medsCheckmark = (p.medsSubs?.medsGiven && p.medsSubs?.medsSheetSigned) ? ' ✓' : '';
+
+                return `<div class="patient-tab ${isActive ? 'active' : ''} ${hospitalized} ${missedTxClass}" onclick="switchPatient(${p.id})">
                     <button class="quick-chart-tab-btn" onclick="event.stopPropagation(); openQuickChart(${p.id})" title="Quick Chart">⚡</button>
                     <div class="tab-header">
                         <span class="patient-name">${p.name} ${notesIndicator}</span>
@@ -5786,8 +5963,12 @@
             const startTimeClass = getFieldStatusClass(patient.startTime);
             const endTimeClass = getFieldStatusClass(patient.endTime);
 
+            // Special status classes for patient card background
+            const hospitalizedClass = patient.hospitalization ? 'patient-hospitalized' : '';
+            const missedTxCardClass = (patient.missedTx && (patient.missedTxSubs?.rescheduled || patient.missedTxSubs?.calledOff || patient.missedTxSubs?.noCallNoShow)) ? 'patient-missed-tx' : '';
+
             return `
-                <div class="patient-card">
+                <div class="patient-card ${hospitalizedClass} ${missedTxCardClass}">
                     <!-- At-a-Glance Section -->
                     <div class="at-a-glance">
                         <div class="glance-title">👁️ Quick View - ${patient.name}</div>
@@ -5911,35 +6092,149 @@
                         </div>
                         <div class="section-content">
                             <div class="qa-section">
-                                <div class="qa-grid">
-                                    ${['preCheck', 'thirtyMinCheck', 'medsComplete', 'abxIDPN', 'statLabs', 'missedTx', 'whiteboard', 'labsPrep'].map(field => {
-                                        const labels = {
-                                            preCheck: 'Pre Check ✓',
-                                            thirtyMinCheck: '30 Min Check ✓',
-                                            medsComplete: 'Meds Complete ✓',
-                                            abxIDPN: 'Abx/IDPN',
-                                            statLabs: 'STAT Labs',
-                                            missedTx: 'Missed Tx',
-                                            whiteboard: 'Whiteboard',
-                                            labsPrep: 'Labs Prep'
-                                        };
-                                        return `
-                                        <div class="checkbox-group">
-                                            <input type="checkbox" id="${field}_${patient.id}" ${patient[field] ? 'checked' : ''} 
-                                                onchange="updatePatient(${patient.id}, '${field}', this.checked)">
-                                            <label for="${field}_${patient.id}">${labels[field]}</label>
-                                        </div>`;
-                                    }).join('')}
+                                <!-- Pre Check with sub-items -->
+                                <div class="qa-main-item ${patient.preCheck ? 'expanded' : ''}" id="qaPreCheck_${patient.id}">
+                                    <label class="qa-main-checkbox">
+                                        <input type="checkbox" ${patient.preCheck ? 'checked' : ''}
+                                            onchange="toggleQAMainItem(${patient.id}, 'preCheck', this.checked)">
+                                        Pre Check
+                                        <span class="qa-checkmark" id="preCheckMark_${patient.id}" style="display: ${(patient.preCheckSubs?.machineCheck && patient.preCheckSubs?.preDialysis && patient.preCheckSubs?.orderVerify) ? 'inline' : 'none'}">✓</span>
+                                    </label>
+                                    <div class="qa-sub-items">
+                                        <label class="qa-sub-item">
+                                            <input type="checkbox" ${patient.preCheckSubs?.machineCheck ? 'checked' : ''}
+                                                onchange="toggleQASubItem(${patient.id}, 'preCheckSubs', 'machineCheck', this.checked)">
+                                            Machine Check
+                                        </label>
+                                        <label class="qa-sub-item">
+                                            <input type="checkbox" ${patient.preCheckSubs?.preDialysis ? 'checked' : ''}
+                                                onchange="toggleQASubItem(${patient.id}, 'preCheckSubs', 'preDialysis', this.checked)">
+                                            Pre Dialysis
+                                        </label>
+                                        <label class="qa-sub-item">
+                                            <input type="checkbox" ${patient.preCheckSubs?.orderVerify ? 'checked' : ''}
+                                                onchange="toggleQASubItem(${patient.id}, 'preCheckSubs', 'orderVerify', this.checked)">
+                                            Order Verify
+                                        </label>
+                                    </div>
                                 </div>
+
+                                <!-- Meds with sub-items -->
+                                <div class="qa-main-item ${patient.medsComplete ? 'expanded' : ''}" id="qaMeds_${patient.id}">
+                                    <label class="qa-main-checkbox">
+                                        <input type="checkbox" ${patient.medsComplete ? 'checked' : ''}
+                                            onchange="toggleQAMainItem(${patient.id}, 'medsComplete', this.checked)">
+                                        Meds
+                                        <span class="qa-checkmark" id="medsCheckMark_${patient.id}" style="display: ${(patient.medsSubs?.medsGiven && patient.medsSubs?.medsSheetSigned) ? 'inline' : 'none'}">✓</span>
+                                    </label>
+                                    <div class="qa-sub-items">
+                                        <label class="qa-sub-item">
+                                            <input type="checkbox" ${patient.medsSubs?.medsGiven ? 'checked' : ''}
+                                                onchange="toggleQASubItem(${patient.id}, 'medsSubs', 'medsGiven', this.checked)">
+                                            Meds Given
+                                        </label>
+                                        <label class="qa-sub-item">
+                                            <input type="checkbox" ${patient.medsSubs?.medsSheetSigned ? 'checked' : ''}
+                                                onchange="toggleQASubItem(${patient.id}, 'medsSubs', 'medsSheetSigned', this.checked)">
+                                            Meds Sheet Signed & Approved
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Simple checkboxes -->
+                                <div class="qa-grid" style="margin-bottom: 15px;">
+                                    <div class="checkbox-group">
+                                        <input type="checkbox" id="thirtyMinCheck_${patient.id}" ${patient.thirtyMinCheck ? 'checked' : ''}
+                                            onchange="updatePatient(${patient.id}, 'thirtyMinCheck', this.checked)">
+                                        <label for="thirtyMinCheck_${patient.id}">30 Min Check ✓</label>
+                                    </div>
+                                    <div class="checkbox-group">
+                                        <input type="checkbox" id="abxIDPN_${patient.id}" ${patient.abxIDPN ? 'checked' : ''}
+                                            onchange="updatePatient(${patient.id}, 'abxIDPN', this.checked)">
+                                        <label for="abxIDPN_${patient.id}">Abx/IDPN</label>
+                                    </div>
+                                    <div class="checkbox-group">
+                                        <input type="checkbox" id="statLabs_${patient.id}" ${patient.statLabs ? 'checked' : ''}
+                                            onchange="updatePatient(${patient.id}, 'statLabs', this.checked)">
+                                        <label for="statLabs_${patient.id}">STAT Labs</label>
+                                    </div>
+                                    <div class="checkbox-group">
+                                        <input type="checkbox" id="labsPrep_${patient.id}" ${patient.labsPrep ? 'checked' : ''}
+                                            onchange="updatePatient(${patient.id}, 'labsPrep', this.checked)">
+                                        <label for="labsPrep_${patient.id}">Labs Prep</label>
+                                    </div>
+                                </div>
+
+                                <!-- Hospitalization with sub-items -->
+                                <div class="qa-main-item ${patient.hospitalization ? 'expanded' : ''}" id="qaHosp_${patient.id}" style="border-color: ${patient.hospitalization ? '#38bdf8' : '#e5e7eb'}; background: ${patient.hospitalization ? '#e0f2fe' : 'white'};">
+                                    <label class="qa-main-checkbox">
+                                        <input type="checkbox" ${patient.hospitalization ? 'checked' : ''}
+                                            onchange="toggleQAMainItem(${patient.id}, 'hospitalization', this.checked)">
+                                        🏥 Hospitalization
+                                    </label>
+                                    <div class="qa-sub-items">
+                                        <div class="qa-sub-item">
+                                            <input type="text" placeholder="Hospital name..." value="${patient.hospitalizationHospital || ''}"
+                                                onchange="updatePatient(${patient.id}, 'hospitalizationHospital', this.value)">
+                                        </div>
+                                        <label class="qa-sub-item">
+                                            <input type="checkbox" ${patient.hospitalizationSubs?.hhPrep ? 'checked' : ''}
+                                                onchange="toggleQASubItem(${patient.id}, 'hospitalizationSubs', 'hhPrep', this.checked)">
+                                            H&H prep (D63.1)
+                                        </label>
+                                        <label class="qa-sub-item">
+                                            <input type="checkbox" ${patient.hospitalizationSubs?.hospEntered ? 'checked' : ''}
+                                                onchange="toggleQASubItem(${patient.id}, 'hospitalizationSubs', 'hospEntered', this.checked)">
+                                            Hospitalization entered
+                                        </label>
+                                        <label class="qa-sub-item">
+                                            <input type="checkbox" ${patient.hospitalizationSubs?.whiteboard ? 'checked' : ''}
+                                                onchange="toggleQASubItem(${patient.id}, 'hospitalizationSubs', 'whiteboard', this.checked)">
+                                            Whiteboard
+                                        </label>
+                                        <label class="qa-sub-item">
+                                            <input type="checkbox" ${patient.hospitalizationSubs?.eosrReport ? 'checked' : ''}
+                                                onchange="toggleQASubItem(${patient.id}, 'hospitalizationSubs', 'eosrReport', this.checked)">
+                                            EOSR report
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Missed Tx with sub-items -->
+                                <div class="qa-main-item ${patient.missedTx ? 'expanded' : ''}" id="qaMissedTx_${patient.id}" style="border-color: ${patient.missedTx ? '#facc15' : '#e5e7eb'}; background: ${patient.missedTx ? '#fef9c3' : 'white'};">
+                                    <label class="qa-main-checkbox">
+                                        <input type="checkbox" ${patient.missedTx ? 'checked' : ''}
+                                            onchange="toggleQAMainItem(${patient.id}, 'missedTx', this.checked)">
+                                        ⚠️ Missed Tx
+                                    </label>
+                                    <div class="qa-sub-items">
+                                        <label class="qa-sub-item">
+                                            <input type="checkbox" ${patient.missedTxSubs?.rescheduled ? 'checked' : ''}
+                                                onchange="toggleQASubItem(${patient.id}, 'missedTxSubs', 'rescheduled', this.checked)">
+                                            Rescheduled
+                                        </label>
+                                        <label class="qa-sub-item">
+                                            <input type="checkbox" ${patient.missedTxSubs?.calledOff ? 'checked' : ''}
+                                                onchange="toggleQASubItem(${patient.id}, 'missedTxSubs', 'calledOff', this.checked)">
+                                            Called off
+                                        </label>
+                                        <label class="qa-sub-item">
+                                            <input type="checkbox" ${patient.missedTxSubs?.noCallNoShow ? 'checked' : ''}
+                                                onchange="toggleQASubItem(${patient.id}, 'missedTxSubs', 'noCallNoShow', this.checked)">
+                                            No call no show
+                                        </label>
+                                    </div>
+                                </div>
+
                                 <div class="field-grid" style="margin-top: 20px;">
                                     <div class="field-group">
                                         <label class="field-label">Ended Early (h:mm)</label>
-                                        <input type="text" class="field-input" value="${patient.endedEarly}" 
+                                        <input type="text" class="field-input" value="${patient.endedEarly}"
                                             placeholder="00:30" onchange="updatePatient(${patient.id}, 'endedEarly', this.value)">
                                     </div>
                                     <div class="field-group">
                                         <label class="field-label">Reschedule (date to date)</label>
-                                        <input type="text" class="field-input" value="${patient.reschedule}" 
+                                        <input type="text" class="field-input" value="${patient.reschedule}"
                                             placeholder="12/10 to 12/12" onchange="updatePatient(${patient.id}, 'reschedule', this.value)">
                                     </div>
                                 </div>
