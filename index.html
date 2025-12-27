@@ -664,7 +664,40 @@
             background: rgba(99, 102, 241, 0.3);
             color: white;
         }
-        
+
+        /* Hospital name badge */
+        .patient-tab .hospital-name-badge {
+            font-size: 0.75em;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            background: #dbeafe;
+            color: #1e40af;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+        .patient-tab.active .hospital-name-badge {
+            background: rgba(59, 130, 246, 0.4);
+            color: white;
+        }
+
+        /* Missed tx badge */
+        .patient-tab .missed-tx-badge {
+            font-size: 0.75em;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            background: #fef3c7;
+            color: #92400e;
+            white-space: nowrap;
+        }
+        .patient-tab.active .missed-tx-badge {
+            background: rgba(245, 158, 11, 0.4);
+            color: white;
+        }
+
         /* Alert badges with tooltips */
         .patient-tab .alert-badge {
             font-size: 0.8em;
@@ -5420,14 +5453,34 @@
                 const medsBadgeClass = allMedsDone ? 'complete' : (status.medsComplete ? 'complete' : 'pending');
                 const medsCheckmarkText = allMedsDone ? 'Meds ✓' : 'Meds';
 
-                // Status badges row
-                const statusRow = `
-                    <div class="tab-row status-row">
-                        <span class="status-badge ${preBadgeClass}">${preCheckmarkText}</span>
-                        <span class="status-badge ${medsBadgeClass}">${medsCheckmarkText}</span>
-                        <span class="status-badge ${status.thirtyMinCheck ? 'complete' : 'pending'}">30m</span>
-                        <span class="status-badge ${status.postComplete ? 'complete' : 'pending'}">Post</span>
-                    </div>`;
+                // Status badges row - conditionally show hospital or missed tx instead of pills
+                let statusRow = '';
+                if (p.hospitalization) {
+                    // If hospitalized, show hospital name instead of status pills
+                    const hospitalName = p.hospitalizationHospital || 'Hospitalized';
+                    statusRow = `
+                        <div class="tab-row status-row hospitalized-status">
+                            <span class="hospital-name-badge">🏥 ${hospitalName}</span>
+                        </div>`;
+                } else if (p.missedTx && (p.missedTxSubs?.rescheduled || p.missedTxSubs?.calledOff || p.missedTxSubs?.noCallNoShow)) {
+                    // If missed tx, show the type of missed tx instead of status pills
+                    let missedType = '';
+                    if (p.missedTxSubs?.rescheduled) missedType = 'Rescheduled';
+                    else if (p.missedTxSubs?.calledOff) missedType = 'Called Off';
+                    else if (p.missedTxSubs?.noCallNoShow) missedType = 'No Call/No Show';
+                    statusRow = `
+                        <div class="tab-row status-row missed-tx-status">
+                            <span class="missed-tx-badge">⚠️ ${missedType}</span>
+                        </div>`;
+                } else {
+                    statusRow = `
+                        <div class="tab-row status-row">
+                            <span class="status-badge ${preBadgeClass}">${preCheckmarkText}</span>
+                            <span class="status-badge ${medsBadgeClass}">${medsCheckmarkText}</span>
+                            <span class="status-badge ${status.thirtyMinCheck ? 'complete' : 'pending'}">30m</span>
+                            <span class="status-badge ${status.postComplete ? 'complete' : 'pending'}">Post</span>
+                        </div>`;
+                }
                 
                 // Time row
                 let timeRow = '';
