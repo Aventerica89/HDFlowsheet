@@ -1,10 +1,14 @@
 <!DOCTYPE html>
 <!--
     HD Flowsheet & QA Tracker
-    Version: 1.9.2
+    Version: 1.9.3
     Date: December 27, 2024
 
     CHANGELOG:
+    v1.9.3 - Chart Closed Feature
+        - Added Chart Closed checkbox in QA Checklist (outlined box on right side)
+        - When checked, patient tab and flowchart turn green
+        - Closed charts automatically move to the right in the tab row
     v1.9.2 - Patient Tab Display Updates
         - Show hospital name instead of status pills when patient is hospitalized
         - Show missed tx type instead of status pills when patient has missed tx
@@ -1115,7 +1119,72 @@
         .patient-tab.missed-tx {
             background: linear-gradient(135deg, #fde047 0%, #facc15 100%) !important;
         }
-        
+
+        /* Chart Closed styling */
+        .chart-closed-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px dashed #d1d5db;
+        }
+        .chart-closed-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            border: 3px solid #10b981;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .chart-closed-checkbox:hover {
+            background: #ecfdf5;
+        }
+        .chart-closed-checkbox.checked {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        .chart-closed-checkbox input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        .chart-closed-label {
+            font-weight: 700;
+            font-size: 1em;
+        }
+        .chart-closed-checkmark {
+            display: none;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .chart-closed-checkbox.checked .chart-closed-checkmark {
+            display: inline;
+        }
+
+        /* Patient tab chart closed (green) */
+        .patient-tab.chart-closed {
+            background: linear-gradient(135deg, #34d399 0%, #10b981 100%) !important;
+            border-color: #059669 !important;
+        }
+        .patient-tab.chart-closed .status-badge,
+        .patient-tab.chart-closed .hospital-name-badge,
+        .patient-tab.chart-closed .missed-tx-badge {
+            background: rgba(255, 255, 255, 0.3) !important;
+            color: white !important;
+        }
+
+        /* Patient card chart closed (green) */
+        .patient-card.chart-closed {
+            background: #ecfdf5 !important;
+            border-color: #10b981 !important;
+        }
+        .patient-card.chart-closed .section-header {
+            background: linear-gradient(135deg, #34d399 0%, #10b981 100%) !important;
+        }
+
         .btn {
             padding: 8px 16px; border: none; border-radius: 4px;
             font-size: 0.9em; font-weight: 600; cursor: pointer; transition: all 0.2s;
@@ -4860,7 +4929,8 @@
                     heparinBolus: false,
                     lidocaine: false,
                     postWeight: false
-                }
+                },
+                chartClosed: false
             };
             
             state.patients.push(patient);
@@ -5435,14 +5505,21 @@
             }
             
             const patients = currentPod.patients;
-            
+
             // Ensure active patient is in current pod, or select first patient
             const activeInPod = patients.find(p => p.id === state.activePatientId);
             if (!activeInPod && patients.length > 0) {
                 state.activePatientId = patients[0].id;
             }
-            
-            const tabsHTML = patients.map(p => {
+
+            // Sort patients: active charts first, closed charts last
+            const sortedPatients = [...patients].sort((a, b) => {
+                if (a.chartClosed && !b.chartClosed) return 1;
+                if (!a.chartClosed && b.chartClosed) return -1;
+                return 0;
+            });
+
+            const tabsHTML = sortedPatients.map(p => {
                 const isActive = p.id === state.activePatientId;
                 const status = getEnhancedPatientStatus(p);
 
@@ -5523,6 +5600,7 @@
                 // Special status classes for tab
                 const hospitalized = p.hospitalization ? 'hospitalized' : '';
                 const missedTxClass = (p.missedTx && (p.missedTxSubs?.rescheduled || p.missedTxSubs?.calledOff || p.missedTxSubs?.noCallNoShow)) ? 'missed-tx' : '';
+                const chartClosedClass = p.chartClosed ? 'chart-closed' : '';
 
                 // Pre badge shows yellow if machine check is done but not all items
                 const preYellow = (p.preCheckSubs?.machineCheck && !(p.preCheckSubs?.machineCheck && p.preCheckSubs?.preDialysis && p.preCheckSubs?.orderVerify)) ? 'yellow' : '';
@@ -5531,7 +5609,7 @@
                 // Meds checkmark if all sub-items done
                 const medsCheckmark = (p.medsSubs?.medsGiven && p.medsSubs?.medsSheetSigned) ? ' ✓' : '';
 
-                return `<div class="patient-tab ${isActive ? 'active' : ''} ${hospitalized} ${missedTxClass}" onclick="switchPatient(${p.id})">
+                return `<div class="patient-tab ${isActive ? 'active' : ''} ${hospitalized} ${missedTxClass} ${chartClosedClass}" onclick="switchPatient(${p.id})">
                     <button class="quick-chart-tab-btn" onclick="event.stopPropagation(); openQuickChart(${p.id})" title="Quick Chart">⚡</button>
                     <div class="tab-header">
                         <span class="patient-name">${p.name} ${notesIndicator}</span>
@@ -6022,9 +6100,10 @@
             // Special status classes for patient card background
             const hospitalizedClass = patient.hospitalization ? 'patient-hospitalized' : '';
             const missedTxCardClass = (patient.missedTx && (patient.missedTxSubs?.rescheduled || patient.missedTxSubs?.calledOff || patient.missedTxSubs?.noCallNoShow)) ? 'patient-missed-tx' : '';
+            const chartClosedCardClass = patient.chartClosed ? 'chart-closed' : '';
 
             return `
-                <div class="patient-card ${hospitalizedClass} ${missedTxCardClass}">
+                <div class="patient-card ${hospitalizedClass} ${missedTxCardClass} ${chartClosedCardClass}">
                     <!-- At-a-Glance Section -->
                     <div class="at-a-glance">
                         <div class="glance-title">👁️ Quick View - ${patient.name}</div>
@@ -6293,6 +6372,16 @@
                                         <input type="text" class="field-input" value="${patient.reschedule}"
                                             placeholder="12/10 to 12/12" onchange="updatePatient(${patient.id}, 'reschedule', this.value)">
                                     </div>
+                                </div>
+
+                                <!-- Chart Closed - Special checkbox -->
+                                <div class="chart-closed-container">
+                                    <label class="chart-closed-checkbox ${patient.chartClosed ? 'checked' : ''}">
+                                        <input type="checkbox" ${patient.chartClosed ? 'checked' : ''}
+                                            onchange="updatePatient(${patient.id}, 'chartClosed', this.checked)">
+                                        <span class="chart-closed-label">📋 Chart Closed</span>
+                                        <span class="chart-closed-checkmark">✓</span>
+                                    </label>
                                 </div>
                             </div>
                         </div>
