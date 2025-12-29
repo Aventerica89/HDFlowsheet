@@ -1,10 +1,18 @@
 <!DOCTYPE html>
 <!--
     HD Flowsheet & QA Tracker
-    Version: 1.9.7
+    Version: 1.9.8
     Date: December 29, 2024
 
     CHANGELOG:
+    v1.9.8 - Operations Tab with Editable Checklists
+        - New top-level navigation: Pt Charting / Operations tabs
+        - Operations page with user-editable checklists for morning/end of shift routines
+        - Create multiple checklists for different positions
+        - Add/edit/delete checklist items without code changes
+        - Daily progress tracking with automatic reset
+        - Data persistence: localStorage + server save/load + JSON export/import
+        - Checklists survive app updates (stored in localStorage, not code)
     v1.9.7 - Quick Notes Enhancements
         - Added click-to-copy on timestamp log entries
         - New snippets: Midodrine, 100 ml bolus, BP drop > 20, Cramping, UF goal increase
@@ -325,7 +333,407 @@
         [data-theme="dark"] .section-content { background: var(--theme-bg-alt); }
         [data-theme="dark"] .field-label { color: var(--theme-text-light); }
         [data-theme="dark"] .tab-content { background: var(--theme-bg); }
-        
+
+        /* ========== TOP-LEVEL NAVIGATION ========== */
+        .top-nav {
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 6px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .top-nav-tab {
+            flex: 1;
+            padding: 12px 24px;
+            border: none;
+            background: transparent;
+            color: white;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+            opacity: 0.7;
+        }
+        .top-nav-tab:hover {
+            opacity: 0.9;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .top-nav-tab.active {
+            background: white;
+            color: var(--theme-primary);
+            opacity: 1;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        /* ========== OPERATIONS PAGE STYLES ========== */
+        .operations-page {
+            display: none;
+        }
+        .operations-page.active {
+            display: block;
+        }
+        .pt-charting-page {
+            display: none;
+        }
+        .pt-charting-page.active {
+            display: block;
+        }
+
+        .ops-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .ops-title {
+            color: white;
+            font-size: 1.8em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .ops-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .ops-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .ops-btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: white;
+        }
+        .ops-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+        .ops-btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        .ops-btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Checklist Tabs */
+        .checklist-tabs-container {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .checklist-tabs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .checklist-tab {
+            padding: 12px 20px;
+            border: 2px solid #e5e7eb;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+            color: #374151;
+        }
+        .checklist-tab:hover {
+            border-color: var(--theme-primary);
+            background: var(--theme-primary-bg);
+        }
+        .checklist-tab.active {
+            border-color: var(--theme-primary);
+            background: var(--theme-primary);
+            color: white;
+        }
+        .checklist-tab-add {
+            padding: 12px 20px;
+            border: 2px dashed #10b981;
+            background: #ecfdf5;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #059669;
+            transition: all 0.2s;
+        }
+        .checklist-tab-add:hover {
+            background: #d1fae5;
+        }
+
+        /* Checklist Content */
+        .checklist-content {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .checklist-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        .checklist-title {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .checklist-position {
+            font-size: 0.9em;
+            color: #64748b;
+            background: #f1f5f9;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+        .checklist-progress {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .checklist-progress-bar {
+            width: 150px;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .checklist-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+            transition: width 0.3s;
+        }
+        .checklist-progress-text {
+            font-weight: 600;
+            color: #374151;
+        }
+
+        /* Checklist Items */
+        .checklist-items {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .checklist-item:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+        .checklist-item.completed {
+            background: #ecfdf5;
+            border-color: #bbf7d0;
+        }
+        .checklist-item.completed .checklist-item-text {
+            text-decoration: line-through;
+            color: #6b7280;
+        }
+        .checklist-item-checkbox {
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+        }
+        .checklist-item-text {
+            flex: 1;
+            font-size: 1em;
+            color: #1e293b;
+        }
+        .checklist-item-actions {
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .checklist-item:hover .checklist-item-actions {
+            opacity: 1;
+        }
+        .checklist-item-btn {
+            padding: 4px 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.2s;
+        }
+        .checklist-item-edit {
+            background: #e0e7ff;
+            color: #4338ca;
+        }
+        .checklist-item-delete {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        /* Add Item Section */
+        .checklist-add-item {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px dashed #e5e7eb;
+        }
+        .checklist-add-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+        .checklist-add-input:focus {
+            border-color: var(--theme-primary);
+            outline: none;
+        }
+        .checklist-add-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .checklist-add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Checklist Empty State */
+        .checklist-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: #64748b;
+        }
+        .checklist-empty-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+        .checklist-empty-text {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        /* Checklist Editor Modal */
+        .checklist-editor-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+        .checklist-editor-modal.active {
+            display: flex;
+        }
+        .checklist-editor {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        .checklist-editor-header {
+            padding: 20px;
+            background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-dark) 100%);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .checklist-editor-title {
+            font-size: 1.3em;
+            font-weight: 700;
+        }
+        .checklist-editor-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+        .checklist-editor-body {
+            padding: 20px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+        .checklist-editor-field {
+            margin-bottom: 20px;
+        }
+        .checklist-editor-label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+        .checklist-editor-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+        .checklist-editor-input:focus {
+            border-color: var(--theme-primary);
+            outline: none;
+        }
+        .checklist-editor-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .checklist-editor-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .checklist-editor-cancel {
+            background: #f3f4f6;
+            color: #374151;
+        }
+        .checklist-editor-save {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        .checklist-editor-delete {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            margin-right: auto;
+        }
+
         .container { max-width: 1600px; margin: 0 auto; }
         h1 {
             text-align: center; color: white; margin-bottom: 8px;
@@ -3461,10 +3869,19 @@
                     <button class="settings-btn" onclick="openSettingsModal()" title="Settings">⚙️</button>
                     <div>
                         <h1 style="margin-bottom: 5px;">🏥 HD Flowsheet & QA Tracker</h1>
-                        <div class="version">Version 1.9.0</div>
+                        <div class="version">Version 1.9.8</div>
                     </div>
                 </div>
             </div>
+
+            <!-- Top-Level Navigation -->
+            <div class="top-nav">
+                <button class="top-nav-tab active" onclick="switchTopNav('charting')" id="topNavCharting">📋 Pt Charting</button>
+                <button class="top-nav-tab" onclick="switchTopNav('operations')" id="topNavOperations">⚙️ Operations</button>
+            </div>
+
+            <!-- Patient Charting Page -->
+            <div class="pt-charting-page active" id="ptChartingPage">
 
             <!-- Re-import Button -->
             <div class="import-btn-header">
@@ -3515,8 +3932,67 @@
 
             <!-- Tab Contents -->
             <div id="tabContents"></div>
+
+            </div><!-- End pt-charting-page -->
+
+            <!-- Operations Page -->
+            <div class="operations-page" id="operationsPage">
+                <div class="ops-header">
+                    <h2 class="ops-title">⚙️ Operations Checklists</h2>
+                    <div class="ops-actions">
+                        <button class="ops-btn ops-btn-primary" onclick="openChecklistEditor()">+ New Checklist</button>
+                        <button class="ops-btn ops-btn-success" onclick="saveOpsToServer()">💾 Save to Server</button>
+                        <button class="ops-btn" style="background: #f3f4f6; color: #374151;" onclick="exportOpsData()">📥 Export JSON</button>
+                        <button class="ops-btn" style="background: #f3f4f6; color: #374151;" onclick="document.getElementById('opsImportFile').click()">📤 Import JSON</button>
+                        <input type="file" id="opsImportFile" accept=".json" style="display: none;" onchange="importOpsData(event)">
+                    </div>
+                </div>
+
+                <!-- Checklist Tabs -->
+                <div class="checklist-tabs-container">
+                    <div class="checklist-tabs" id="checklistTabs">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Checklist Content -->
+                <div class="checklist-content" id="checklistContent">
+                    <div class="checklist-empty">
+                        <div class="checklist-empty-icon">📋</div>
+                        <div class="checklist-empty-text">No checklists yet. Create your first checklist to get started!</div>
+                        <button class="ops-btn ops-btn-primary" onclick="openChecklistEditor()">+ Create Checklist</button>
+                    </div>
+                </div>
+            </div><!-- End operations-page -->
+
+        </div><!-- End mainApp -->
+    </div><!-- End container -->
+
+    <!-- Checklist Editor Modal -->
+    <div class="checklist-editor-modal" id="checklistEditorModal">
+        <div class="checklist-editor">
+            <div class="checklist-editor-header">
+                <span class="checklist-editor-title" id="checklistEditorTitle">New Checklist</span>
+                <button class="checklist-editor-close" onclick="closeChecklistEditor()">×</button>
+            </div>
+            <div class="checklist-editor-body">
+                <div class="checklist-editor-field">
+                    <label class="checklist-editor-label">Checklist Name</label>
+                    <input type="text" class="checklist-editor-input" id="checklistNameInput" placeholder="e.g., Morning Routine">
+                </div>
+                <div class="checklist-editor-field">
+                    <label class="checklist-editor-label">Position</label>
+                    <input type="text" class="checklist-editor-input" id="checklistPositionInput" placeholder="e.g., PCT, RN, CHN">
+                </div>
+            </div>
+            <div class="checklist-editor-footer">
+                <button class="checklist-editor-btn checklist-editor-delete" id="checklistDeleteBtn" style="display: none;" onclick="deleteChecklist()">🗑️ Delete</button>
+                <button class="checklist-editor-btn checklist-editor-cancel" onclick="closeChecklistEditor()">Cancel</button>
+                <button class="checklist-editor-btn checklist-editor-save" onclick="saveChecklist()">Save</button>
+            </div>
         </div>
     </div>
+
     <script>
         // State management
         let state = {
@@ -3540,6 +4016,430 @@
                 TCH: { name: 'TCH', chairs: [1, 2, 3, 4, 5], info: '(Chairs 1-5)' }
             }
         };
+
+        // ========== OPERATIONS STATE & FUNCTIONS ==========
+        let opsState = {
+            checklists: [],  // Array of {id, name, position, items: [{id, text, order}]}
+            activeChecklistId: null,
+            completions: {},  // {date_checklistId: {completedItems: [], timestamp}}
+            editingChecklistId: null  // null = new, number = editing existing
+        };
+
+        // Load operations data from localStorage
+        function loadOpsData() {
+            const saved = localStorage.getItem('hd_operations_data');
+            if (saved) {
+                const data = JSON.parse(saved);
+                opsState.checklists = data.checklists || [];
+                opsState.completions = data.completions || {};
+            }
+            renderChecklistTabs();
+        }
+
+        // Save operations data to localStorage
+        function saveOpsData() {
+            localStorage.setItem('hd_operations_data', JSON.stringify({
+                checklists: opsState.checklists,
+                completions: opsState.completions
+            }));
+        }
+
+        // Switch between top-level tabs
+        function switchTopNav(tab) {
+            document.getElementById('topNavCharting').classList.toggle('active', tab === 'charting');
+            document.getElementById('topNavOperations').classList.toggle('active', tab === 'operations');
+            document.getElementById('ptChartingPage').classList.toggle('active', tab === 'charting');
+            document.getElementById('operationsPage').classList.toggle('active', tab === 'operations');
+
+            if (tab === 'operations') {
+                loadOpsData();
+            }
+        }
+
+        // Render checklist tabs
+        function renderChecklistTabs() {
+            const container = document.getElementById('checklistTabs');
+
+            if (opsState.checklists.length === 0) {
+                container.innerHTML = '';
+                renderChecklistContent();
+                return;
+            }
+
+            // Set active checklist if none selected
+            if (!opsState.activeChecklistId && opsState.checklists.length > 0) {
+                opsState.activeChecklistId = opsState.checklists[0].id;
+            }
+
+            container.innerHTML = opsState.checklists.map(cl => `
+                <div class="checklist-tab ${cl.id === opsState.activeChecklistId ? 'active' : ''}"
+                     onclick="selectChecklist(${cl.id})">
+                    ${cl.name}
+                    <span style="font-size: 0.8em; opacity: 0.7; margin-left: 5px;">(${cl.position})</span>
+                </div>
+            `).join('') + `
+                <div class="checklist-tab-add" onclick="openChecklistEditor()">+ Add</div>
+            `;
+
+            renderChecklistContent();
+        }
+
+        // Select a checklist tab
+        function selectChecklist(id) {
+            opsState.activeChecklistId = id;
+            renderChecklistTabs();
+        }
+
+        // Get today's date key
+        function getTodayKey() {
+            const now = new Date();
+            return now.toLocaleDateString('en-US', { timeZone: 'America/Phoenix' }).replace(/\//g, '-');
+        }
+
+        // Get completion key for checklist
+        function getCompletionKey(checklistId) {
+            return `${getTodayKey()}_${checklistId}`;
+        }
+
+        // Render checklist content
+        function renderChecklistContent() {
+            const container = document.getElementById('checklistContent');
+
+            if (opsState.checklists.length === 0) {
+                container.innerHTML = `
+                    <div class="checklist-empty">
+                        <div class="checklist-empty-icon">📋</div>
+                        <div class="checklist-empty-text">No checklists yet. Create your first checklist to get started!</div>
+                        <button class="ops-btn ops-btn-primary" onclick="openChecklistEditor()">+ Create Checklist</button>
+                    </div>
+                `;
+                return;
+            }
+
+            const checklist = opsState.checklists.find(cl => cl.id === opsState.activeChecklistId);
+            if (!checklist) return;
+
+            const completionKey = getCompletionKey(checklist.id);
+            const completion = opsState.completions[completionKey] || { completedItems: [] };
+            const completedCount = completion.completedItems.length;
+            const totalCount = checklist.items.length;
+            const progressPercent = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
+
+            const itemsHTML = checklist.items.length === 0
+                ? '<div class="checklist-empty" style="padding: 20px;"><div class="checklist-empty-text">No items in this checklist. Add items below!</div></div>'
+                : checklist.items.sort((a, b) => a.order - b.order).map(item => {
+                    const isCompleted = completion.completedItems.includes(item.id);
+                    return `
+                        <div class="checklist-item ${isCompleted ? 'completed' : ''}">
+                            <input type="checkbox" class="checklist-item-checkbox"
+                                   ${isCompleted ? 'checked' : ''}
+                                   onchange="toggleChecklistItem(${checklist.id}, ${item.id}, this.checked)">
+                            <span class="checklist-item-text">${item.text}</span>
+                            <div class="checklist-item-actions">
+                                <button class="checklist-item-btn checklist-item-edit" onclick="editChecklistItem(${checklist.id}, ${item.id})">✏️</button>
+                                <button class="checklist-item-btn checklist-item-delete" onclick="deleteChecklistItem(${checklist.id}, ${item.id})">🗑️</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            container.innerHTML = `
+                <div class="checklist-header">
+                    <div>
+                        <div class="checklist-title">${checklist.name}</div>
+                        <span class="checklist-position">${checklist.position}</span>
+                    </div>
+                    <div class="checklist-progress">
+                        <div class="checklist-progress-bar">
+                            <div class="checklist-progress-fill" style="width: ${progressPercent}%"></div>
+                        </div>
+                        <span class="checklist-progress-text">${completedCount}/${totalCount}</span>
+                        <button class="ops-btn" style="background: #e0e7ff; color: #4338ca; padding: 6px 12px;" onclick="editChecklistDetails(${checklist.id})">✏️ Edit</button>
+                        <button class="ops-btn" style="background: #fef3c7; color: #92400e; padding: 6px 12px;" onclick="resetChecklistProgress(${checklist.id})">🔄 Reset</button>
+                    </div>
+                </div>
+                <div class="checklist-items">
+                    ${itemsHTML}
+                </div>
+                <div class="checklist-add-item">
+                    <input type="text" class="checklist-add-input" id="newItemInput_${checklist.id}"
+                           placeholder="Add new item..."
+                           onkeypress="if(event.key==='Enter') addChecklistItem(${checklist.id})">
+                    <button class="checklist-add-btn" onclick="addChecklistItem(${checklist.id})">+ Add Item</button>
+                </div>
+            `;
+        }
+
+        // Toggle checklist item completion
+        function toggleChecklistItem(checklistId, itemId, checked) {
+            const completionKey = getCompletionKey(checklistId);
+            if (!opsState.completions[completionKey]) {
+                opsState.completions[completionKey] = { completedItems: [], timestamp: new Date().toISOString() };
+            }
+
+            const completion = opsState.completions[completionKey];
+            if (checked) {
+                if (!completion.completedItems.includes(itemId)) {
+                    completion.completedItems.push(itemId);
+                }
+            } else {
+                completion.completedItems = completion.completedItems.filter(id => id !== itemId);
+            }
+
+            saveOpsData();
+            renderChecklistContent();
+        }
+
+        // Add item to checklist
+        function addChecklistItem(checklistId) {
+            const input = document.getElementById(`newItemInput_${checklistId}`);
+            const text = input.value.trim();
+            if (!text) return;
+
+            const checklist = opsState.checklists.find(cl => cl.id === checklistId);
+            if (!checklist) return;
+
+            const newItem = {
+                id: Date.now(),
+                text: text,
+                order: checklist.items.length + 1
+            };
+            checklist.items.push(newItem);
+
+            saveOpsData();
+            renderChecklistContent();
+        }
+
+        // Edit checklist item
+        function editChecklistItem(checklistId, itemId) {
+            const checklist = opsState.checklists.find(cl => cl.id === checklistId);
+            if (!checklist) return;
+
+            const item = checklist.items.find(i => i.id === itemId);
+            if (!item) return;
+
+            const newText = prompt('Edit item:', item.text);
+            if (newText !== null && newText.trim()) {
+                item.text = newText.trim();
+                saveOpsData();
+                renderChecklistContent();
+            }
+        }
+
+        // Delete checklist item
+        function deleteChecklistItem(checklistId, itemId) {
+            if (!confirm('Delete this item?')) return;
+
+            const checklist = opsState.checklists.find(cl => cl.id === checklistId);
+            if (!checklist) return;
+
+            checklist.items = checklist.items.filter(i => i.id !== itemId);
+
+            // Also remove from completions
+            const completionKey = getCompletionKey(checklistId);
+            if (opsState.completions[completionKey]) {
+                opsState.completions[completionKey].completedItems =
+                    opsState.completions[completionKey].completedItems.filter(id => id !== itemId);
+            }
+
+            saveOpsData();
+            renderChecklistContent();
+        }
+
+        // Reset checklist progress for today
+        function resetChecklistProgress(checklistId) {
+            if (!confirm('Reset all checkmarks for today?')) return;
+
+            const completionKey = getCompletionKey(checklistId);
+            opsState.completions[completionKey] = { completedItems: [], timestamp: new Date().toISOString() };
+
+            saveOpsData();
+            renderChecklistContent();
+        }
+
+        // Open checklist editor modal
+        function openChecklistEditor(checklistId = null) {
+            opsState.editingChecklistId = checklistId;
+
+            const titleEl = document.getElementById('checklistEditorTitle');
+            const nameInput = document.getElementById('checklistNameInput');
+            const positionInput = document.getElementById('checklistPositionInput');
+            const deleteBtn = document.getElementById('checklistDeleteBtn');
+
+            if (checklistId) {
+                const checklist = opsState.checklists.find(cl => cl.id === checklistId);
+                if (checklist) {
+                    titleEl.textContent = 'Edit Checklist';
+                    nameInput.value = checklist.name;
+                    positionInput.value = checklist.position;
+                    deleteBtn.style.display = 'block';
+                }
+            } else {
+                titleEl.textContent = 'New Checklist';
+                nameInput.value = '';
+                positionInput.value = '';
+                deleteBtn.style.display = 'none';
+            }
+
+            document.getElementById('checklistEditorModal').classList.add('active');
+        }
+
+        // Edit checklist details (name/position)
+        function editChecklistDetails(checklistId) {
+            openChecklistEditor(checklistId);
+        }
+
+        // Close checklist editor
+        function closeChecklistEditor() {
+            document.getElementById('checklistEditorModal').classList.remove('active');
+            opsState.editingChecklistId = null;
+        }
+
+        // Save checklist from editor
+        function saveChecklist() {
+            const name = document.getElementById('checklistNameInput').value.trim();
+            const position = document.getElementById('checklistPositionInput').value.trim();
+
+            if (!name) {
+                alert('Please enter a checklist name');
+                return;
+            }
+
+            if (opsState.editingChecklistId) {
+                // Update existing
+                const checklist = opsState.checklists.find(cl => cl.id === opsState.editingChecklistId);
+                if (checklist) {
+                    checklist.name = name;
+                    checklist.position = position || 'General';
+                }
+            } else {
+                // Create new
+                const newChecklist = {
+                    id: Date.now(),
+                    name: name,
+                    position: position || 'General',
+                    items: []
+                };
+                opsState.checklists.push(newChecklist);
+                opsState.activeChecklistId = newChecklist.id;
+            }
+
+            saveOpsData();
+            closeChecklistEditor();
+            renderChecklistTabs();
+        }
+
+        // Delete checklist
+        function deleteChecklist() {
+            if (!opsState.editingChecklistId) return;
+            if (!confirm('Delete this entire checklist? This cannot be undone.')) return;
+
+            opsState.checklists = opsState.checklists.filter(cl => cl.id !== opsState.editingChecklistId);
+
+            // Clean up completions
+            Object.keys(opsState.completions).forEach(key => {
+                if (key.endsWith(`_${opsState.editingChecklistId}`)) {
+                    delete opsState.completions[key];
+                }
+            });
+
+            opsState.activeChecklistId = opsState.checklists.length > 0 ? opsState.checklists[0].id : null;
+
+            saveOpsData();
+            closeChecklistEditor();
+            renderChecklistTabs();
+        }
+
+        // Save operations data to server
+        function saveOpsToServer() {
+            const data = {
+                checklists: opsState.checklists,
+                completions: opsState.completions
+            };
+
+            fetch('api/save.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: 'operations', data: data })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    alert('Operations data saved to server successfully!');
+                } else {
+                    alert('Error saving to server: ' + (result.error || 'Unknown error'));
+                }
+            })
+            .catch(err => {
+                alert('Error saving to server: ' + err.message);
+            });
+        }
+
+        // Load operations data from server
+        function loadOpsFromServer() {
+            fetch('api/load.php?type=operations')
+            .then(response => response.json())
+            .then(result => {
+                if (result.success && result.data) {
+                    opsState.checklists = result.data.checklists || [];
+                    opsState.completions = result.data.completions || {};
+                    saveOpsData(); // Also save to localStorage
+                    renderChecklistTabs();
+                    alert('Operations data loaded from server!');
+                } else {
+                    alert('No operations data found on server or error: ' + (result.error || ''));
+                }
+            })
+            .catch(err => {
+                alert('Error loading from server: ' + err.message);
+            });
+        }
+
+        // Export operations data to JSON file
+        function exportOpsData() {
+            const data = {
+                checklists: opsState.checklists,
+                completions: opsState.completions,
+                exportedAt: new Date().toISOString()
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `operations_backup_${getTodayKey()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Import operations data from JSON file
+        function importOpsData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.checklists) {
+                        if (confirm('This will replace your current checklists. Continue?')) {
+                            opsState.checklists = data.checklists;
+                            opsState.completions = data.completions || {};
+                            opsState.activeChecklistId = opsState.checklists.length > 0 ? opsState.checklists[0].id : null;
+                            saveOpsData();
+                            renderChecklistTabs();
+                            alert('Operations data imported successfully!');
+                        }
+                    } else {
+                        alert('Invalid operations data file');
+                    }
+                } catch (err) {
+                    alert('Error reading file: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = ''; // Reset file input
+        }
 
         // ========== V1.6.4 NEW FUNCTIONS ==========
         

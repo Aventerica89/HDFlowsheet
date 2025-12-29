@@ -18,7 +18,16 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 }
 
 $dataDir = __DIR__ . '/../data';
-$filename = 'flowsheet.json';
+
+// Determine file type based on request
+$type = isset($_GET['type']) ? $_GET['type'] : 'flowsheet';
+
+// Set filename based on type
+if ($type === 'operations') {
+    $filename = 'operations.json';
+} else {
+    $filename = 'flowsheet.json';
+}
 
 // Check if specific backup requested
 if (isset($_GET['backup'])) {
