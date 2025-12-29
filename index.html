@@ -635,62 +635,90 @@
             color: #2563eb;
         }
 
-        /* Folder Styles */
-        .checklist-folder {
+        /* Folder Tabs Styles */
+        .folder-tabs-container {
             margin-bottom: 20px;
+        }
+        .folder-tabs {
+            display: flex;
+            gap: 4px;
+            border-bottom: 2px solid #e5e7eb;
+            margin-bottom: 0;
+            flex-wrap: wrap;
+        }
+        .folder-tab {
+            padding: 10px 16px;
+            background: #f9fafb;
             border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        .checklist-folder-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 15px;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            border-bottom: 1px solid #e5e7eb;
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
             cursor: pointer;
-        }
-        .checklist-folder-header:hover {
-            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-        }
-        .checklist-folder-title {
+            font-weight: 500;
+            color: #6b7280;
+            transition: all 0.2s;
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-weight: 600;
+            gap: 8px;
+            position: relative;
+            top: 2px;
+        }
+        .folder-tab:hover {
+            background: #f3f4f6;
             color: #374151;
         }
-        .checklist-folder-toggle {
-            font-size: 0.9em;
-            transition: transform 0.2s;
+        .folder-tab.active {
+            background: white;
+            color: #2563eb;
+            border-color: #2563eb;
+            border-bottom: 2px solid white;
+            font-weight: 600;
         }
-        .checklist-folder.collapsed .checklist-folder-toggle {
-            transform: rotate(-90deg);
-        }
-        .checklist-folder-actions {
+        .folder-tab-name {
             display: flex;
-            gap: 8px;
+            align-items: center;
+            gap: 6px;
+        }
+        .folder-tab-progress {
+            font-size: 0.85em;
+            color: #9ca3af;
+            margin-left: 4px;
+        }
+        .folder-tab.active .folder-tab-progress {
+            color: #2563eb;
+        }
+        .folder-tab-actions {
+            display: flex;
+            gap: 4px;
+            margin-left: 8px;
             opacity: 0;
             transition: opacity 0.2s;
         }
-        .checklist-folder-header:hover .checklist-folder-actions {
+        .folder-tab:hover .folder-tab-actions {
             opacity: 1;
         }
-        .checklist-folder-progress {
-            font-size: 0.85em;
-            color: #6b7280;
-            margin-left: auto;
-            margin-right: 15px;
+        .folder-tab-btn {
+            padding: 2px 6px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9em;
+            border-radius: 4px;
+            transition: background 0.2s;
         }
-        .checklist-folder-items {
-            padding: 10px;
+        .folder-tab-btn:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+        .folder-content {
+            padding: 15px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+        }
+        .folder-items {
             display: flex;
             flex-direction: column;
             gap: 8px;
-        }
-        .checklist-folder.collapsed .checklist-folder-items {
-            display: none;
         }
         .checklist-uncategorized {
             margin-bottom: 20px;
@@ -4227,7 +4255,7 @@
             activeChecklistId: null,
             completions: {},  // {date_checklistId: {completedItems: [], timestamp}}
             editingChecklistId: null,  // null = new, number = editing existing
-            collapsedFolders: {}  // {checklistId_folderId: true}
+            activeFolders: {}  // {checklistId: folderId} - tracks active tab for each checklist (null = uncategorized)
         };
 
         // Drag state for reordering
@@ -4244,7 +4272,7 @@
                 const data = JSON.parse(saved);
                 opsState.checklists = data.checklists || [];
                 opsState.completions = data.completions || {};
-                opsState.collapsedFolders = data.collapsedFolders || {};
+                opsState.activeFolders = data.activeFolders || {};
                 // Ensure each checklist has folders array
                 opsState.checklists.forEach(cl => {
                     if (!cl.folders) cl.folders = [];
@@ -4262,7 +4290,7 @@
             localStorage.setItem('hd_operations_data', JSON.stringify({
                 checklists: opsState.checklists,
                 completions: opsState.completions,
-                collapsedFolders: opsState.collapsedFolders
+                activeFolders: opsState.activeFolders
             }));
         }
 
@@ -4377,6 +4405,19 @@
             const totalCount = checklist.items.length;
             const progressPercent = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
 
+            // Get or set active folder for this checklist (null = uncategorized)
+            if (opsState.activeFolders[checklist.id] === undefined) {
+                // Default to uncategorized or first folder if no uncategorized items
+                const uncategorizedItems = checklist.items.filter(item => !item.folderId);
+                if (uncategorizedItems.length > 0 || checklist.folders.length === 0) {
+                    opsState.activeFolders[checklist.id] = null;
+                } else {
+                    opsState.activeFolders[checklist.id] = checklist.folders[0]?.id || null;
+                }
+            }
+
+            const activeFolderId = opsState.activeFolders[checklist.id];
+
             // Group items by folder
             const uncategorizedItems = checklist.items.filter(item => !item.folderId).sort((a, b) => a.order - b.order);
             const folderItemsMap = {};
@@ -4384,68 +4425,77 @@
                 folderItemsMap[folder.id] = checklist.items.filter(item => item.folderId === folder.id).sort((a, b) => a.order - b.order);
             });
 
-            // Build folders HTML
-            let foldersHTML = '';
-            checklist.folders.sort((a, b) => a.order - b.order).forEach(folder => {
-                const folderKey = `${checklist.id}_${folder.id}`;
-                const isCollapsed = opsState.collapsedFolders[folderKey];
-                const folderItems = folderItemsMap[folder.id] || [];
-                const folderCompleted = folderItems.filter(item => completion.completedItems.includes(item.id)).length;
-
-                const folderItemsHTML = folderItems.map(item => {
-                    const isCompleted = completion.completedItems.includes(item.id);
-                    return renderChecklistItemHTML(checklist, item, isCompleted);
-                }).join('');
-
-                foldersHTML += `
-                    <div class="checklist-folder ${isCollapsed ? 'collapsed' : ''}" data-folder-id="${folder.id}">
-                        <div class="checklist-folder-header" onclick="toggleFolder(${checklist.id}, ${folder.id})">
-                            <div class="checklist-folder-title">
-                                <span class="checklist-folder-toggle">▼</span>
-                                📁 ${folder.name}
-                            </div>
-                            <span class="checklist-folder-progress">${folderCompleted}/${folderItems.length}</span>
-                            <div class="checklist-folder-actions">
-                                <button class="checklist-item-btn checklist-item-edit" onclick="event.stopPropagation(); editFolder(${checklist.id}, ${folder.id})">✏️</button>
-                                <button class="checklist-item-btn checklist-item-delete" onclick="event.stopPropagation(); deleteFolder(${checklist.id}, ${folder.id})">🗑️</button>
-                            </div>
-                        </div>
-                        <div class="checklist-folder-items"
-                             ondragover="handleFolderDragOver(event)"
-                             ondragleave="handleFolderDragLeave(event)"
-                             ondrop="handleFolderDrop(event, ${checklist.id}, ${folder.id})">
-                            ${folderItemsHTML || '<div style="padding: 10px; color: #9ca3af; font-size: 0.9em;">Drag items here or add new items</div>'}
-                        </div>
+            // Build folder tabs HTML
+            let tabsHTML = '';
+            if (checklist.folders.length > 0 || uncategorizedItems.length > 0) {
+                // Uncategorized tab
+                const uncatCompleted = uncategorizedItems.filter(item => completion.completedItems.includes(item.id)).length;
+                const isUncatActive = activeFolderId === null;
+                tabsHTML += `
+                    <div class="folder-tab ${isUncatActive ? 'active' : ''}" onclick="switchFolder(${checklist.id}, null)">
+                        <span class="folder-tab-name">📋 Uncategorized</span>
+                        <span class="folder-tab-progress">${uncatCompleted}/${uncategorizedItems.length}</span>
                     </div>
                 `;
-            });
 
-            // Build uncategorized items HTML
-            let uncategorizedHTML = '';
-            if (uncategorizedItems.length > 0 || checklist.folders.length > 0) {
+                // Folder tabs
+                checklist.folders.sort((a, b) => a.order - b.order).forEach(folder => {
+                    const folderItems = folderItemsMap[folder.id] || [];
+                    const folderCompleted = folderItems.filter(item => completion.completedItems.includes(item.id)).length;
+                    const isActive = activeFolderId === folder.id;
+
+                    tabsHTML += `
+                        <div class="folder-tab ${isActive ? 'active' : ''}" onclick="switchFolder(${checklist.id}, ${folder.id})">
+                            <span class="folder-tab-name">📁 ${folder.name}</span>
+                            <span class="folder-tab-progress">${folderCompleted}/${folderItems.length}</span>
+                            <div class="folder-tab-actions">
+                                <button class="folder-tab-btn" onclick="event.stopPropagation(); editFolder(${checklist.id}, ${folder.id})" title="Edit folder">✏️</button>
+                                <button class="folder-tab-btn" onclick="event.stopPropagation(); deleteFolder(${checklist.id}, ${folder.id})" title="Delete folder">🗑️</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            // Build active folder content HTML
+            let activeItemsHTML = '';
+            let activeFolderDrop = '';
+            if (activeFolderId === null) {
+                // Show uncategorized items
                 const uncatItemsHTML = uncategorizedItems.map(item => {
                     const isCompleted = completion.completedItems.includes(item.id);
                     return renderChecklistItemHTML(checklist, item, isCompleted);
                 }).join('');
-
-                if (checklist.folders.length > 0) {
-                    uncategorizedHTML = `
-                        <div class="checklist-uncategorized"
-                             ondragover="handleFolderDragOver(event)"
-                             ondragleave="handleFolderDragLeave(event)"
-                             ondrop="handleFolderDrop(event, ${checklist.id}, null)">
-                            <div class="checklist-uncategorized-title">📋 Uncategorized</div>
-                            ${uncatItemsHTML || '<div style="padding: 10px; color: #9ca3af; font-size: 0.9em;">Drag items here</div>'}
-                        </div>
-                    `;
-                } else {
-                    uncategorizedHTML = `<div class="checklist-items">${uncatItemsHTML}</div>`;
-                }
+                activeItemsHTML = uncatItemsHTML || '<div style="padding: 10px; color: #9ca3af; font-size: 0.9em;">No items. Add items below or drag items from other folders.</div>';
+                activeFolderDrop = `ondragover="handleFolderDragOver(event)" ondragleave="handleFolderDragLeave(event)" ondrop="handleFolderDrop(event, ${checklist.id}, null)"`;
+            } else {
+                // Show items from active folder
+                const folderItems = folderItemsMap[activeFolderId] || [];
+                const folderItemsHTML = folderItems.map(item => {
+                    const isCompleted = completion.completedItems.includes(item.id);
+                    return renderChecklistItemHTML(checklist, item, isCompleted);
+                }).join('');
+                activeItemsHTML = folderItemsHTML || '<div style="padding: 10px; color: #9ca3af; font-size: 0.9em;">No items in this folder. Add items below or drag items here.</div>';
+                activeFolderDrop = `ondragover="handleFolderDragOver(event)" ondragleave="handleFolderDragLeave(event)" ondrop="handleFolderDrop(event, ${checklist.id}, ${activeFolderId})"`;
             }
 
             // Empty state
+            let contentHTML = '';
             if (checklist.items.length === 0 && checklist.folders.length === 0) {
-                uncategorizedHTML = '<div class="checklist-empty" style="padding: 20px;"><div class="checklist-empty-text">No items in this checklist. Add folders and items below!</div></div>';
+                contentHTML = '<div class="checklist-empty" style="padding: 20px;"><div class="checklist-empty-text">No items in this checklist. Add folders and items below!</div></div>';
+            } else if (tabsHTML) {
+                contentHTML = `
+                    <div class="folder-tabs-container">
+                        <div class="folder-tabs">
+                            ${tabsHTML}
+                        </div>
+                        <div class="folder-content">
+                            <div class="folder-items" ${activeFolderDrop}>
+                                ${activeItemsHTML}
+                            </div>
+                        </div>
+                    </div>
+                `;
             }
 
             container.innerHTML = `
@@ -4464,15 +4514,14 @@
                     </div>
                 </div>
                 <button class="folder-add-btn" onclick="addFolder(${checklist.id})">📁 + Add Folder</button>
-                ${foldersHTML}
-                ${uncategorizedHTML}
+                ${contentHTML}
                 <div class="checklist-add-item">
                     <input type="text" class="checklist-add-input" id="newItemInput_${checklist.id}"
                            placeholder="Add new item..."
                            onkeypress="if(event.key==='Enter') addChecklistItem(${checklist.id})">
                     <select id="newItemFolder_${checklist.id}" style="padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1em;">
-                        <option value="">No Folder</option>
-                        ${checklist.folders.map(f => `<option value="${f.id}">${f.name}</option>`).join('')}
+                        <option value="" ${activeFolderId === null ? 'selected' : ''}>No Folder</option>
+                        ${checklist.folders.map(f => `<option value="${f.id}" ${activeFolderId === f.id ? 'selected' : ''}>${f.name}</option>`).join('')}
                     </select>
                     <button class="checklist-add-btn" onclick="addChecklistItem(${checklist.id})">+ Add Item</button>
                     <button class="ops-btn" style="background: #e0e7ff; color: #4338ca; padding: 12px 16px;" onclick="openItemEditor(${checklist.id})">+ Add with URL</button>
@@ -4584,10 +4633,9 @@
             renderChecklistContent();
         }
 
-        // Toggle folder collapsed state
-        function toggleFolder(checklistId, folderId) {
-            const folderKey = `${checklistId}_${folderId}`;
-            opsState.collapsedFolders[folderKey] = !opsState.collapsedFolders[folderKey];
+        // Switch active folder tab
+        function switchFolder(checklistId, folderId) {
+            opsState.activeFolders[checklistId] = folderId;
             saveOpsData();
             renderChecklistContent();
         }
@@ -4646,8 +4694,10 @@
             // Remove folder
             checklist.folders = checklist.folders.filter(f => f.id !== folderId);
 
-            // Remove collapsed state
-            delete opsState.collapsedFolders[`${checklistId}_${folderId}`];
+            // If this was the active folder, switch to uncategorized
+            if (opsState.activeFolders[checklistId] === folderId) {
+                opsState.activeFolders[checklistId] = null;
+            }
 
             saveOpsData();
             renderChecklistContent();
