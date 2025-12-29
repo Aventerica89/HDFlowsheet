@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <!--
     HD Flowsheet & QA Tracker
-    Version: 1.9.6
+    Version: 1.9.7
     Date: December 29, 2024
 
     CHANGELOG:
+    v1.9.7 - Quick Notes Enhancements
+        - Added click-to-copy on timestamp log entries
+        - New snippets: Midodrine, 100 ml bolus, BP drop > 20, Cramping, UF goal increase
     v1.9.6 - QA Checklist 5-Column Grid Layout
         - Reorganized QA Checklist into horizontal 5-column grid
         - Created new "Misc" toggle box with 30 Min Check, Abx/IDPN, STAT Labs, Labs Prep
@@ -1846,11 +1849,16 @@
 
         .timestamp-log-item {
             display: grid;
-            grid-template-columns: 80px 1fr 120px 40px;
+            grid-template-columns: 80px 1fr 120px 30px 40px;
             align-items: center;
             padding: 12px 15px;
             border-bottom: 1px solid #e5e7eb;
             gap: 10px;
+            transition: background 0.3s;
+        }
+
+        .timestamp-log-item:hover {
+            background: #f0f9ff;
         }
 
         .timestamp-log-item:last-child {
@@ -1873,6 +1881,16 @@
             font-weight: 600;
             color: #f59e0b;
             text-align: right;
+        }
+
+        .timestamp-copy-icon {
+            font-size: 0.9em;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
+
+        .timestamp-log-item:hover .timestamp-copy-icon {
+            opacity: 1;
         }
 
         .timestamp-log-delete {
@@ -3974,13 +3992,29 @@
             }
 
             list.innerHTML = timestampState.logs.map(log => `
-                <div class="timestamp-log-item">
+                <div class="timestamp-log-item" data-log-id="${log.id}" onclick="copyTimestampEntry(this, ${log.id})" title="Click to copy" style="cursor: pointer;">
                     <div class="timestamp-log-time">${log.time}</div>
                     <div class="timestamp-log-patient">Chair ${log.chair} - ${log.patientName}</div>
                     <div class="timestamp-log-event">${log.event}</div>
-                    <button class="timestamp-log-delete" onclick="deleteTimestampLog(${log.id})">🗑️</button>
+                    <span class="timestamp-copy-icon">📋</span>
+                    <button class="timestamp-log-delete" onclick="event.stopPropagation(); deleteTimestampLog(${log.id})">🗑️</button>
                 </div>
             `).join('');
+        }
+
+        function copyTimestampEntry(element, logId) {
+            const log = timestampState.logs.find(l => l.id === logId);
+            if (log) {
+                const text = `${log.time} - Chair ${log.chair} (${log.patientName}): ${log.event}`;
+                navigator.clipboard.writeText(text).then(() => {
+                    // Visual feedback - flash green
+                    element.style.background = '#d1fae5';
+                    element.style.transition = 'background 0.3s';
+                    setTimeout(() => {
+                        element.style.background = '';
+                    }, 500);
+                });
+            }
         }
 
         // Settings Modal functions
@@ -7437,9 +7471,14 @@
                     <button class="timestamp-event-btn" onclick="logTimestampEvent('Hypertension')" disabled>Hypertension</button>
                     <button class="timestamp-event-btn" onclick="logTimestampEvent('Imodium')" disabled>Imodium</button>
                     <button class="timestamp-event-btn" onclick="logTimestampEvent('Tylenol')" disabled>Tylenol</button>
+                    <button class="timestamp-event-btn" onclick="logTimestampEvent('Midodrine')" disabled>Midodrine</button>
                     <button class="timestamp-event-btn" onclick="logTimestampEvent('UF min')" disabled>UF min</button>
                     <button class="timestamp-event-btn" onclick="logTimestampEvent('Temp up')" disabled>Temp up</button>
                     <button class="timestamp-event-btn" onclick="logTimestampEvent('Temp down')" disabled>Temp down</button>
+                    <button class="timestamp-event-btn" onclick="logTimestampEvent('100 ml bolus')" disabled>100 ml bolus</button>
+                    <button class="timestamp-event-btn" onclick="logTimestampEvent('BP drop > 20')" disabled>BP drop > 20</button>
+                    <button class="timestamp-event-btn" onclick="logTimestampEvent('Cramping')" disabled>Cramping</button>
+                    <button class="timestamp-event-btn" onclick="logTimestampEvent('UF goal increase')" disabled>UF goal increase</button>
                 </div>
 
                 <div class="timestamp-log-section">
