@@ -1,10 +1,17 @@
 <!DOCTYPE html>
 <!--
     HD Flowsheet & QA Tracker
-    Version: 1.9.8
+    Version: 1.9.9
     Date: December 29, 2024
 
     CHANGELOG:
+    v1.9.9 - Operations Checklist Enhancements
+        - Drag and drop reordering for checklist items
+        - URL link support: Add URLs to checklist items with "Open Link" button
+        - Folders: Organize checklist items into collapsible folders (e.g., TCH, East B Side, East A Side)
+        - Add/edit/delete folders with custom names
+        - Folder dropdown when adding items, or drag items between folders
+        - Item editor modal for adding/editing items with URL
     v1.9.8 - Operations Tab with Editable Checklists
         - New top-level navigation: Pt Charting / Operations tabs
         - Operations page with user-editable checklists for morning/end of shift routines
@@ -583,6 +590,151 @@
         .checklist-item-delete {
             background: #fee2e2;
             color: #dc2626;
+        }
+
+        /* Drag and Drop Styles */
+        .checklist-item.dragging {
+            opacity: 0.5;
+            background: #dbeafe;
+            border: 2px dashed #3b82f6;
+        }
+        .checklist-item.drag-over {
+            border-top: 3px solid #3b82f6;
+        }
+        .checklist-item-drag-handle {
+            cursor: grab;
+            color: #9ca3af;
+            padding: 0 5px;
+            font-size: 1.2em;
+        }
+        .checklist-item-drag-handle:active {
+            cursor: grabbing;
+        }
+
+        /* URL Link Styles */
+        .checklist-item-link {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #3b82f6;
+            cursor: pointer;
+            font-size: 0.85em;
+            padding: 3px 8px;
+            background: #eff6ff;
+            border-radius: 4px;
+            text-decoration: none;
+            margin-left: 8px;
+        }
+        .checklist-item-link:hover {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        /* Folder Styles */
+        .checklist-folder {
+            margin-bottom: 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .checklist-folder-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 15px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-bottom: 1px solid #e5e7eb;
+            cursor: pointer;
+        }
+        .checklist-folder-header:hover {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        }
+        .checklist-folder-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            color: #374151;
+        }
+        .checklist-folder-toggle {
+            font-size: 0.9em;
+            transition: transform 0.2s;
+        }
+        .checklist-folder.collapsed .checklist-folder-toggle {
+            transform: rotate(-90deg);
+        }
+        .checklist-folder-actions {
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .checklist-folder-header:hover .checklist-folder-actions {
+            opacity: 1;
+        }
+        .checklist-folder-progress {
+            font-size: 0.85em;
+            color: #6b7280;
+            margin-left: auto;
+            margin-right: 15px;
+        }
+        .checklist-folder-items {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .checklist-folder.collapsed .checklist-folder-items {
+            display: none;
+        }
+        .checklist-uncategorized {
+            margin-bottom: 20px;
+        }
+        .checklist-uncategorized-title {
+            font-size: 0.9em;
+            color: #6b7280;
+            margin-bottom: 10px;
+            padding-left: 5px;
+        }
+
+        /* Folder Management */
+        .folder-add-btn {
+            padding: 8px 16px;
+            background: #f3e8ff;
+            color: #7c3aed;
+            border: 2px dashed #c4b5fd;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-bottom: 15px;
+            transition: all 0.2s;
+        }
+        .folder-add-btn:hover {
+            background: #ede9fe;
+            border-color: #a78bfa;
+        }
+
+        /* Item Edit Modal enhancements */
+        .item-edit-row {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        .item-edit-row label {
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.9em;
+        }
+        .item-edit-row input, .item-edit-row select {
+            padding: 10px 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+        .item-edit-row input:focus, .item-edit-row select:focus {
+            border-color: var(--theme-primary);
+            outline: none;
         }
 
         /* Add Item Section */
@@ -3869,7 +4021,7 @@
                     <button class="settings-btn" onclick="openSettingsModal()" title="Settings">⚙️</button>
                     <div>
                         <h1 style="margin-bottom: 5px;">🏥 HD Flowsheet & QA Tracker</h1>
-                        <div class="version">Version 1.9.8</div>
+                        <div class="version">Version 1.9.9</div>
                     </div>
                 </div>
             </div>
@@ -4019,10 +4171,18 @@
 
         // ========== OPERATIONS STATE & FUNCTIONS ==========
         let opsState = {
-            checklists: [],  // Array of {id, name, position, items: [{id, text, order}]}
+            checklists: [],  // Array of {id, name, position, folders: [{id, name, order}], items: [{id, text, order, folderId, url}]}
             activeChecklistId: null,
             completions: {},  // {date_checklistId: {completedItems: [], timestamp}}
-            editingChecklistId: null  // null = new, number = editing existing
+            editingChecklistId: null,  // null = new, number = editing existing
+            collapsedFolders: {}  // {checklistId_folderId: true}
+        };
+
+        // Drag state for reordering
+        let dragState = {
+            draggedItem: null,
+            draggedItemId: null,
+            checklistId: null
         };
 
         // Load operations data from localStorage
@@ -4032,6 +4192,15 @@
                 const data = JSON.parse(saved);
                 opsState.checklists = data.checklists || [];
                 opsState.completions = data.completions || {};
+                opsState.collapsedFolders = data.collapsedFolders || {};
+                // Ensure each checklist has folders array
+                opsState.checklists.forEach(cl => {
+                    if (!cl.folders) cl.folders = [];
+                    // Ensure each item has folderId (null = uncategorized)
+                    cl.items.forEach(item => {
+                        if (item.folderId === undefined) item.folderId = null;
+                    });
+                });
             }
             renderChecklistTabs();
         }
@@ -4040,7 +4209,8 @@
         function saveOpsData() {
             localStorage.setItem('hd_operations_data', JSON.stringify({
                 checklists: opsState.checklists,
-                completions: opsState.completions
+                completions: opsState.completions,
+                collapsedFolders: opsState.collapsedFolders
             }));
         }
 
@@ -4101,6 +4271,33 @@
             return `${getTodayKey()}_${checklistId}`;
         }
 
+        // Render a single checklist item HTML
+        function renderChecklistItemHTML(checklist, item, isCompleted) {
+            const urlLink = item.url ? `<a href="${item.url}" target="_blank" class="checklist-item-link" onclick="event.stopPropagation()">🔗 Open Link</a>` : '';
+            return `
+                <div class="checklist-item ${isCompleted ? 'completed' : ''}"
+                     draggable="true"
+                     data-item-id="${item.id}"
+                     data-folder-id="${item.folderId || ''}"
+                     ondragstart="handleItemDragStart(event, ${checklist.id}, ${item.id})"
+                     ondragend="handleItemDragEnd(event)"
+                     ondragover="handleItemDragOver(event)"
+                     ondragleave="handleItemDragLeave(event)"
+                     ondrop="handleItemDrop(event, ${checklist.id}, ${item.id})">
+                    <span class="checklist-item-drag-handle">⋮⋮</span>
+                    <input type="checkbox" class="checklist-item-checkbox"
+                           ${isCompleted ? 'checked' : ''}
+                           onchange="toggleChecklistItem(${checklist.id}, ${item.id}, this.checked)">
+                    <span class="checklist-item-text">${item.text}</span>
+                    ${urlLink}
+                    <div class="checklist-item-actions">
+                        <button class="checklist-item-btn checklist-item-edit" onclick="editChecklistItem(${checklist.id}, ${item.id})">✏️</button>
+                        <button class="checklist-item-btn checklist-item-delete" onclick="deleteChecklistItem(${checklist.id}, ${item.id})">🗑️</button>
+                    </div>
+                </div>
+            `;
+        }
+
         // Render checklist content
         function renderChecklistContent() {
             const container = document.getElementById('checklistContent');
@@ -4119,29 +4316,85 @@
             const checklist = opsState.checklists.find(cl => cl.id === opsState.activeChecklistId);
             if (!checklist) return;
 
+            // Ensure folders array exists
+            if (!checklist.folders) checklist.folders = [];
+
             const completionKey = getCompletionKey(checklist.id);
             const completion = opsState.completions[completionKey] || { completedItems: [] };
             const completedCount = completion.completedItems.length;
             const totalCount = checklist.items.length;
             const progressPercent = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
 
-            const itemsHTML = checklist.items.length === 0
-                ? '<div class="checklist-empty" style="padding: 20px;"><div class="checklist-empty-text">No items in this checklist. Add items below!</div></div>'
-                : checklist.items.sort((a, b) => a.order - b.order).map(item => {
+            // Group items by folder
+            const uncategorizedItems = checklist.items.filter(item => !item.folderId).sort((a, b) => a.order - b.order);
+            const folderItemsMap = {};
+            checklist.folders.forEach(folder => {
+                folderItemsMap[folder.id] = checklist.items.filter(item => item.folderId === folder.id).sort((a, b) => a.order - b.order);
+            });
+
+            // Build folders HTML
+            let foldersHTML = '';
+            checklist.folders.sort((a, b) => a.order - b.order).forEach(folder => {
+                const folderKey = `${checklist.id}_${folder.id}`;
+                const isCollapsed = opsState.collapsedFolders[folderKey];
+                const folderItems = folderItemsMap[folder.id] || [];
+                const folderCompleted = folderItems.filter(item => completion.completedItems.includes(item.id)).length;
+
+                const folderItemsHTML = folderItems.map(item => {
                     const isCompleted = completion.completedItems.includes(item.id);
-                    return `
-                        <div class="checklist-item ${isCompleted ? 'completed' : ''}">
-                            <input type="checkbox" class="checklist-item-checkbox"
-                                   ${isCompleted ? 'checked' : ''}
-                                   onchange="toggleChecklistItem(${checklist.id}, ${item.id}, this.checked)">
-                            <span class="checklist-item-text">${item.text}</span>
-                            <div class="checklist-item-actions">
-                                <button class="checklist-item-btn checklist-item-edit" onclick="editChecklistItem(${checklist.id}, ${item.id})">✏️</button>
-                                <button class="checklist-item-btn checklist-item-delete" onclick="deleteChecklistItem(${checklist.id}, ${item.id})">🗑️</button>
+                    return renderChecklistItemHTML(checklist, item, isCompleted);
+                }).join('');
+
+                foldersHTML += `
+                    <div class="checklist-folder ${isCollapsed ? 'collapsed' : ''}" data-folder-id="${folder.id}">
+                        <div class="checklist-folder-header" onclick="toggleFolder(${checklist.id}, ${folder.id})">
+                            <div class="checklist-folder-title">
+                                <span class="checklist-folder-toggle">▼</span>
+                                📁 ${folder.name}
+                            </div>
+                            <span class="checklist-folder-progress">${folderCompleted}/${folderItems.length}</span>
+                            <div class="checklist-folder-actions">
+                                <button class="checklist-item-btn checklist-item-edit" onclick="event.stopPropagation(); editFolder(${checklist.id}, ${folder.id})">✏️</button>
+                                <button class="checklist-item-btn checklist-item-delete" onclick="event.stopPropagation(); deleteFolder(${checklist.id}, ${folder.id})">🗑️</button>
                             </div>
                         </div>
-                    `;
+                        <div class="checklist-folder-items"
+                             ondragover="handleFolderDragOver(event)"
+                             ondragleave="handleFolderDragLeave(event)"
+                             ondrop="handleFolderDrop(event, ${checklist.id}, ${folder.id})">
+                            ${folderItemsHTML || '<div style="padding: 10px; color: #9ca3af; font-size: 0.9em;">Drag items here or add new items</div>'}
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Build uncategorized items HTML
+            let uncategorizedHTML = '';
+            if (uncategorizedItems.length > 0 || checklist.folders.length > 0) {
+                const uncatItemsHTML = uncategorizedItems.map(item => {
+                    const isCompleted = completion.completedItems.includes(item.id);
+                    return renderChecklistItemHTML(checklist, item, isCompleted);
                 }).join('');
+
+                if (checklist.folders.length > 0) {
+                    uncategorizedHTML = `
+                        <div class="checklist-uncategorized"
+                             ondragover="handleFolderDragOver(event)"
+                             ondragleave="handleFolderDragLeave(event)"
+                             ondrop="handleFolderDrop(event, ${checklist.id}, null)">
+                            <div class="checklist-uncategorized-title">📋 Uncategorized</div>
+                            ${uncatItemsHTML || '<div style="padding: 10px; color: #9ca3af; font-size: 0.9em;">Drag items here</div>'}
+                        </div>
+                    `;
+                } else {
+                    uncategorizedHTML = `<div class="checklist-items">${uncatItemsHTML}</div>`;
+                }
+            }
+
+            // Empty state
+            if (checklist.items.length === 0 && checklist.folders.length === 0) {
+                uncategorizedHTML = '<div class="checklist-empty" style="padding: 20px;"><div class="checklist-empty-text">No items in this checklist. Add folders and items below!</div></div>';
+            }
 
             container.innerHTML = `
                 <div class="checklist-header">
@@ -4158,16 +4411,291 @@
                         <button class="ops-btn" style="background: #fef3c7; color: #92400e; padding: 6px 12px;" onclick="resetChecklistProgress(${checklist.id})">🔄 Reset</button>
                     </div>
                 </div>
-                <div class="checklist-items">
-                    ${itemsHTML}
-                </div>
+                <button class="folder-add-btn" onclick="addFolder(${checklist.id})">📁 + Add Folder</button>
+                ${foldersHTML}
+                ${uncategorizedHTML}
                 <div class="checklist-add-item">
                     <input type="text" class="checklist-add-input" id="newItemInput_${checklist.id}"
                            placeholder="Add new item..."
                            onkeypress="if(event.key==='Enter') addChecklistItem(${checklist.id})">
+                    <select id="newItemFolder_${checklist.id}" style="padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1em;">
+                        <option value="">No Folder</option>
+                        ${checklist.folders.map(f => `<option value="${f.id}">${f.name}</option>`).join('')}
+                    </select>
                     <button class="checklist-add-btn" onclick="addChecklistItem(${checklist.id})">+ Add Item</button>
+                    <button class="ops-btn" style="background: #e0e7ff; color: #4338ca; padding: 12px 16px;" onclick="openItemEditor(${checklist.id})">+ Add with URL</button>
                 </div>
             `;
+        }
+
+        // Drag and drop handlers
+        function handleItemDragStart(event, checklistId, itemId) {
+            dragState.draggedItem = event.target;
+            dragState.draggedItemId = itemId;
+            dragState.checklistId = checklistId;
+            event.target.classList.add('dragging');
+            event.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleItemDragEnd(event) {
+            event.target.classList.remove('dragging');
+            document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+            dragState.draggedItem = null;
+            dragState.draggedItemId = null;
+            dragState.checklistId = null;
+        }
+
+        function handleItemDragOver(event) {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'move';
+            const item = event.target.closest('.checklist-item');
+            if (item && item !== dragState.draggedItem) {
+                item.classList.add('drag-over');
+            }
+        }
+
+        function handleItemDragLeave(event) {
+            const item = event.target.closest('.checklist-item');
+            if (item) {
+                item.classList.remove('drag-over');
+            }
+        }
+
+        function handleItemDrop(event, checklistId, targetItemId) {
+            event.preventDefault();
+            const item = event.target.closest('.checklist-item');
+            if (item) item.classList.remove('drag-over');
+
+            if (!dragState.draggedItemId || dragState.draggedItemId === targetItemId) return;
+
+            const checklist = opsState.checklists.find(cl => cl.id === checklistId);
+            if (!checklist) return;
+
+            const draggedItem = checklist.items.find(i => i.id === dragState.draggedItemId);
+            const targetItem = checklist.items.find(i => i.id === targetItemId);
+            if (!draggedItem || !targetItem) return;
+
+            // Move dragged item to target's folder
+            draggedItem.folderId = targetItem.folderId;
+
+            // Reorder items in the same folder
+            const folderItems = checklist.items.filter(i => i.folderId === targetItem.folderId).sort((a, b) => a.order - b.order);
+            const draggedIndex = folderItems.findIndex(i => i.id === draggedItem.id);
+            const targetIndex = folderItems.findIndex(i => i.id === targetItem.id);
+
+            // Remove and insert at new position
+            folderItems.splice(draggedIndex, 1);
+            folderItems.splice(targetIndex, 0, draggedItem);
+
+            // Update order values
+            folderItems.forEach((item, index) => {
+                item.order = index + 1;
+            });
+
+            saveOpsData();
+            renderChecklistContent();
+        }
+
+        function handleFolderDragOver(event) {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'move';
+            const container = event.target.closest('.checklist-folder-items, .checklist-uncategorized');
+            if (container) container.style.background = '#dbeafe';
+        }
+
+        function handleFolderDragLeave(event) {
+            const container = event.target.closest('.checklist-folder-items, .checklist-uncategorized');
+            if (container) container.style.background = '';
+        }
+
+        function handleFolderDrop(event, checklistId, folderId) {
+            event.preventDefault();
+            const container = event.target.closest('.checklist-folder-items, .checklist-uncategorized');
+            if (container) container.style.background = '';
+
+            if (!dragState.draggedItemId) return;
+
+            const checklist = opsState.checklists.find(cl => cl.id === checklistId);
+            if (!checklist) return;
+
+            const draggedItem = checklist.items.find(i => i.id === dragState.draggedItemId);
+            if (!draggedItem) return;
+
+            // Move item to new folder
+            draggedItem.folderId = folderId;
+
+            // Reorder within the new folder
+            const folderItems = checklist.items.filter(i => i.folderId === folderId).sort((a, b) => a.order - b.order);
+            draggedItem.order = folderItems.length;
+
+            saveOpsData();
+            renderChecklistContent();
+        }
+
+        // Toggle folder collapsed state
+        function toggleFolder(checklistId, folderId) {
+            const folderKey = `${checklistId}_${folderId}`;
+            opsState.collapsedFolders[folderKey] = !opsState.collapsedFolders[folderKey];
+            saveOpsData();
+            renderChecklistContent();
+        }
+
+        // Add folder to checklist
+        function addFolder(checklistId) {
+            const name = prompt('Enter folder name:');
+            if (!name || !name.trim()) return;
+
+            const checklist = opsState.checklists.find(cl => cl.id === checklistId);
+            if (!checklist) return;
+
+            if (!checklist.folders) checklist.folders = [];
+
+            const newFolder = {
+                id: Date.now(),
+                name: name.trim(),
+                order: checklist.folders.length + 1
+            };
+            checklist.folders.push(newFolder);
+
+            saveOpsData();
+            renderChecklistContent();
+        }
+
+        // Edit folder
+        function editFolder(checklistId, folderId) {
+            const checklist = opsState.checklists.find(cl => cl.id === checklistId);
+            if (!checklist) return;
+
+            const folder = checklist.folders.find(f => f.id === folderId);
+            if (!folder) return;
+
+            const newName = prompt('Edit folder name:', folder.name);
+            if (!newName || !newName.trim()) return;
+
+            folder.name = newName.trim();
+            saveOpsData();
+            renderChecklistContent();
+        }
+
+        // Delete folder
+        function deleteFolder(checklistId, folderId) {
+            if (!confirm('Delete this folder? Items will be moved to Uncategorized.')) return;
+
+            const checklist = opsState.checklists.find(cl => cl.id === checklistId);
+            if (!checklist) return;
+
+            // Move items to uncategorized
+            checklist.items.forEach(item => {
+                if (item.folderId === folderId) {
+                    item.folderId = null;
+                }
+            });
+
+            // Remove folder
+            checklist.folders = checklist.folders.filter(f => f.id !== folderId);
+
+            // Remove collapsed state
+            delete opsState.collapsedFolders[`${checklistId}_${folderId}`];
+
+            saveOpsData();
+            renderChecklistContent();
+        }
+
+        // Open item editor for adding with URL
+        function openItemEditor(checklistId, itemId = null) {
+            const checklist = opsState.checklists.find(cl => cl.id === checklistId);
+            if (!checklist) return;
+
+            let item = null;
+            if (itemId) {
+                item = checklist.items.find(i => i.id === itemId);
+            }
+
+            const folderOptions = checklist.folders.map(f =>
+                `<option value="${f.id}" ${item && item.folderId === f.id ? 'selected' : ''}>${f.name}</option>`
+            ).join('');
+
+            const modalHTML = `
+                <div class="checklist-editor-modal active" id="itemEditorModal" onclick="if(event.target===this) closeItemEditor()">
+                    <div class="checklist-editor">
+                        <div class="checklist-editor-header">
+                            <h3>${item ? 'Edit Item' : 'Add Item with URL'}</h3>
+                            <button onclick="closeItemEditor()" style="background: none; border: none; color: white; font-size: 1.5em; cursor: pointer;">&times;</button>
+                        </div>
+                        <div class="checklist-editor-body" style="padding: 20px;">
+                            <div class="item-edit-row">
+                                <label>Item Text *</label>
+                                <input type="text" id="itemEditText" value="${item ? item.text : ''}" placeholder="Enter item text...">
+                            </div>
+                            <div class="item-edit-row">
+                                <label>URL (optional)</label>
+                                <input type="text" id="itemEditUrl" value="${item && item.url ? item.url : ''}" placeholder="https://...">
+                            </div>
+                            <div class="item-edit-row">
+                                <label>Folder</label>
+                                <select id="itemEditFolder">
+                                    <option value="" ${!item || !item.folderId ? 'selected' : ''}>No Folder</option>
+                                    ${folderOptions}
+                                </select>
+                            </div>
+                            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                                <button class="ops-btn" onclick="closeItemEditor()">Cancel</button>
+                                <button class="ops-btn ops-btn-success" onclick="saveItemFromEditor(${checklistId}, ${itemId || 'null'})">${item ? 'Save Changes' : 'Add Item'}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Remove existing modal if any
+            const existing = document.getElementById('itemEditorModal');
+            if (existing) existing.remove();
+
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            document.getElementById('itemEditText').focus();
+        }
+
+        function closeItemEditor() {
+            const modal = document.getElementById('itemEditorModal');
+            if (modal) modal.remove();
+        }
+
+        function saveItemFromEditor(checklistId, itemId) {
+            const text = document.getElementById('itemEditText').value.trim();
+            const url = document.getElementById('itemEditUrl').value.trim();
+            const folderId = document.getElementById('itemEditFolder').value;
+
+            if (!text) {
+                alert('Please enter item text');
+                return;
+            }
+
+            const checklist = opsState.checklists.find(cl => cl.id === checklistId);
+            if (!checklist) return;
+
+            if (itemId) {
+                // Edit existing item
+                const item = checklist.items.find(i => i.id === itemId);
+                if (item) {
+                    item.text = text;
+                    item.url = url || null;
+                    item.folderId = folderId ? parseInt(folderId) : null;
+                }
+            } else {
+                // Add new item
+                const newItem = {
+                    id: Date.now(),
+                    text: text,
+                    url: url || null,
+                    folderId: folderId ? parseInt(folderId) : null,
+                    order: checklist.items.length + 1
+                };
+                checklist.items.push(newItem);
+            }
+
+            saveOpsData();
+            closeItemEditor();
+            renderChecklistContent();
         }
 
         // Toggle checklist item completion
@@ -4193,37 +4721,32 @@
         // Add item to checklist
         function addChecklistItem(checklistId) {
             const input = document.getElementById(`newItemInput_${checklistId}`);
+            const folderSelect = document.getElementById(`newItemFolder_${checklistId}`);
             const text = input.value.trim();
             if (!text) return;
 
             const checklist = opsState.checklists.find(cl => cl.id === checklistId);
             if (!checklist) return;
 
+            const folderId = folderSelect ? (folderSelect.value ? parseInt(folderSelect.value) : null) : null;
+
             const newItem = {
                 id: Date.now(),
                 text: text,
-                order: checklist.items.length + 1
+                order: checklist.items.length + 1,
+                folderId: folderId,
+                url: null
             };
             checklist.items.push(newItem);
 
+            input.value = '';
             saveOpsData();
             renderChecklistContent();
         }
 
-        // Edit checklist item
+        // Edit checklist item (opens the item editor modal)
         function editChecklistItem(checklistId, itemId) {
-            const checklist = opsState.checklists.find(cl => cl.id === checklistId);
-            if (!checklist) return;
-
-            const item = checklist.items.find(i => i.id === itemId);
-            if (!item) return;
-
-            const newText = prompt('Edit item:', item.text);
-            if (newText !== null && newText.trim()) {
-                item.text = newText.trim();
-                saveOpsData();
-                renderChecklistContent();
-            }
+            openItemEditor(checklistId, itemId);
         }
 
         // Delete checklist item
@@ -4318,7 +4841,8 @@
                     id: Date.now(),
                     name: name,
                     position: position || 'General',
-                    items: []
+                    items: [],
+                    folders: []
                 };
                 opsState.checklists.push(newChecklist);
                 opsState.activeChecklistId = newChecklist.id;
