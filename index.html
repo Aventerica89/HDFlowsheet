@@ -1,10 +1,18 @@
 <!DOCTYPE html>
 <!--
     HD Flowsheet & QA Tracker
-    Version: 1.9.4
+    Version: 1.9.5
     Date: December 27, 2024
 
     CHANGELOG:
+    v1.9.5 - Misc To-Do List Feature
+        - Added Misc To-Do List section to each patient chart in QA Checklist
+        - Add custom to-dos with input field or pre-configured snippet buttons
+        - Snippets: Access assessment chart, Foot check, Monthly/Daily progress note, Notify MD/NP, PHN Call
+        - Each to-do has timestamp and checkbox for completion
+        - Separate To Do and Complete sections
+        - Chart cannot be closed until all to-dos are complete
+        - Red exclamation mark on patient tab when incomplete to-dos exist
     v1.9.3 - Chart Closed Feature
         - Added Chart Closed checkbox in QA Checklist (outlined box on right side)
         - When checked, patient tab and flowchart turn green
@@ -1163,6 +1171,15 @@
         .chart-closed-checkbox.checked .chart-closed-checkmark {
             display: inline;
         }
+        .chart-closed-checkbox.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #f3f4f6;
+            border-color: #d1d5db;
+        }
+        .chart-closed-checkbox.disabled:hover {
+            background: #f3f4f6;
+        }
 
         /* Patient tab chart closed (green) */
         .patient-tab.chart-closed {
@@ -1183,6 +1200,158 @@
         }
         .patient-card.chart-closed .section-header {
             background: linear-gradient(135deg, #34d399 0%, #10b981 100%) !important;
+        }
+
+        /* Misc To-Do List Styles */
+        .misc-todo-section {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        .misc-todo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .misc-todo-title {
+            font-weight: 700;
+            font-size: 1.1em;
+            color: #1e293b;
+        }
+        .misc-todo-add-section {
+            background: white;
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+        .misc-todo-input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .misc-todo-input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.95em;
+        }
+        .misc-todo-input:focus {
+            border-color: #6366f1;
+            outline: none;
+        }
+        .misc-todo-add-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .misc-todo-add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+        .misc-todo-snippets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .misc-todo-snippet-btn {
+            padding: 6px 12px;
+            background: #e0e7ff;
+            color: #4338ca;
+            border: 1px solid #c7d2fe;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .misc-todo-snippet-btn:hover {
+            background: #c7d2fe;
+            transform: translateY(-1px);
+        }
+        .misc-todo-list {
+            margin-bottom: 15px;
+        }
+        .misc-todo-list-header {
+            font-weight: 600;
+            font-size: 0.9em;
+            color: #64748b;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .misc-todo-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            transition: all 0.2s;
+        }
+        .misc-todo-item:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .misc-todo-item.completed {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+        .misc-todo-item.completed .misc-todo-text {
+            text-decoration: line-through;
+            color: #6b7280;
+        }
+        .misc-todo-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        .misc-todo-text {
+            flex: 1;
+            font-size: 0.95em;
+        }
+        .misc-todo-timestamp {
+            font-size: 0.8em;
+            color: #94a3b8;
+        }
+        .misc-todo-delete {
+            padding: 4px 8px;
+            background: #fee2e2;
+            color: #dc2626;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.8em;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: all 0.2s;
+        }
+        .misc-todo-delete:hover {
+            opacity: 1;
+            background: #fecaca;
+        }
+        .misc-todo-empty {
+            color: #94a3b8;
+            font-style: italic;
+            padding: 10px;
+            text-align: center;
+        }
+        .incomplete-todos-badge {
+            color: #dc2626;
+            font-weight: bold;
+            margin-left: 5px;
         }
 
         .btn {
@@ -4930,7 +5099,8 @@
                     lidocaine: false,
                     postWeight: false
                 },
-                chartClosed: false
+                chartClosed: false,
+                miscTodos: []  // Array of {id, text, completed, timestamp}
             };
             
             state.patients.push(patient);
@@ -5018,6 +5188,59 @@
 
                 renderAll();
             }
+        }
+
+        // Misc To-Do List Functions
+        function addMiscTodo(patientId, text) {
+            const patient = state.patients.find(p => p.id === patientId);
+            if (patient && text.trim()) {
+                if (!patient.miscTodos) patient.miscTodos = [];
+                const now = new Date();
+                const timestamp = now.toLocaleString('en-US', {
+                    timeZone: 'America/Phoenix',
+                    month: 'short', day: 'numeric',
+                    hour: 'numeric', minute: '2-digit'
+                });
+                patient.miscTodos.push({
+                    id: Date.now(),
+                    text: text.trim(),
+                    completed: false,
+                    timestamp: timestamp
+                });
+                renderAll();
+            }
+        }
+
+        function addMiscTodoFromInput(patientId) {
+            const input = document.getElementById(`miscTodoInput_${patientId}`);
+            if (input && input.value.trim()) {
+                addMiscTodo(patientId, input.value);
+                input.value = '';
+            }
+        }
+
+        function toggleMiscTodo(patientId, todoId, completed) {
+            const patient = state.patients.find(p => p.id === patientId);
+            if (patient && patient.miscTodos) {
+                const todo = patient.miscTodos.find(t => t.id === todoId);
+                if (todo) {
+                    todo.completed = completed;
+                    renderAll();
+                }
+            }
+        }
+
+        function deleteMiscTodo(patientId, todoId) {
+            const patient = state.patients.find(p => p.id === patientId);
+            if (patient && patient.miscTodos) {
+                patient.miscTodos = patient.miscTodos.filter(t => t.id !== todoId);
+                renderAll();
+            }
+        }
+
+        function hasIncompleteTodos(patient) {
+            if (!patient.miscTodos || patient.miscTodos.length === 0) return false;
+            return patient.miscTodos.some(t => !t.completed);
         }
 
         // Check if patient has any missed tx sub-items checked
@@ -5597,6 +5820,9 @@
                 // Notes indicator
                 const notesIndicator = p.quickNotes ? '<span title="Has notes" style="opacity: 0.7;">📝</span>' : '';
 
+                // Incomplete todos indicator
+                const incompleteTodosIndicator = hasIncompleteTodos(p) ? '<span title="Incomplete to-dos" style="color: #dc2626; font-weight: bold;">❗</span>' : '';
+
                 // Special status classes for tab
                 const hospitalized = p.hospitalization ? 'hospitalized' : '';
                 const missedTxClass = (p.missedTx && (p.missedTxSubs?.rescheduled || p.missedTxSubs?.calledOff || p.missedTxSubs?.noCallNoShow)) ? 'missed-tx' : '';
@@ -5612,7 +5838,7 @@
                 return `<div class="patient-tab ${isActive ? 'active' : ''} ${hospitalized} ${missedTxClass} ${chartClosedClass}" onclick="switchPatient(${p.id})">
                     <button class="quick-chart-tab-btn" onclick="event.stopPropagation(); openQuickChart(${p.id})" title="Quick Chart">⚡</button>
                     <div class="tab-header">
-                        <span class="patient-name">${p.name} ${notesIndicator}</span>
+                        <span class="patient-name">${p.name} ${notesIndicator} ${incompleteTodosIndicator}</span>
                         <span class="chair-badge">${chairBadge}</span>
                     </div>
                     <div class="tab-body">
@@ -6374,14 +6600,76 @@
                                     </div>
                                 </div>
 
+                                <!-- Misc To-Do List Section -->
+                                <div class="misc-todo-section">
+                                    <div class="misc-todo-header">
+                                        <span class="misc-todo-title">📝 Misc To-Do List</span>
+                                        ${hasIncompleteTodos(patient) ? '<span class="incomplete-todos-badge">⚠️ Incomplete</span>' : ''}
+                                    </div>
+
+                                    <!-- Add To Do -->
+                                    <div class="misc-todo-add-section">
+                                        <div class="misc-todo-input-row">
+                                            <input type="text" class="misc-todo-input" id="miscTodoInput_${patient.id}"
+                                                placeholder="Enter a to-do item..."
+                                                onkeypress="if(event.key==='Enter') addMiscTodoFromInput(${patient.id})">
+                                            <button class="misc-todo-add-btn" onclick="addMiscTodoFromInput(${patient.id})">+ Add To Do</button>
+                                        </div>
+                                        <div class="misc-todo-snippets">
+                                            <button class="misc-todo-snippet-btn" onclick="addMiscTodo(${patient.id}, 'Access assessment chart')">Access assessment chart</button>
+                                            <button class="misc-todo-snippet-btn" onclick="addMiscTodo(${patient.id}, 'Foot check')">Foot check</button>
+                                            <button class="misc-todo-snippet-btn" onclick="addMiscTodo(${patient.id}, 'Monthly progress note')">Monthly progress note</button>
+                                            <button class="misc-todo-snippet-btn" onclick="addMiscTodo(${patient.id}, 'Daily progress note')">Daily progress note</button>
+                                            <button class="misc-todo-snippet-btn" onclick="addMiscTodo(${patient.id}, 'Notify MD/NP')">Notify MD/NP</button>
+                                            <button class="misc-todo-snippet-btn" onclick="addMiscTodo(${patient.id}, 'PHN Call')">PHN Call</button>
+                                        </div>
+                                    </div>
+
+                                    <!-- To Do List -->
+                                    <div class="misc-todo-list">
+                                        <div class="misc-todo-list-header">📋 To Do</div>
+                                        ${(patient.miscTodos || []).filter(t => !t.completed).length === 0
+                                            ? '<div class="misc-todo-empty">No pending to-dos</div>'
+                                            : (patient.miscTodos || []).filter(t => !t.completed).map(todo => `
+                                                <div class="misc-todo-item">
+                                                    <input type="checkbox" class="misc-todo-checkbox"
+                                                        onchange="toggleMiscTodo(${patient.id}, ${todo.id}, this.checked)">
+                                                    <span class="misc-todo-text">${todo.text}</span>
+                                                    <span class="misc-todo-timestamp">${todo.timestamp}</span>
+                                                    <button class="misc-todo-delete" onclick="deleteMiscTodo(${patient.id}, ${todo.id})">✕</button>
+                                                </div>
+                                            `).join('')
+                                        }
+                                    </div>
+
+                                    <!-- Complete List -->
+                                    <div class="misc-todo-list">
+                                        <div class="misc-todo-list-header">✅ Complete</div>
+                                        ${(patient.miscTodos || []).filter(t => t.completed).length === 0
+                                            ? '<div class="misc-todo-empty">No completed to-dos</div>'
+                                            : (patient.miscTodos || []).filter(t => t.completed).map(todo => `
+                                                <div class="misc-todo-item completed">
+                                                    <input type="checkbox" class="misc-todo-checkbox" checked
+                                                        onchange="toggleMiscTodo(${patient.id}, ${todo.id}, this.checked)">
+                                                    <span class="misc-todo-text">${todo.text}</span>
+                                                    <span class="misc-todo-timestamp">${todo.timestamp}</span>
+                                                    <button class="misc-todo-delete" onclick="deleteMiscTodo(${patient.id}, ${todo.id})">✕</button>
+                                                </div>
+                                            `).join('')
+                                        }
+                                    </div>
+                                </div>
+
                                 <!-- Chart Closed - Special checkbox -->
                                 <div class="chart-closed-container">
-                                    <label class="chart-closed-checkbox ${patient.chartClosed ? 'checked' : ''}">
-                                        <input type="checkbox" ${patient.chartClosed ? 'checked' : ''}
-                                            onchange="updatePatient(${patient.id}, 'chartClosed', this.checked)">
+                                    <label class="chart-closed-checkbox ${patient.chartClosed ? 'checked' : ''} ${hasIncompleteTodos(patient) ? 'disabled' : ''}">
+                                        <input type="checkbox" ${patient.chartClosed ? 'checked' : ''} ${hasIncompleteTodos(patient) ? 'disabled' : ''}
+                                            onchange="updatePatient(${patient.id}, 'chartClosed', this.checked)"
+                                            title="${hasIncompleteTodos(patient) ? 'Complete all to-dos before closing chart' : 'Mark chart as closed'}">
                                         <span class="chart-closed-label">📋 Chart Closed</span>
                                         <span class="chart-closed-checkmark">✓</span>
                                     </label>
+                                    ${hasIncompleteTodos(patient) ? '<span style="color: #dc2626; font-size: 0.85em; margin-left: 10px;">Complete all to-dos first</span>' : ''}
                                 </div>
                             </div>
                         </div>
