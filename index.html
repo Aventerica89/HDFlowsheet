@@ -4005,7 +4005,7 @@
         function copyTimestampEntry(element, logId) {
             const log = timestampState.logs.find(l => l.id === logId);
             if (log) {
-                const text = `${log.time} - Chair ${log.chair} (${log.patientName}): ${log.event}`;
+                const text = log.time;
                 navigator.clipboard.writeText(text).then(() => {
                     // Visual feedback - flash green
                     element.style.background = '#d1fae5';
