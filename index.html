@@ -1,10 +1,15 @@
 <!DOCTYPE html>
 <!--
     HD Flowsheet & QA Tracker
-    Version: 1.9.9
+    Version: 1.9.10
     Date: December 29, 2024
 
     CHANGELOG:
+    v1.9.10 - Patient Chart Section Reordering
+        - Drag and drop reordering for patient chart toggle sections
+        - Expand All / Collapse All buttons in Quick View header
+        - Section order is saved and persists across sessions
+        - Drag handle (⋮⋮) on each section header for easy reordering
     v1.9.9 - Operations Checklist Enhancements
         - Drag and drop reordering for checklist items
         - URL link support: Add URLs to checklist items with "Open Link" button
@@ -1398,6 +1403,53 @@
         .section-content.collapsed {
             max-height: 0;
             opacity: 0;
+        }
+
+        /* Draggable Section Styles */
+        .collapsible-section.dragging {
+            opacity: 0.5;
+            background: #dbeafe;
+            border-radius: 8px;
+        }
+        .collapsible-section.drag-over {
+            border-top: 3px solid #3b82f6;
+        }
+        .section-drag-handle {
+            cursor: grab;
+            color: rgba(255,255,255,0.7);
+            padding: 0 5px;
+            font-size: 1em;
+            margin-right: 5px;
+        }
+        .section-drag-handle:active {
+            cursor: grabbing;
+        }
+        .sections-container {
+            min-height: 50px;
+        }
+
+        /* Expand/Collapse All Icons */
+        .glance-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 8px;
+        }
+        .glance-action-btn {
+            background: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            color: var(--theme-primary);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .glance-action-btn:hover {
+            background: var(--theme-primary);
+            color: white;
         }
         
         /* Tech Check Section */
@@ -4021,7 +4073,7 @@
                     <button class="settings-btn" onclick="openSettingsModal()" title="Settings">⚙️</button>
                     <div>
                         <h1 style="margin-bottom: 5px;">🏥 HD Flowsheet & QA Tracker</h1>
-                        <div class="version">Version 1.9.9</div>
+                        <div class="version">Version 1.9.10</div>
                     </div>
                 </div>
             </div>
@@ -6123,7 +6175,140 @@
                 content.classList.remove('collapsed');
             }
         }
-        
+
+        // Expand all sections for a patient
+        function expandAllSections(patientId) {
+            const sectionNames = ['techcheck', 'qa', 'assignment', 'orders', 'weight', 'time'];
+            sectionNames.forEach(sectionName => {
+                const key = `${patientId}_${sectionName}`;
+                state.collapsedSections[key] = false;
+                const header = document.querySelector(`[data-section="${key}"]`);
+                if (header) {
+                    const content = header.nextElementSibling;
+                    header.classList.remove('collapsed');
+                    content.classList.remove('collapsed');
+                }
+            });
+        }
+
+        // Collapse all sections for a patient
+        function collapseAllSections(patientId) {
+            const sectionNames = ['techcheck', 'qa', 'assignment', 'orders', 'weight', 'time'];
+            sectionNames.forEach(sectionName => {
+                const key = `${patientId}_${sectionName}`;
+                state.collapsedSections[key] = true;
+                const header = document.querySelector(`[data-section="${key}"]`);
+                if (header) {
+                    const content = header.nextElementSibling;
+                    header.classList.add('collapsed');
+                    content.classList.add('collapsed');
+                }
+            });
+        }
+
+        // Section drag state
+        let sectionDragState = {
+            draggedSection: null,
+            draggedSectionId: null,
+            patientId: null
+        };
+
+        // Initialize section order in state if needed
+        function initSectionOrder() {
+            if (!state.sectionOrder) {
+                state.sectionOrder = ['techcheck', 'qa', 'assignment', 'orders', 'weight', 'time'];
+            }
+        }
+
+        // Section drag and drop handlers
+        function handleSectionDragStart(event, patientId) {
+            initSectionOrder();
+            const section = event.target.closest('.collapsible-section');
+            sectionDragState.draggedSection = section;
+            sectionDragState.draggedSectionId = section.dataset.sectionId;
+            sectionDragState.patientId = patientId;
+            section.classList.add('dragging');
+            event.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleSectionDragEnd(event) {
+            event.target.closest('.collapsible-section').classList.remove('dragging');
+            document.querySelectorAll('.collapsible-section.drag-over').forEach(el => el.classList.remove('drag-over'));
+            sectionDragState.draggedSection = null;
+            sectionDragState.draggedSectionId = null;
+            sectionDragState.patientId = null;
+        }
+
+        function handleSectionDragOver(event) {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'move';
+            const section = event.target.closest('.collapsible-section');
+            if (section && section !== sectionDragState.draggedSection) {
+                // Remove drag-over from all sections first
+                document.querySelectorAll('.collapsible-section.drag-over').forEach(el => el.classList.remove('drag-over'));
+                section.classList.add('drag-over');
+            }
+        }
+
+        function handleSectionDragLeave(event) {
+            const section = event.target.closest('.collapsible-section');
+            if (section) {
+                section.classList.remove('drag-over');
+            }
+        }
+
+        function handleSectionDrop(event, patientId) {
+            event.preventDefault();
+            const targetSection = event.target.closest('.collapsible-section');
+            if (targetSection) targetSection.classList.remove('drag-over');
+
+            if (!sectionDragState.draggedSectionId) return;
+
+            const targetSectionId = targetSection?.dataset.sectionId;
+            if (!targetSectionId || sectionDragState.draggedSectionId === targetSectionId) return;
+
+            initSectionOrder();
+
+            // Get current order
+            const order = [...state.sectionOrder];
+            const draggedIndex = order.indexOf(sectionDragState.draggedSectionId);
+            const targetIndex = order.indexOf(targetSectionId);
+
+            if (draggedIndex === -1 || targetIndex === -1) return;
+
+            // Remove dragged item and insert at new position
+            order.splice(draggedIndex, 1);
+            order.splice(targetIndex, 0, sectionDragState.draggedSectionId);
+
+            // Update state
+            state.sectionOrder = order;
+            saveState();
+
+            // Reorder the sections in the DOM for ALL patients
+            reorderSectionsInDOM();
+        }
+
+        // Reorder sections in DOM based on saved order
+        function reorderSectionsInDOM() {
+            initSectionOrder();
+            state.patients.forEach(patient => {
+                const container = document.getElementById(`sectionsContainer_${patient.id}`);
+                if (!container) return;
+
+                const sections = {};
+                container.querySelectorAll('.collapsible-section').forEach(section => {
+                    sections[section.dataset.sectionId] = section;
+                });
+
+                // Reorder based on saved order
+                state.sectionOrder.forEach(sectionId => {
+                    if (sections[sectionId]) {
+                        container.appendChild(sections[sectionId]);
+                    }
+                });
+            });
+        }
+
         // Toggle Tech Check item (checked = missing from chart)
         function toggleTechCheck(patientId, field, event) {
             event.stopPropagation();
@@ -7820,7 +8005,17 @@
                 <div class="patient-card ${hospitalizedClass} ${missedTxCardClass} ${chartClosedCardClass}">
                     <!-- At-a-Glance Section -->
                     <div class="at-a-glance">
-                        <div class="glance-title">👁️ Quick View - ${patient.name}</div>
+                        <div class="glance-title">
+                            👁️ Quick View - ${patient.name}
+                            <div class="glance-actions">
+                                <button class="glance-action-btn" onclick="expandAllSections(${patient.id})" title="Expand All">
+                                    ⬇️ Expand
+                                </button>
+                                <button class="glance-action-btn" onclick="collapseAllSections(${patient.id})" title="Collapse All">
+                                    ⬆️ Collapse
+                                </button>
+                            </div>
+                        </div>
                         <div class="glance-grid">
                             <div class="glance-item">
                                 <div class="glance-label">Rx Time</div>
@@ -7849,9 +8044,18 @@
                         </div>
                     </div>
 
+                    <!-- Sections Container for Drag/Drop Reordering -->
+                    <div class="sections-container" id="sectionsContainer_${patient.id}">
+
                     <!-- Tech Check (Missing Chart Items) - COLLAPSIBLE -->
-                    <div class="collapsible-section">
+                    <div class="collapsible-section" data-section-id="techcheck" draggable="true"
+                         ondragstart="handleSectionDragStart(event, ${patient.id})"
+                         ondragend="handleSectionDragEnd(event)"
+                         ondragover="handleSectionDragOver(event)"
+                         ondragleave="handleSectionDragLeave(event)"
+                         ondrop="handleSectionDrop(event, ${patient.id})">
                         <div class="section-header" data-section="${patient.id}_techcheck" onclick="toggleSection(${patient.id}, 'techcheck')">
+                            <span class="section-drag-handle" onclick="event.stopPropagation()">⋮⋮</span>
                             🔍 Tech Check (Missing Chart Items)
                             <span class="toggle-icon">▼</span>
                         </div>
@@ -7934,8 +8138,14 @@
                     </div>
 
                     <!-- QA Checklist - COLLAPSIBLE -->
-                    <div class="collapsible-section">
+                    <div class="collapsible-section" data-section-id="qa" draggable="true"
+                         ondragstart="handleSectionDragStart(event, ${patient.id})"
+                         ondragend="handleSectionDragEnd(event)"
+                         ondragover="handleSectionDragOver(event)"
+                         ondragleave="handleSectionDragLeave(event)"
+                         ondrop="handleSectionDrop(event, ${patient.id})">
                         <div class="section-header" data-section="${patient.id}_qa" onclick="toggleSection(${patient.id}, 'qa')">
+                            <span class="section-drag-handle" onclick="event.stopPropagation()">⋮⋮</span>
                             ✅ QA Checklist
                             <span class="toggle-icon">▼</span>
                         </div>
@@ -8175,8 +8385,14 @@
                     </div>
 
                     <!-- Assignment - COLLAPSIBLE -->
-                    <div class="collapsible-section">
+                    <div class="collapsible-section" data-section-id="assignment" draggable="true"
+                         ondragstart="handleSectionDragStart(event, ${patient.id})"
+                         ondragend="handleSectionDragEnd(event)"
+                         ondragover="handleSectionDragOver(event)"
+                         ondragleave="handleSectionDragLeave(event)"
+                         ondrop="handleSectionDrop(event, ${patient.id})">
                         <div class="section-header" data-section="${patient.id}_assignment" onclick="toggleSection(${patient.id}, 'assignment')">
+                            <span class="section-drag-handle" onclick="event.stopPropagation()">⋮⋮</span>
                             👤 Assignment (Tech/Pod/Chair)
                             <span class="toggle-icon">▼</span>
                         </div>
@@ -8219,8 +8435,14 @@
                     </div>
 
                     <!-- Treatment Orders - COLLAPSIBLE -->
-                    <div class="collapsible-section">
+                    <div class="collapsible-section" data-section-id="orders" draggable="true"
+                         ondragstart="handleSectionDragStart(event, ${patient.id})"
+                         ondragend="handleSectionDragEnd(event)"
+                         ondragover="handleSectionDragOver(event)"
+                         ondragleave="handleSectionDragLeave(event)"
+                         ondrop="handleSectionDrop(event, ${patient.id})">
                         <div class="section-header" data-section="${patient.id}_orders" onclick="toggleSection(${patient.id}, 'orders')">
+                            <span class="section-drag-handle" onclick="event.stopPropagation()">⋮⋮</span>
                             📋 Treatment Orders
                             <span class="toggle-icon">▼</span>
                         </div>
@@ -8292,8 +8514,14 @@
                     </div>
 
                     <!-- Weight Management - COLLAPSIBLE -->
-                    <div class="collapsible-section">
+                    <div class="collapsible-section" data-section-id="weight" draggable="true"
+                         ondragstart="handleSectionDragStart(event, ${patient.id})"
+                         ondragend="handleSectionDragEnd(event)"
+                         ondragover="handleSectionDragOver(event)"
+                         ondragleave="handleSectionDragLeave(event)"
+                         ondrop="handleSectionDrop(event, ${patient.id})">
                         <div class="section-header" data-section="${patient.id}_weight" onclick="toggleSection(${patient.id}, 'weight')">
+                            <span class="section-drag-handle" onclick="event.stopPropagation()">⋮⋮</span>
                             ⚖️ Weight & UF Management
                             <span class="toggle-icon">▼</span>
                         </div>
@@ -8476,8 +8704,14 @@
                     </div>
 
                     <!-- Time Tracking - COLLAPSIBLE -->
-                    <div class="collapsible-section">
+                    <div class="collapsible-section" data-section-id="time" draggable="true"
+                         ondragstart="handleSectionDragStart(event, ${patient.id})"
+                         ondragend="handleSectionDragEnd(event)"
+                         ondragover="handleSectionDragOver(event)"
+                         ondragleave="handleSectionDragLeave(event)"
+                         ondrop="handleSectionDrop(event, ${patient.id})">
                         <div class="section-header" data-section="${patient.id}_time" onclick="toggleSection(${patient.id}, 'time')">
+                            <span class="section-drag-handle" onclick="event.stopPropagation()">⋮⋮</span>
                             ⏱️ Treatment Time Tracking
                             <span class="toggle-icon">▼</span>
                         </div>
@@ -8599,6 +8833,8 @@
                         </div>
                     </div>
 
+                    </div><!-- End Sections Container -->
+
                     <!-- Delete Button -->
                     <div style="text-align: center; margin-top: 30px;">
                         <button class="btn btn-danger" onclick="removePatient(${patient.id})">
@@ -8617,6 +8853,8 @@
                     ${renderPatientCard(p)}
                 </div>`;
             }).join('');
+            // Apply saved section order after rendering
+            reorderSectionsInDOM();
         }
 
         function renderAssignmentInfo() {
