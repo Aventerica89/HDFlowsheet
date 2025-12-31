@@ -1,10 +1,15 @@
 <!DOCTYPE html>
 <!--
     HD Flowsheet & QA Tracker
-    Version: 1.9.10
-    Date: December 29, 2024
+    Version: 1.9.11
+    Date: December 31, 2024
 
     CHANGELOG:
+    v1.9.11 - Theme-Aware Snippet Sections & Default Collapsed Sections
+        - Pre Dialysis, Post Dialysis, and Treatment Time Documentation sections now use theme colors
+        - Removed hardcoded blue/orange backgrounds that clashed with selected themes
+        - Assignment and Treatment Orders sections now collapsed by default for new patients
+        - Reduces visual clutter while keeping sections easily expandable
     v1.9.10 - Patient Chart Section Reordering
         - Drag and drop reordering for patient chart toggle sections
         - Expand All / Collapse All buttons in Quick View header
@@ -4119,7 +4124,7 @@
                     <button class="settings-btn" onclick="openSettingsModal()" title="Settings">⚙️</button>
                     <div>
                         <h1 style="margin-bottom: 5px;">🏥 HD Flowsheet & QA Tracker</h1>
-                        <div class="version">Version 1.9.10</div>
+                        <div class="version">Version 1.9.11</div>
                     </div>
                 </div>
             </div>
