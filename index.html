@@ -2067,8 +2067,8 @@
         }
         
         .snippet-section {
-            background: linear-gradient(135deg, #e8f4f8 0%, #d4e9f2 100%);
-            border: 2px solid #7eb3d1;
+            background: var(--theme-primary-bg);
+            border: 2px solid var(--theme-border);
             border-radius: 8px;
             padding: 15px;
             flex: 1;
@@ -2101,8 +2101,8 @@
         
         /* Time Documentation Snippet Styles */
         .time-snippet-section {
-            background: linear-gradient(135deg, #fef3e8 0%, #fce7d4 100%);
-            border: 2px solid #e8b87e;
+            background: var(--theme-primary-bg);
+            border: 2px solid var(--theme-border);
             border-radius: 8px;
             padding: 15px;
             margin-top: 15px;
@@ -6870,6 +6870,10 @@
             if (!state.activePatientId) {
                 state.activePatientId = patient.id;
             }
+
+            // Initialize Assignment and Treatment Orders sections as collapsed by default
+            state.collapsedSections[`${patient.id}_assignment`] = true;
+            state.collapsedSections[`${patient.id}_orders`] = true;
         }
 
         // Remove patient
@@ -8469,12 +8473,12 @@
                          ondragover="handleSectionDragOver(event)"
                          ondragleave="handleSectionDragLeave(event)"
                          ondrop="handleSectionDrop(event, ${patient.id})">
-                        <div class="section-header" data-section="${patient.id}_assignment" onclick="toggleSection(${patient.id}, 'assignment')">
+                        <div class="section-header ${state.collapsedSections[`${patient.id}_assignment`] ? 'collapsed' : ''}" data-section="${patient.id}_assignment" onclick="toggleSection(${patient.id}, 'assignment')">
                             <span class="section-drag-handle" onclick="event.stopPropagation()">⋮⋮</span>
                             👤 Assignment (Tech/Pod/Chair)
                             <span class="toggle-icon">▼</span>
                         </div>
-                        <div class="section-content">
+                        <div class="section-content ${state.collapsedSections[`${patient.id}_assignment`] ? 'collapsed' : ''}">
                             <div class="field-grid">
                                 <div class="field-group">
                                     <label class="field-label">Section</label>
@@ -8519,12 +8523,12 @@
                          ondragover="handleSectionDragOver(event)"
                          ondragleave="handleSectionDragLeave(event)"
                          ondrop="handleSectionDrop(event, ${patient.id})">
-                        <div class="section-header" data-section="${patient.id}_orders" onclick="toggleSection(${patient.id}, 'orders')">
+                        <div class="section-header ${state.collapsedSections[`${patient.id}_orders`] ? 'collapsed' : ''}" data-section="${patient.id}_orders" onclick="toggleSection(${patient.id}, 'orders')">
                             <span class="section-drag-handle" onclick="event.stopPropagation()">⋮⋮</span>
                             📋 Treatment Orders
                             <span class="toggle-icon">▼</span>
                         </div>
-                        <div class="section-content">
+                        <div class="section-content ${state.collapsedSections[`${patient.id}_orders`] ? 'collapsed' : ''}">
                             <div class="field-grid">
                                 <div class="field-group">
                                     <label class="field-label">Patient Name</label>
