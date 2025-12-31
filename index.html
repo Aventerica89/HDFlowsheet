@@ -4240,6 +4240,7 @@
             collapsedSections: {}, // Track collapsed state per patient per section
             technicians: [], // Array of {name: string, pod: string}
             currentSection: 'B1', // Currently selected section
+            sectionOrder: ['techcheck', 'qa', 'assignment', 'orders', 'weight', 'time'], // Order of sections in patient charts
             sections: {
                 B1: { name: 'B1', chairs: [1, 2, 3, 4, 5, 16, 17, 18, 19, 20], info: '(Chairs 1-5, 16-20)' },
                 B2: { name: 'B2', chairs: [6, 7, 8, 9, 10, 11, 12, 13, 14, 15], info: '(Chairs 6-15)' },
@@ -4600,18 +4601,18 @@
         function handleFolderDragOver(event) {
             event.preventDefault();
             event.dataTransfer.dropEffect = 'move';
-            const container = event.target.closest('.checklist-folder-items, .checklist-uncategorized');
+            const container = event.target.closest('.checklist-folder-items, .checklist-uncategorized, .folder-items');
             if (container) container.style.background = '#dbeafe';
         }
 
         function handleFolderDragLeave(event) {
-            const container = event.target.closest('.checklist-folder-items, .checklist-uncategorized');
+            const container = event.target.closest('.checklist-folder-items, .checklist-uncategorized, .folder-items');
             if (container) container.style.background = '';
         }
 
         function handleFolderDrop(event, checklistId, folderId) {
             event.preventDefault();
-            const container = event.target.closest('.checklist-folder-items, .checklist-uncategorized');
+            const container = event.target.closest('.checklist-folder-items, .checklist-uncategorized, .folder-items');
             if (container) container.style.background = '';
 
             if (!dragState.draggedItemId) return;
@@ -5099,7 +5100,28 @@
         function saveSection() {
             localStorage.setItem('hd_current_section', state.currentSection);
         }
-        
+
+        // Save/load section order
+        function saveSectionOrder() {
+            localStorage.setItem('hd_section_order', JSON.stringify(state.sectionOrder));
+        }
+
+        function loadSectionOrder() {
+            const saved = localStorage.getItem('hd_section_order');
+            if (saved) {
+                try {
+                    state.sectionOrder = JSON.parse(saved);
+                } catch (e) {
+                    console.error('Failed to load section order:', e);
+                }
+            }
+        }
+
+        // Alias for backward compatibility
+        function saveState() {
+            saveSectionOrder();
+        }
+
         // ========== THEME FUNCTIONS ==========
         let currentTheme = 'clinical-blue';
         
@@ -9132,6 +9154,7 @@
             loadShifts(); // Load selected shifts
             loadTechnicians();
             loadSection();
+            loadSectionOrder(); // Load saved section order
             showImportModal(); // Show import modal with section selector on page load
         });
     </script>
