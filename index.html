@@ -236,24 +236,6 @@
             --theme-body-gradient: linear-gradient(135deg, #64748b 0%, #475569 100%);
         }
         
-        /* Theme: Sage Medical */
-        [data-theme="sage"] {
-            --theme-primary: #16a34a;
-            --theme-primary-dark: #166534;
-            --theme-primary-light: #bbf7d0;
-            --theme-primary-bg: #f0fdf4;
-            --theme-accent: #166534;
-            --theme-accent-light: #dcfce7;
-            --theme-accent-bg: #f0fdf4;
-            --theme-text: #14532d;
-            --theme-text-light: #4d7c0f;
-            --theme-border: #86efac;
-            --theme-bg: #ffffff;
-            --theme-bg-alt: #f0fdf4;
-            --theme-header-gradient: linear-gradient(135deg, #16a34a 0%, #166534 100%);
-            --theme-body-gradient: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-        }
-        
         /* Theme: Warm Neutral */
         [data-theme="warm"] {
             --theme-primary: #a8a29e;
@@ -270,24 +252,6 @@
             --theme-bg-alt: #fafaf9;
             --theme-header-gradient: linear-gradient(135deg, #a8a29e 0%, #78716c 100%);
             --theme-body-gradient: linear-gradient(135deg, #d6d3d1 0%, #a8a29e 100%);
-        }
-        
-        /* Theme: Dark Mode */
-        [data-theme="dark"] {
-            --theme-primary: #3b82f6;
-            --theme-primary-dark: #1e293b;
-            --theme-primary-light: #334155;
-            --theme-primary-bg: #0f172a;
-            --theme-accent: #22c55e;
-            --theme-accent-light: #14532d;
-            --theme-accent-bg: #14532d;
-            --theme-text: #e2e8f0;
-            --theme-text-light: #94a3b8;
-            --theme-border: #475569;
-            --theme-bg: #1e293b;
-            --theme-bg-alt: #0f172a;
-            --theme-header-gradient: linear-gradient(135deg, #334155 0%, #1e293b 100%);
-            --theme-body-gradient: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
         }
         
         /* Theme: Navy Professional */
@@ -325,7 +289,25 @@
             --theme-header-gradient: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
             --theme-body-gradient: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
         }
-        
+
+        /* Theme: Ultra-Light Clinical */
+        [data-theme="ultra-light"] {
+            --theme-primary: #2a7de1;
+            --theme-primary-dark: #1c5ab0;
+            --theme-primary-light: #eef6fc;
+            --theme-primary-bg: #f4f8fb;
+            --theme-accent: #2a7de1;
+            --theme-accent-light: #eef6fc;
+            --theme-accent-bg: #f4f8fb;
+            --theme-text: #2c3e50;
+            --theme-text-light: #546e7a;
+            --theme-border: #2a7de1;
+            --theme-bg: #ffffff;
+            --theme-bg-alt: #f4f8fb;
+            --theme-header-gradient: linear-gradient(135deg, #2a7de1 0%, #1c5ab0 100%);
+            --theme-body-gradient: linear-gradient(135deg, #f4f8fb 0%, #eef6fc 100%);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
@@ -335,22 +317,6 @@
             transition: background 0.3s ease;
         }
         
-        /* Dark mode specific overrides */
-        [data-theme="dark"] .container { color: var(--theme-text); }
-        [data-theme="dark"] .patient-card { background: var(--theme-bg); color: var(--theme-text); }
-        [data-theme="dark"] .modal { background: var(--theme-bg); color: var(--theme-text); }
-        [data-theme="dark"] .glance-item { background: var(--theme-bg-alt); }
-        [data-theme="dark"] .glance-label { color: var(--theme-text-light); }
-        [data-theme="dark"] .glance-value { color: var(--theme-text); }
-        [data-theme="dark"] input, [data-theme="dark"] select, [data-theme="dark"] textarea { 
-            background: var(--theme-bg-alt); 
-            color: var(--theme-text); 
-            border-color: var(--theme-border);
-        }
-        [data-theme="dark"] .section-content { background: var(--theme-bg-alt); }
-        [data-theme="dark"] .field-label { color: var(--theme-text-light); }
-        [data-theme="dark"] .tab-content { background: var(--theme-bg); }
-
         /* ========== TOP-LEVEL NAVIGATION ========== */
         .top-nav {
             display: flex;
@@ -9603,17 +9569,13 @@
                             <div class="theme-preview" style="background: linear-gradient(135deg, #475569 0%, #334155 100%);"></div>
                             <div class="theme-option-name">Slate Professional</div>
                         </div>
-                        <div class="theme-option" data-theme-value="sage" onclick="setTheme('sage')">
-                            <div class="theme-preview" style="background: linear-gradient(135deg, #16a34a 0%, #166534 100%);"></div>
-                            <div class="theme-option-name">Sage Medical</div>
+                        <div class="theme-option" data-theme-value="ultra-light" onclick="setTheme('ultra-light')">
+                            <div class="theme-preview" style="background: linear-gradient(135deg, #2a7de1 0%, #1c5ab0 100%);"></div>
+                            <div class="theme-option-name">Ultra-Light Clinical</div>
                         </div>
                         <div class="theme-option" data-theme-value="warm" onclick="setTheme('warm')">
                             <div class="theme-preview" style="background: linear-gradient(135deg, #a8a29e 0%, #78716c 100%);"></div>
                             <div class="theme-option-name">Warm Neutral</div>
-                        </div>
-                        <div class="theme-option" data-theme-value="dark" onclick="setTheme('dark')">
-                            <div class="theme-preview" style="background: linear-gradient(135deg, #334155 0%, #1e293b 100%);"></div>
-                            <div class="theme-option-name">Dark Mode</div>
                         </div>
                         <div class="theme-option" data-theme-value="navy" onclick="setTheme('navy')">
                             <div class="theme-preview" style="background: linear-gradient(135deg, #2563eb 0%, #1e3a5f 100%);"></div>
