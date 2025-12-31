@@ -1884,6 +1884,24 @@
             padding-bottom: 10px;
             border-bottom: 2px solid #e2e8f0;
         }
+        .misc-todo-header.collapsed {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        .misc-todo-header.collapsed span:first-child {
+            transform: rotate(-90deg);
+        }
+        .misc-todo-content {
+            max-height: 2000px;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+            opacity: 1;
+        }
+        .misc-todo-content.collapsed {
+            max-height: 0;
+            opacity: 0;
+        }
         .misc-todo-title {
             font-weight: 700;
             font-size: 1.1em;
@@ -8086,6 +8104,14 @@
                                 <button class="glance-action-btn" onclick="collapseAllSections(${patient.id})" title="Collapse All">
                                     ⬆️ Collapse
                                 </button>
+                                <label class="chart-closed-checkbox ${patient.chartClosed ? 'checked' : ''} ${hasIncompleteTodos(patient) ? 'disabled' : ''}" style="margin-left: 15px;">
+                                    <input type="checkbox" ${patient.chartClosed ? 'checked' : ''} ${hasIncompleteTodos(patient) ? 'disabled' : ''}
+                                        onchange="updatePatient(${patient.id}, 'chartClosed', this.checked)"
+                                        title="${hasIncompleteTodos(patient) ? 'Complete all to-dos before closing chart' : 'Mark chart as closed'}">
+                                    <span class="chart-closed-label">📋 Chart Closed</span>
+                                    <span class="chart-closed-checkmark">✓</span>
+                                </label>
+                                ${hasIncompleteTodos(patient) ? '<span style="color: #dc2626; font-size: 0.75em; margin-left: 8px;">Complete all to-dos first</span>' : ''}
                             </div>
                         </div>
                         <div class="glance-grid">
@@ -8368,26 +8394,17 @@
                                     </div>
                                 </div><!-- End qa-boxes-grid -->
 
-                                <div class="field-grid" style="margin-top: 15px;">
-                                    <div class="field-group">
-                                        <label class="field-label">Ended Early (h:mm)</label>
-                                        <input type="text" class="field-input" value="${patient.endedEarly}"
-                                            placeholder="00:30" onchange="updatePatient(${patient.id}, 'endedEarly', this.value)">
-                                    </div>
-                                    <div class="field-group">
-                                        <label class="field-label">Reschedule (date to date)</label>
-                                        <input type="text" class="field-input" value="${patient.reschedule}"
-                                            placeholder="12/10 to 12/12" onchange="updatePatient(${patient.id}, 'reschedule', this.value)">
-                                    </div>
-                                </div>
-
-                                <!-- Misc To-Do List Section -->
-                                <div class="misc-todo-section">
-                                    <div class="misc-todo-header">
-                                        <span class="misc-todo-title">📝 Misc To-Do List</span>
-                                        ${hasIncompleteTodos(patient) ? '<span class="incomplete-todos-badge">⚠️ Incomplete</span>' : ''}
+                                <!-- Misc To-Do List Section - COLLAPSIBLE SUBSECTION -->
+                                <div class="misc-todo-section" style="margin-top: 15px;">
+                                    <div class="misc-todo-header" data-section="${patient.id}_misctodo" onclick="toggleSection(${patient.id}, 'misctodo')" style="cursor: pointer; padding: 10px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 8px; display: flex; align-items: center; justify-content: space-between;">
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <span style="font-size: 0.9em; transition: transform 0.2s;">▼</span>
+                                            <span class="misc-todo-title">📝 Misc To-Do List</span>
+                                            ${hasIncompleteTodos(patient) ? '<span class="incomplete-todos-badge">⚠️ Incomplete</span>' : ''}
+                                        </div>
                                     </div>
 
+                                    <div class="misc-todo-content" style="max-height: 2000px; overflow: hidden; transition: max-height 0.3s ease-out, opacity 0.3s ease-out; opacity: 1;">
                                     <!-- Add To Do -->
                                     <div class="misc-todo-add-section">
                                         <div class="misc-todo-input-row">
@@ -8439,18 +8456,7 @@
                                             `).join('')
                                         }
                                     </div>
-                                </div>
-
-                                <!-- Chart Closed - Special checkbox -->
-                                <div class="chart-closed-container">
-                                    <label class="chart-closed-checkbox ${patient.chartClosed ? 'checked' : ''} ${hasIncompleteTodos(patient) ? 'disabled' : ''}">
-                                        <input type="checkbox" ${patient.chartClosed ? 'checked' : ''} ${hasIncompleteTodos(patient) ? 'disabled' : ''}
-                                            onchange="updatePatient(${patient.id}, 'chartClosed', this.checked)"
-                                            title="${hasIncompleteTodos(patient) ? 'Complete all to-dos before closing chart' : 'Mark chart as closed'}">
-                                        <span class="chart-closed-label">📋 Chart Closed</span>
-                                        <span class="chart-closed-checkmark">✓</span>
-                                    </label>
-                                    ${hasIncompleteTodos(patient) ? '<span style="color: #dc2626; font-size: 0.85em; margin-left: 10px;">Complete all to-dos first</span>' : ''}
+                                    </div><!-- End misc-todo-content -->
                                 </div>
                             </div>
                         </div>
