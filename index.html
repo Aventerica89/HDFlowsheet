@@ -5245,6 +5245,17 @@
                         <button class="eosr-btn eosr-btn-copy" onclick="copyEOSRToClipboard()">📋 Copy All to Clipboard</button>
                     </div>
 
+                    <!-- Treatments Complete Without Issue Section -->
+                    <div class="eosr-section">
+                        <div class="eosr-section-header">
+                            <span>Treatments Complete Without Issue</span>
+                            <span class="eosr-section-count" id="eosrCompleteCount">0 patients</span>
+                        </div>
+                        <div class="eosr-section-content" id="eosrCompleteContent">
+                            <div class="eosr-bullet-placeholder">•</div>
+                        </div>
+                    </div>
+
                     <!-- COVID-19 Presumptive Section -->
                     <div class="eosr-section">
                         <div class="eosr-section-header">
@@ -5517,6 +5528,7 @@
 
         // EOSR state to track edits
         let eosrState = {
+            completeEdits: {},   // {patientId: editedText}
             earlyTermEdits: {},  // {patientId: editedText}
             weightEdits: {}      // {patientId: editedText}
         };
@@ -5799,9 +5811,67 @@
 
         // Refresh EOSR data from current patient data
         function refreshEOSR() {
+            renderEOSRComplete();
             renderEOSREarlyTerm();
             renderEOSRWeight();
             renderEOSRStatLabs();
+        }
+
+        // Render Treatments Complete Without Issue section
+        function renderEOSRComplete() {
+            const container = document.getElementById('eosrCompleteContent');
+            const countEl = document.getElementById('eosrCompleteCount');
+
+            // Get patients who completed treatment without issue:
+            // - Has completed treatment (startTime, endTime, postWeight all present)
+            // - No time issues (not ended >15 min early)
+            // - No weight issues (post weight within 1.5 kg of dry weight)
+            // - No hospitalization
+            const completePatients = state.patients.filter(p => {
+                // Must have completed treatment
+                if (!p.startTime || !p.endTime || !p.postWeight || !p.dryWeight || !p.rxTime) return false;
+
+                // Check for time issues
+                const timeCheck = calcTimeShortfall(p.rxTime, p.startTime, p.endTime);
+                if (timeCheck.isShort) return false;
+
+                // Check for weight issues
+                if (checkWeightAlert(p.postWeight, p.dryWeight)) return false;
+
+                // Check for hospitalization
+                if (p.hospitalization) return false;
+
+                return true;
+            });
+
+            countEl.textContent = `${completePatients.length} patient${completePatients.length !== 1 ? 's' : ''}`;
+
+            if (completePatients.length === 0) {
+                container.innerHTML = '<div class="eosr-bullet-placeholder">•</div>';
+                return;
+            }
+
+            container.innerHTML = completePatients.map(p => {
+                const formattedName = formatEOSRInitials(p);
+                const defaultText = 'Pt completed full treatment without issue and within dry weight parameters. No complaints at d/c.';
+                const editedText = eosrState.completeEdits[p.id] !== undefined
+                    ? eosrState.completeEdits[p.id]
+                    : defaultText;
+
+                return `
+                    <div class="eosr-entry">
+                        <div class="eosr-entry-header">
+                            <span><span class="eosr-patient-name">${formattedName}</span></span>
+                            <span class="eosr-patient-badge">Chair ${p.chair || 'N/A'}</span>
+                        </div>
+                        <textarea class="eosr-entry-text"
+                            data-patient-id="${p.id}"
+                            data-section="complete"
+                            data-name="${formattedName}"
+                            oninput="updateEOSREntry(this)">${editedText}</textarea>
+                    </div>
+                `;
+            }).join('');
         }
 
         // Render STAT Labs section from Operations Labs and patient chart labs
@@ -5953,7 +6023,9 @@
             const section = textarea.dataset.section;
             const newValue = textarea.value;
 
-            if (section === 'earlyTerm') {
+            if (section === 'complete') {
+                eosrState.completeEdits[patientId] = newValue;
+            } else if (section === 'earlyTerm') {
                 eosrState.earlyTermEdits[patientId] = newValue;
             } else if (section === 'weight') {
                 eosrState.weightEdits[patientId] = newValue;
@@ -5962,6 +6034,7 @@
 
         // EOSR section definitions in order
         const eosrSections = [
+            { id: 'Complete', title: 'Treatments Complete Without Issue', contentId: 'eosrCompleteContent' },
             { id: 'Covid', title: 'COVID-19 Presumptive', contentId: 'eosrCovidContent' },
             { id: 'Weight', title: 'Patients leaving over/under 1.5 kg of dry weight', contentId: 'eosrWeightContent' },
             { id: 'EarlyTerm', title: 'Early Termination', contentId: 'eosrEarlyTermContent' },
