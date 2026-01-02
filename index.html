@@ -579,22 +579,85 @@
         }
 
         /* Drag and Drop Styles */
+        .checklist-item {
+            transition: transform 0.15s ease, box-shadow 0.15s ease, margin 0.15s ease;
+            position: relative;
+        }
         .checklist-item.dragging {
-            opacity: 0.5;
+            opacity: 0.7;
             background: #dbeafe;
             border: 2px dashed #3b82f6;
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+            z-index: 1000;
         }
-        .checklist-item.drag-over {
-            border-top: 3px solid #3b82f6;
+        .checklist-item.drag-over-top {
+            margin-top: 45px;
+        }
+        .checklist-item.drag-over-top::before {
+            content: '';
+            position: absolute;
+            top: -25px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #60a5fa);
+            border-radius: 2px;
+            box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+        }
+        .checklist-item.drag-over-bottom {
+            margin-bottom: 45px;
+        }
+        .checklist-item.drag-over-bottom::after {
+            content: '';
+            position: absolute;
+            bottom: -25px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #60a5fa);
+            border-radius: 2px;
+            box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
         }
         .checklist-item-drag-handle {
             cursor: grab;
             color: #9ca3af;
             padding: 0 5px;
             font-size: 1.2em;
+            transition: color 0.15s ease;
+        }
+        .checklist-item-drag-handle:hover {
+            color: #3b82f6;
         }
         .checklist-item-drag-handle:active {
             cursor: grabbing;
+        }
+        /* Move buttons */
+        .checklist-item-move-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            margin-right: 4px;
+        }
+        .checklist-move-btn {
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 3px;
+            cursor: pointer;
+            padding: 1px 5px;
+            font-size: 10px;
+            line-height: 1;
+            color: #6b7280;
+            transition: all 0.15s ease;
+        }
+        .checklist-move-btn:hover {
+            background: #dbeafe;
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+        .checklist-move-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
         }
 
         /* URL Link Styles */
@@ -4539,7 +4602,8 @@
         let dragState = {
             draggedItem: null,
             draggedItemId: null,
-            checklistId: null
+            checklistId: null,
+            dropPosition: null  // 'before' or 'after'
         };
 
         // Load operations data from localStorage
@@ -4629,7 +4693,7 @@
         }
 
         // Render a single checklist item HTML
-        function renderChecklistItemHTML(checklist, item, isCompleted) {
+        function renderChecklistItemHTML(checklist, item, isCompleted, isFirst, isLast) {
             const urlLink = item.url ? `<a href="${item.url}" target="_blank" class="checklist-item-link" onclick="event.stopPropagation()">🔗 Open Link</a>` : '';
             return `
                 <div class="checklist-item ${isCompleted ? 'completed' : ''}"
@@ -4641,7 +4705,11 @@
                      ondragover="handleItemDragOver(event)"
                      ondragleave="handleItemDragLeave(event)"
                      ondrop="handleItemDrop(event, ${checklist.id}, ${item.id})">
-                    <span class="checklist-item-drag-handle">⋮⋮</span>
+                    <div class="checklist-item-move-btns">
+                        <button class="checklist-move-btn" onclick="event.stopPropagation(); moveChecklistItem(${checklist.id}, ${item.id}, 'up')" ${isFirst ? 'disabled' : ''} title="Move up">▲</button>
+                        <button class="checklist-move-btn" onclick="event.stopPropagation(); moveChecklistItem(${checklist.id}, ${item.id}, 'down')" ${isLast ? 'disabled' : ''} title="Move down">▼</button>
+                    </div>
+                    <span class="checklist-item-drag-handle" title="Drag to reorder">⋮⋮</span>
                     <input type="checkbox" class="checklist-item-checkbox"
                            ${isCompleted ? 'checked' : ''}
                            onchange="toggleChecklistItem(${checklist.id}, ${item.id}, this.checked)">
@@ -4739,18 +4807,22 @@
             let activeFolderDrop = '';
             if (activeFolderId === null) {
                 // Show uncategorized items
-                const uncatItemsHTML = uncategorizedItems.map(item => {
+                const uncatItemsHTML = uncategorizedItems.map((item, idx, arr) => {
                     const isCompleted = completion.completedItems.includes(item.id);
-                    return renderChecklistItemHTML(checklist, item, isCompleted);
+                    const isFirst = idx === 0;
+                    const isLast = idx === arr.length - 1;
+                    return renderChecklistItemHTML(checklist, item, isCompleted, isFirst, isLast);
                 }).join('');
                 activeItemsHTML = uncatItemsHTML || '<div style="padding: 10px; color: #9ca3af; font-size: 0.9em;">No items. Add items below or drag items from other folders.</div>';
                 activeFolderDrop = `ondragover="handleFolderDragOver(event)" ondragleave="handleFolderDragLeave(event)" ondrop="handleFolderDrop(event, ${checklist.id}, null)"`;
             } else {
                 // Show items from active folder
                 const folderItems = folderItemsMap[activeFolderId] || [];
-                const folderItemsHTML = folderItems.map(item => {
+                const folderItemsHTML = folderItems.map((item, idx, arr) => {
                     const isCompleted = completion.completedItems.includes(item.id);
-                    return renderChecklistItemHTML(checklist, item, isCompleted);
+                    const isFirst = idx === 0;
+                    const isLast = idx === arr.length - 1;
+                    return renderChecklistItemHTML(checklist, item, isCompleted, isFirst, isLast);
                 }).join('');
                 activeItemsHTML = folderItemsHTML || '<div style="padding: 10px; color: #9ca3af; font-size: 0.9em;">No items in this folder. Add items below or drag items here.</div>';
                 activeFolderDrop = `ondragover="handleFolderDragOver(event)" ondragleave="handleFolderDragLeave(event)" ondrop="handleFolderDrop(event, ${checklist.id}, ${activeFolderId})"`;
@@ -4806,43 +4878,88 @@
             `;
         }
 
-        // Drag and drop handlers
+        // Drag and drop handlers - improved with proper position detection
         function handleItemDragStart(event, checklistId, itemId) {
-            dragState.draggedItem = event.target;
+            const itemEl = event.target.closest('.checklist-item');
+            dragState.draggedItem = itemEl;
             dragState.draggedItemId = itemId;
             dragState.checklistId = checklistId;
-            event.target.classList.add('dragging');
+            dragState.dropPosition = null;
+
+            // Use setTimeout to allow the drag image to be captured first
+            setTimeout(() => {
+                itemEl.classList.add('dragging');
+            }, 0);
+
             event.dataTransfer.effectAllowed = 'move';
+            event.dataTransfer.setData('text/plain', itemId.toString());
         }
 
         function handleItemDragEnd(event) {
-            event.target.classList.remove('dragging');
-            document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+            const itemEl = event.target.closest('.checklist-item');
+            if (itemEl) itemEl.classList.remove('dragging');
+
+            // Clear all drag-over classes
+            document.querySelectorAll('.drag-over-top, .drag-over-bottom').forEach(el => {
+                el.classList.remove('drag-over-top', 'drag-over-bottom');
+            });
+
             dragState.draggedItem = null;
             dragState.draggedItemId = null;
             dragState.checklistId = null;
+            dragState.dropPosition = null;
         }
 
         function handleItemDragOver(event) {
             event.preventDefault();
             event.dataTransfer.dropEffect = 'move';
+
             const item = event.target.closest('.checklist-item');
-            if (item && item !== dragState.draggedItem) {
-                item.classList.add('drag-over');
+            if (!item || item === dragState.draggedItem) return;
+
+            // Calculate if we're in the top or bottom half of the target
+            const rect = item.getBoundingClientRect();
+            const midpoint = rect.top + rect.height / 2;
+            const isAbove = event.clientY < midpoint;
+
+            // Clear previous drag-over classes from all items
+            document.querySelectorAll('.drag-over-top, .drag-over-bottom').forEach(el => {
+                if (el !== item) {
+                    el.classList.remove('drag-over-top', 'drag-over-bottom');
+                }
+            });
+
+            // Set the appropriate class based on mouse position
+            if (isAbove) {
+                item.classList.remove('drag-over-bottom');
+                item.classList.add('drag-over-top');
+                dragState.dropPosition = 'before';
+            } else {
+                item.classList.remove('drag-over-top');
+                item.classList.add('drag-over-bottom');
+                dragState.dropPosition = 'after';
             }
         }
 
         function handleItemDragLeave(event) {
             const item = event.target.closest('.checklist-item');
-            if (item) {
-                item.classList.remove('drag-over');
-            }
+            if (!item) return;
+
+            // Only remove classes if we're actually leaving the item (not just moving between children)
+            const relatedTarget = event.relatedTarget;
+            if (relatedTarget && item.contains(relatedTarget)) return;
+
+            item.classList.remove('drag-over-top', 'drag-over-bottom');
         }
 
         function handleItemDrop(event, checklistId, targetItemId) {
             event.preventDefault();
+            event.stopPropagation();
+
             const item = event.target.closest('.checklist-item');
-            if (item) item.classList.remove('drag-over');
+            if (item) {
+                item.classList.remove('drag-over-top', 'drag-over-bottom');
+            }
 
             if (!dragState.draggedItemId || dragState.draggedItemId === targetItemId) return;
 
@@ -4854,21 +4971,78 @@
             if (!draggedItem || !targetItem) return;
 
             // Move dragged item to target's folder
+            const oldFolderId = draggedItem.folderId;
             draggedItem.folderId = targetItem.folderId;
 
-            // Reorder items in the same folder
-            const folderItems = checklist.items.filter(i => i.folderId === targetItem.folderId).sort((a, b) => a.order - b.order);
-            const draggedIndex = folderItems.findIndex(i => i.id === draggedItem.id);
-            const targetIndex = folderItems.findIndex(i => i.id === targetItem.id);
+            // Get all items in the target folder, sorted by order
+            let folderItems = checklist.items
+                .filter(i => i.folderId === targetItem.folderId)
+                .sort((a, b) => a.order - b.order);
 
-            // Remove and insert at new position
-            folderItems.splice(draggedIndex, 1);
+            // Remove dragged item from its current position
+            folderItems = folderItems.filter(i => i.id !== draggedItem.id);
+
+            // Find target position
+            let targetIndex = folderItems.findIndex(i => i.id === targetItem.id);
+
+            // Calculate mouse position relative to target to determine before/after
+            const rect = item ? item.getBoundingClientRect() : null;
+            const isDropAfter = dragState.dropPosition === 'after';
+
+            // Insert at the correct position
+            if (isDropAfter) {
+                targetIndex = targetIndex + 1;
+            }
+
+            // Insert dragged item at the new position
             folderItems.splice(targetIndex, 0, draggedItem);
 
-            // Update order values
-            folderItems.forEach((item, index) => {
-                item.order = index + 1;
+            // Update order values for all items in folder
+            folderItems.forEach((itm, index) => {
+                itm.order = index + 1;
             });
+
+            // Also update order for old folder if item moved between folders
+            if (oldFolderId !== targetItem.folderId) {
+                const oldFolderItems = checklist.items
+                    .filter(i => i.folderId === oldFolderId && i.id !== draggedItem.id)
+                    .sort((a, b) => a.order - b.order);
+                oldFolderItems.forEach((itm, index) => {
+                    itm.order = index + 1;
+                });
+            }
+
+            saveOpsData();
+            renderChecklistContent();
+        }
+
+        // Move item up or down with buttons
+        function moveChecklistItem(checklistId, itemId, direction) {
+            const checklist = opsState.checklists.find(cl => cl.id === checklistId);
+            if (!checklist) return;
+
+            const item = checklist.items.find(i => i.id === itemId);
+            if (!item) return;
+
+            // Get items in the same folder, sorted by order
+            const folderItems = checklist.items
+                .filter(i => i.folderId === item.folderId)
+                .sort((a, b) => a.order - b.order);
+
+            const currentIndex = folderItems.findIndex(i => i.id === itemId);
+
+            // Check bounds
+            if (direction === 'up' && currentIndex === 0) return;
+            if (direction === 'down' && currentIndex === folderItems.length - 1) return;
+
+            // Swap with adjacent item
+            const swapIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+            const swapItem = folderItems[swapIndex];
+
+            // Swap order values
+            const tempOrder = item.order;
+            item.order = swapItem.order;
+            swapItem.order = tempOrder;
 
             saveOpsData();
             renderChecklistContent();
