@@ -2693,10 +2693,13 @@
             align-items: center;
             gap: 5px;
             font-size: 0.85em;
+            flex-basis: 100%;
+            margin-top: 5px;
         }
         .labs-result-input input[type="text"] {
-            width: 120px;
-            padding: 4px 8px;
+            flex: 1;
+            min-width: 200px;
+            padding: 6px 10px;
             border: 1px solid #d1d5db;
             border-radius: 4px;
             font-size: 0.9em;
@@ -8322,6 +8325,14 @@
             }
         }
 
+        function addLabFromInput(patientId) {
+            const input = document.getElementById(`labInput_${patientId}`);
+            if (input && input.value.trim()) {
+                addLab(patientId, input.value);
+                input.value = '';
+            }
+        }
+
         function toggleLabCheckbox(patientId, labId, field, value) {
             const patient = state.patients.find(p => p.id === patientId);
             if (patient && patient.labs) {
@@ -10248,12 +10259,12 @@
                                         </div><!-- End misc-todo-content -->
                                     </div>
 
-                                    <!-- Labs Section -->
+                                    <!-- STAT Labs Section -->
                                     <div class="labs-section" style="margin-top: 0;">
                                         <div class="labs-header" data-section="${patient.id}_labs" onclick="toggleSection(${patient.id}, 'labs')" style="cursor: pointer; padding: 10px; background: linear-gradient(135deg, #fef9c3 0%, #fef3c7 100%); border-radius: 8px; display: flex; align-items: center; justify-content: space-between;">
                                             <div style="display: flex; align-items: center; gap: 10px;">
                                                 <span style="font-size: 0.9em; transition: transform 0.2s;">▼</span>
-                                                <span class="labs-title">🧪 Labs</span>
+                                                <span class="labs-title">🧪 STAT Labs</span>
                                                 ${hasIncompleteLabs(patient) ? '<span class="incomplete-labs-badge">⚠️ Incomplete</span>' : ''}
                                             </div>
                                         </div>
@@ -10261,6 +10272,13 @@
                                         <div class="labs-content">
                                         <!-- Add Lab -->
                                         <div class="labs-add-section">
+                                            <div class="labs-input-row" style="display: flex; gap: 10px; margin-bottom: 10px;">
+                                                <input type="text" class="labs-input" id="labInput_${patient.id}"
+                                                    placeholder="Enter a lab..."
+                                                    onkeypress="if(event.key==='Enter') addLabFromInput(${patient.id})"
+                                                    style="flex: 1; padding: 10px 12px; border: 2px solid #e2e8f0; border-radius: 6px; font-size: 0.95em;">
+                                                <button class="labs-add-btn" onclick="addLabFromInput(${patient.id})" style="padding: 10px 20px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">+ Add Lab</button>
+                                            </div>
                                             <div class="labs-snippets">
                                                 <button class="labs-snippet-btn" onclick="addLab(${patient.id}, 'H&H - Post Hosp.')">H&H - Post Hosp.</button>
                                                 <button class="labs-snippet-btn" onclick="addLab(${patient.id}, 'BMP - 2+ Missed Tx')">BMP - 2+ Missed Tx</button>
