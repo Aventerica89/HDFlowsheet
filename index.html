@@ -647,6 +647,20 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
         }
+        .labs-refresh-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .labs-refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
         .labs-input-section {
             background: #f9fafb;
             border: 1px solid #e5e7eb;
@@ -5078,7 +5092,7 @@
                     <button class="settings-btn" onclick="openSettingsModal()" title="Settings">⚙️</button>
                     <div>
                         <h1 style="margin-bottom: 5px;">🏥 HD Flowsheet & QA Tracker</h1>
-                        <div class="version">Version 1.9.13</div>
+                        <div class="version">Version 1.9.14</div>
                     </div>
                 </div>
             </div>
@@ -5203,7 +5217,10 @@
                     <div class="labs-container">
                         <div class="labs-header-actions">
                             <h3 class="labs-title">🧪 Lab Results</h3>
-                            <button class="labs-copy-all-btn" onclick="copyAllLabs()">📋 Copy All</button>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="labs-refresh-btn" onclick="refreshLabsList()">🔄 Refresh</button>
+                                <button class="labs-copy-all-btn" onclick="copyAllLabs()">📋 Copy All</button>
+                            </div>
                         </div>
 
                         <!-- Add Lab Input Section -->
@@ -5625,12 +5642,12 @@
             updateLabDateTime();  // Refresh the time
         }
 
-        // Copy a single lab entry to clipboard
+        // Copy a single lab entry to clipboard (without date/time)
         function copyLabEntry(id) {
             const entry = labsState.entries.find(e => e.id === id);
             if (!entry) return;
 
-            const text = `${entry.patientName} - ${entry.labResult} - ${entry.dateTime}`;
+            const text = `${entry.patientName} - ${entry.labResult}`;
             navigator.clipboard.writeText(text).then(() => {
                 // Show brief feedback
                 const btn = document.querySelector(`button[onclick="copyLabEntry(${id})"]`);
@@ -5654,7 +5671,7 @@
             renderLabsList();
         }
 
-        // Copy all lab entries as a bulleted list
+        // Copy all lab entries as a bulleted list (without date/time)
         function copyAllLabs() {
             if (labsState.entries.length === 0) {
                 alert('No lab entries to copy.');
@@ -5662,7 +5679,7 @@
             }
 
             const bulletList = labsState.entries.map(entry =>
-                `• ${entry.patientName} - ${entry.labResult} - ${entry.dateTime}`
+                `• ${entry.patientName} - ${entry.labResult}`
             ).join('\n');
 
             navigator.clipboard.writeText(bulletList).then(() => {
@@ -5676,6 +5693,31 @@
                     }, 1500);
                 }
             });
+        }
+
+        // Refresh labs list - sync from patient charts
+        function refreshLabsList() {
+            // Re-sync all completed labs from patient charts
+            if (typeof state !== 'undefined' && state.patients) {
+                state.patients.forEach(patient => {
+                    if (patient.labs) {
+                        patient.labs.filter(lab => lab.sectionComplete).forEach(lab => {
+                            syncLabToOperations(patient, lab);
+                        });
+                    }
+                });
+            }
+            // Reload and render
+            loadLabsData();
+            // Show feedback
+            const btn = document.querySelector('.labs-refresh-btn');
+            if (btn) {
+                const originalText = btn.textContent;
+                btn.textContent = '✓ Refreshed!';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 1500);
+            }
         }
 
         // Render the labs list
