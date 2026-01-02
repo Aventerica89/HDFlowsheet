@@ -761,6 +761,20 @@
             padding: 40px 20px;
             font-style: italic;
         }
+        .labs-entry-synced {
+            border-left: 3px solid #10b981;
+        }
+        .labs-synced-badge {
+            display: inline-block;
+            background: #d1fae5;
+            color: #059669;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+            text-transform: uppercase;
+        }
 
         /* Checklist Tabs */
         .checklist-tabs-container {
@@ -2915,6 +2929,61 @@
             cursor: pointer;
             accent-color: #16a34a;
         }
+        /* Expandable Completed Labs */
+        .labs-item-completed {
+            background: #dcfce7;
+            border-color: #86efac;
+            cursor: pointer;
+        }
+        .labs-item-completed .labs-item-header {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .labs-item-completed.expanded .labs-item-header {
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+        }
+        .labs-item-completed .labs-expand-icon {
+            font-size: 0.8em;
+            color: #64748b;
+            transition: transform 0.2s;
+        }
+        .labs-item-completed.expanded .labs-expand-icon {
+            transform: rotate(180deg);
+        }
+        .labs-item-completed .labs-item-details {
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            padding-top: 10px;
+        }
+        .labs-item-completed.expanded .labs-item-details {
+            display: flex;
+        }
+        .labs-detail-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 0.85em;
+            color: #374151;
+        }
+        .labs-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .labs-detail-item.checked {
+            color: #16a34a;
+        }
+        .labs-detail-result {
+            background: #f0fdf4;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-weight: 600;
+            color: #166534;
+        }
         /* Grid container for Misc ToDo and Labs */
         .todo-labs-grid {
             display: grid;
@@ -5009,7 +5078,7 @@
                     <button class="settings-btn" onclick="openSettingsModal()" title="Settings">⚙️</button>
                     <div>
                         <h1 style="margin-bottom: 5px;">🏥 HD Flowsheet & QA Tracker</h1>
-                        <div class="version">Version 1.9.12</div>
+                        <div class="version">Version 1.9.13</div>
                     </div>
                 </div>
             </div>
@@ -5150,7 +5219,7 @@
                                 </div>
                                 <div class="labs-input-group">
                                     <label>Date/Time (Phoenix AZ)</label>
-                                    <input type="text" id="labDateTime" readonly>
+                                    <input type="text" id="labDateTime">
                                 </div>
                                 <button class="labs-add-btn" onclick="addLabEntry()">+ Add Lab</button>
                             </div>
@@ -5620,9 +5689,12 @@
             }
 
             listContainer.innerHTML = labsState.entries.map(entry => `
-                <div class="labs-entry">
+                <div class="labs-entry ${entry.sourcePatientId ? 'labs-entry-synced' : ''}">
                     <div class="labs-entry-info">
-                        <div class="labs-entry-main">${entry.patientName} - ${entry.labResult}</div>
+                        <div class="labs-entry-main">
+                            ${entry.patientName} - ${entry.labResult}
+                            ${entry.sourcePatientId ? '<span class="labs-synced-badge">Auto</span>' : ''}
+                        </div>
                         <div class="labs-entry-time">${entry.dateTime}</div>
                     </div>
                     <div class="labs-entry-actions">
@@ -8784,8 +8856,81 @@
                 const lab = patient.labs.find(l => l.id === labId);
                 if (lab && isLabComplete(lab)) {
                     lab.sectionComplete = value;
+                    // Sync to Operations Labs when marked complete
+                    if (value) {
+                        syncLabToOperations(patient, lab);
+                    }
                     renderAll();
                 }
+            }
+        }
+
+        // Toggle expand/collapse for completed labs in patient chart
+        function toggleCompletedLabExpand(patientId, labId, event) {
+            // Don't toggle if clicking on checkbox or delete button
+            if (event.target.type === 'checkbox' || event.target.classList.contains('labs-item-delete')) {
+                return;
+            }
+            const element = document.getElementById(`completedLab_${patientId}_${labId}`);
+            if (element) {
+                element.classList.toggle('expanded');
+            }
+        }
+
+        // Sync a completed lab from patient chart to Operations Labs section
+        function syncLabToOperations(patient, lab) {
+            // Load current labs data
+            const saved = localStorage.getItem('hd_labs_data');
+            let labsData = { entries: [] };
+            if (saved) {
+                labsData = JSON.parse(saved);
+            }
+
+            // Check if this lab already exists (by patient + lab name + timestamp combo)
+            const existingIndex = labsData.entries.findIndex(e =>
+                e.sourcePatientId === patient.id &&
+                e.sourceLabId === lab.id
+            );
+
+            // Format patient identifier
+            const patientName = patient.initials || patient.name || `Pt #${patient.number}`;
+
+            // Create entry with lab details
+            const entry = {
+                id: Date.now(),
+                patientName: patientName,
+                labResult: lab.name + (lab.resultText ? ` - ${lab.resultText}` : ''),
+                dateTime: lab.timestamp || getPhoenixTime(),
+                timestamp: new Date().toISOString(),
+                sourcePatientId: patient.id,
+                sourceLabId: lab.id,
+                // Store full lab details for reference
+                labDetails: {
+                    name: lab.name,
+                    resultText: lab.resultText || '',
+                    distributed: lab.distributed,
+                    drawn: lab.drawn,
+                    orderInNextGen: lab.orderInNextGen,
+                    resultsSentEmail: lab.resultsSentEmail,
+                    resultsEnteredRenvio: lab.resultsEnteredRenvio,
+                    actionTaken: lab.actionTaken
+                }
+            };
+
+            if (existingIndex >= 0) {
+                // Update existing entry
+                labsData.entries[existingIndex] = entry;
+            } else {
+                // Add new entry at the beginning
+                labsData.entries.unshift(entry);
+            }
+
+            // Save back to localStorage
+            localStorage.setItem('hd_labs_data', JSON.stringify(labsData));
+
+            // Update labsState if it's been initialized
+            if (typeof labsState !== 'undefined') {
+                labsState.entries = labsData.entries;
             }
         }
 
@@ -10763,15 +10908,31 @@
                                             ${(patient.labs || []).filter(l => l.sectionComplete).length === 0
                                                 ? '<div class="labs-empty">No completed labs</div>'
                                                 : (patient.labs || []).filter(l => l.sectionComplete).map(lab => `
-                                                    <div class="labs-item all-complete" style="opacity: 0.8;">
+                                                    <div class="labs-item labs-item-completed" id="completedLab_${patient.id}_${lab.id}" onclick="toggleCompletedLabExpand(${patient.id}, ${lab.id}, event)">
                                                         <div class="labs-item-header">
-                                                            <label class="labs-complete-checkbox">
+                                                            <label class="labs-complete-checkbox" onclick="event.stopPropagation()">
                                                                 <input type="checkbox" checked
                                                                     onchange="toggleLabSectionComplete(${patient.id}, ${lab.id}, this.checked)">
                                                             </label>
-                                                            <span class="labs-item-name" style="text-decoration: line-through;">${lab.name}</span>
+                                                            <span class="labs-item-name">${lab.name}</span>
+                                                            <span class="labs-expand-icon">▼</span>
                                                             <span class="labs-item-timestamp">${lab.timestamp}</span>
-                                                            <button class="labs-item-delete" onclick="deleteLab(${patient.id}, ${lab.id})">✕</button>
+                                                            <button class="labs-item-delete" onclick="event.stopPropagation(); deleteLab(${patient.id}, ${lab.id})">✕</button>
+                                                        </div>
+                                                        <div class="labs-item-details">
+                                                            <div class="labs-detail-row">
+                                                                <span class="labs-detail-item ${lab.distributed ? 'checked' : ''}">✓ Distributed</span>
+                                                                <span class="labs-detail-item ${lab.drawn ? 'checked' : ''}">✓ Drawn</span>
+                                                                <span class="labs-detail-item ${lab.orderInNextGen ? 'checked' : ''}">✓ Order in NextGen</span>
+                                                            </div>
+                                                            <div class="labs-detail-row">
+                                                                <span class="labs-detail-item ${lab.resultsSentEmail ? 'checked' : ''}">✓ Results sent via Email</span>
+                                                                <span class="labs-detail-item ${lab.resultsEnteredRenvio ? 'checked' : ''}">✓ Results entered in Renvio</span>
+                                                            </div>
+                                                            <div class="labs-detail-row">
+                                                                <span class="labs-detail-item ${lab.actionTaken ? 'checked' : ''}">✓ Action taken if out of parameters</span>
+                                                            </div>
+                                                            ${lab.resultText ? '<div class="labs-detail-result">Result: ' + lab.resultText + '</div>' : ''}
                                                         </div>
                                                     </div>
                                                 `).join('')
