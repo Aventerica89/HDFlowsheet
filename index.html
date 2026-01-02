@@ -1475,11 +1475,11 @@
             padding: 12px; margin-bottom: 12px; text-align: center;
         }
         .btn-reimport {
-            padding: 10px 20px; background: #667eea; color: white;
+            padding: 10px 20px; background: #5B9BD5; color: white;
             border: none; border-radius: 6px; font-weight: 600;
             cursor: pointer; transition: all 0.2s;
         }
-        .btn-reimport:hover { background: #5568d3; transform: translateY(-2px); }
+        .btn-reimport:hover { background: #4A8BC5; transform: translateY(-2px); }
         
         .summary-dashboard {
             background: white; border-radius: 8px; padding: 12px;
@@ -3236,7 +3236,7 @@
         }
         
         .floating-btn {
-            background: var(--theme-header-gradient);
+            background: #5B9BD5;
             color: white;
             border: none;
             padding: 12px 16px;
@@ -3244,44 +3244,18 @@
             font-weight: 700;
             font-size: 0.9em;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            box-shadow: 0 4px 12px rgba(91, 155, 213, 0.4);
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
             gap: 8px;
             white-space: nowrap;
         }
-        
+
         .floating-btn:hover {
+            background: #4A8BC5;
             transform: translateX(-3px);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-        }
-        
-        .floating-btn.green {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-        }
-        
-        .floating-btn.green:hover {
-            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.5);
-        }
-        
-        .floating-btn.orange {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
-        }
-        
-        .floating-btn.orange:hover {
-            box-shadow: 0 6px 16px rgba(245, 158, 11, 0.5);
-        }
-
-        .floating-btn.purple {
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
-        }
-
-        .floating-btn.purple:hover {
-            box-shadow: 0 6px 16px rgba(139, 92, 246, 0.5);
+            box-shadow: 0 6px 16px rgba(91, 155, 213, 0.5);
         }
 
         /* Bottom Center Floating Button */
@@ -3290,7 +3264,7 @@
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            background: #5B9BD5;
             color: white;
             border: none;
             padding: 16px 28px;
@@ -3298,7 +3272,7 @@
             font-weight: 700;
             font-size: 1.1em;
             cursor: pointer;
-            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.5);
+            box-shadow: 0 6px 20px rgba(91, 155, 213, 0.5);
             transition: all 0.3s ease;
             z-index: 999;
             display: flex;
@@ -3307,8 +3281,9 @@
         }
 
         .floating-btn-bottom:hover {
+            background: #4A8BC5;
             transform: translateX(-50%) translateY(-3px);
-            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.6);
+            box-shadow: 0 8px 25px rgba(91, 155, 213, 0.6);
         }
 
         /* Timestamp Modal */
@@ -5113,16 +5088,16 @@
                     <button class="btn-reimport" onclick="showImportModal()">
                         📥 Import/Re-import Patient Orders
                     </button>
-                    <button class="btn-reimport" onclick="saveToServer()" style="background: #10b981;">
+                    <button class="btn-reimport" onclick="saveToServer()">
                         💾 Save to Server
                     </button>
-                    <button class="btn-reimport" onclick="loadFromServer()" style="background: #059669;">
+                    <button class="btn-reimport" onclick="loadFromServer()">
                         📂 Load from Server
                     </button>
-                    <button class="btn-reimport" onclick="exportToFile()" style="background: #6366f1;">
+                    <button class="btn-reimport" onclick="exportToFile()">
                         📥 Export to File
                     </button>
-                    <button class="btn-reimport" onclick="document.getElementById('importFileHeader').click()" style="background: #8b5cf6;">
+                    <button class="btn-reimport" onclick="document.getElementById('importFileHeader').click()">
                         📤 Import from File
                     </button>
                     <input type="file" id="importFileHeader" accept=".json" style="display: none;" onchange="importFromFile(event)">
@@ -11764,13 +11739,13 @@
         <button class="floating-btn" onclick="toggleDrawer()">
             📋 Charting
         </button>
-        <button class="floating-btn green" onclick="openBulkAssign()">
+        <button class="floating-btn" onclick="openBulkAssign()">
             👥 Quick Assign
         </button>
-        <button class="floating-btn orange" onclick="openQuickNotes()">
+        <button class="floating-btn" onclick="openQuickNotes()">
             📝 Quick Notes
         </button>
-        <button class="floating-btn purple" onclick="saveToServer()">
+        <button class="floating-btn" onclick="saveToServer()">
             💾 Save
         </button>
     </div>
