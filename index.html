@@ -331,12 +331,12 @@
         .top-nav {
             display: flex;
             justify-content: center;
-            gap: 0;
+            gap: 8px;
             margin-bottom: 15px;
             background: rgba(255, 255, 255, 0.15);
             border-radius: 12px;
             padding: 6px;
-            max-width: 400px;
+            max-width: 600px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -377,6 +377,148 @@
         }
         .pt-charting-page.active {
             display: block;
+        }
+
+        /* ========== REPORTS PAGE STYLES ========== */
+        .reports-page {
+            display: none;
+        }
+        .reports-page.active {
+            display: block;
+        }
+        .reports-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .reports-title {
+            color: white;
+            font-size: 1.8em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .reports-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .reports-tab {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.85);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            color: #667eea;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .reports-tab:hover {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: rgba(102, 126, 234, 0.5);
+        }
+        .reports-tab.active {
+            background: white;
+            color: var(--theme-primary);
+            border: 2px solid var(--theme-primary);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+        .eosr-container {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .eosr-section {
+            margin-bottom: 24px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .eosr-section-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 16px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .eosr-section-content {
+            padding: 16px;
+        }
+        .eosr-entry {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 8px;
+        }
+        .eosr-entry:last-child {
+            margin-bottom: 0;
+        }
+        .eosr-entry-header {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .eosr-entry-text {
+            width: 100%;
+            min-height: 60px;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+        }
+        .eosr-entry-text:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .eosr-empty {
+            text-align: center;
+            color: #9ca3af;
+            padding: 20px;
+            font-style: italic;
+        }
+        .eosr-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .eosr-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .eosr-btn-refresh {
+            background: #3b82f6;
+            color: white;
+        }
+        .eosr-btn-refresh:hover {
+            background: #2563eb;
+        }
+        .eosr-btn-copy {
+            background: #10b981;
+            color: white;
+        }
+        .eosr-btn-copy:hover {
+            background: #059669;
+        }
+        .eosr-patient-badge {
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
         }
 
         .ops-header {
@@ -4450,6 +4592,7 @@
             <div class="top-nav">
                 <button class="top-nav-tab active" onclick="switchTopNav('charting')" id="topNavCharting">📋 Pt Charting</button>
                 <button class="top-nav-tab" onclick="switchTopNav('operations')" id="topNavOperations">⚙️ Operations</button>
+                <button class="top-nav-tab" onclick="switchTopNav('reports')" id="topNavReports">📊 Reports</button>
             </div>
 
             <!-- Patient Charting Page -->
@@ -4551,6 +4694,48 @@
                     </div>
                 </div>
             </div><!-- End operations-page -->
+
+            <!-- Reports Page -->
+            <div class="reports-page" id="reportsPage">
+                <div class="reports-header">
+                    <h2 class="reports-title">📊 Reports</h2>
+                </div>
+
+                <!-- Reports Tabs -->
+                <div class="reports-tabs">
+                    <button class="reports-tab active" onclick="switchReportTab('eosr')" id="reportTabEOSR">📋 End of Shift Report</button>
+                </div>
+
+                <!-- End of Shift Report Content -->
+                <div id="eosrContent" class="eosr-container">
+                    <div class="eosr-actions" style="margin-top: 0; margin-bottom: 20px;">
+                        <button class="eosr-btn eosr-btn-refresh" onclick="refreshEOSR()">🔄 Refresh Report</button>
+                        <button class="eosr-btn eosr-btn-copy" onclick="copyEOSRToClipboard()">📋 Copy All to Clipboard</button>
+                    </div>
+
+                    <!-- Early Termination Section -->
+                    <div class="eosr-section">
+                        <div class="eosr-section-header">
+                            <span>Early Termination</span>
+                            <span class="eosr-section-count" id="eosrEarlyTermCount">0 patients</span>
+                        </div>
+                        <div class="eosr-section-content" id="eosrEarlyTermContent">
+                            <div class="eosr-empty">No patients with early termination (>15 min) this shift.</div>
+                        </div>
+                    </div>
+
+                    <!-- Patients leaving over/under 1.5 kg of dry weight Section -->
+                    <div class="eosr-section">
+                        <div class="eosr-section-header">
+                            <span>Patients leaving over/under 1.5 kg of dry weight</span>
+                            <span class="eosr-section-count" id="eosrWeightCount">0 patients</span>
+                        </div>
+                        <div class="eosr-section-content" id="eosrWeightContent">
+                            <div class="eosr-empty">No patients leaving &gt;1.5 kg from dry weight this shift.</div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- End reports-page -->
 
         </div><!-- End mainApp -->
     </div><!-- End container -->
@@ -4655,12 +4840,172 @@
         function switchTopNav(tab) {
             document.getElementById('topNavCharting').classList.toggle('active', tab === 'charting');
             document.getElementById('topNavOperations').classList.toggle('active', tab === 'operations');
+            document.getElementById('topNavReports').classList.toggle('active', tab === 'reports');
             document.getElementById('ptChartingPage').classList.toggle('active', tab === 'charting');
             document.getElementById('operationsPage').classList.toggle('active', tab === 'operations');
+            document.getElementById('reportsPage').classList.toggle('active', tab === 'reports');
 
             if (tab === 'operations') {
                 loadOpsData();
             }
+            if (tab === 'reports') {
+                refreshEOSR();
+            }
+        }
+
+        // Switch between report tabs (for future expansion)
+        function switchReportTab(tab) {
+            // Currently only EOSR tab exists
+            document.getElementById('reportTabEOSR').classList.toggle('active', tab === 'eosr');
+            if (tab === 'eosr') {
+                refreshEOSR();
+            }
+        }
+
+        // EOSR state to track edits
+        let eosrState = {
+            earlyTermEdits: {},  // {patientId: editedText}
+            weightEdits: {}      // {patientId: editedText}
+        };
+
+        // Refresh EOSR data from current patient data
+        function refreshEOSR() {
+            renderEOSREarlyTerm();
+            renderEOSRWeight();
+        }
+
+        // Render Early Termination section
+        function renderEOSREarlyTerm() {
+            const container = document.getElementById('eosrEarlyTermContent');
+            const countEl = document.getElementById('eosrEarlyTermCount');
+
+            // Get patients with early termination (>15 mins)
+            const earlyTermPatients = state.patients.filter(p => {
+                if (!p.rxTime || !p.startTime || !p.endTime) return false;
+                const timeCheck = calcTimeShortfall(p.rxTime, p.startTime, p.endTime);
+                return timeCheck.isShort; // isShort is true when >15 mins early
+            });
+
+            countEl.textContent = `${earlyTermPatients.length} patient${earlyTermPatients.length !== 1 ? 's' : ''}`;
+
+            if (earlyTermPatients.length === 0) {
+                container.innerHTML = '<div class="eosr-empty">No patients with early termination (>15 min) this shift.</div>';
+                return;
+            }
+
+            container.innerHTML = earlyTermPatients.map(p => {
+                const snippet = generateTimeSnippet(p);
+                // Check if we have an edited version
+                const editedText = eosrState.earlyTermEdits[p.id] !== undefined
+                    ? eosrState.earlyTermEdits[p.id]
+                    : snippet.text;
+
+                return `
+                    <div class="eosr-entry">
+                        <div class="eosr-entry-header">
+                            <span>${p.name || p.initials || 'Patient'}</span>
+                            <span class="eosr-patient-badge">Chair ${p.chair || 'N/A'}</span>
+                        </div>
+                        <textarea class="eosr-entry-text"
+                            data-patient-id="${p.id}"
+                            data-section="earlyTerm"
+                            onchange="updateEOSREntry(this)">${editedText}</textarea>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Render Weight deviation section
+        function renderEOSRWeight() {
+            const container = document.getElementById('eosrWeightContent');
+            const countEl = document.getElementById('eosrWeightCount');
+
+            // Get patients leaving >1.5 kg from dry weight
+            const weightPatients = state.patients.filter(p => {
+                if (!p.postWeight || !p.dryWeight) return false;
+                return checkWeightAlert(p.postWeight, p.dryWeight); // Returns true if |post - dry| > 1.5
+            });
+
+            countEl.textContent = `${weightPatients.length} patient${weightPatients.length !== 1 ? 's' : ''}`;
+
+            if (weightPatients.length === 0) {
+                container.innerHTML = '<div class="eosr-empty">No patients leaving &gt;1.5 kg from dry weight this shift.</div>';
+                return;
+            }
+
+            container.innerHTML = weightPatients.map(p => {
+                const snippet = generateUFSnippet(p);
+                // Check if we have an edited version
+                const editedText = eosrState.weightEdits[p.id] !== undefined
+                    ? eosrState.weightEdits[p.id]
+                    : snippet.text;
+
+                return `
+                    <div class="eosr-entry">
+                        <div class="eosr-entry-header">
+                            <span>${p.name || p.initials || 'Patient'}</span>
+                            <span class="eosr-patient-badge">Chair ${p.chair || 'N/A'}</span>
+                        </div>
+                        <textarea class="eosr-entry-text"
+                            data-patient-id="${p.id}"
+                            data-section="weight"
+                            onchange="updateEOSREntry(this)">${editedText}</textarea>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Update EOSR entry when edited
+        function updateEOSREntry(textarea) {
+            const patientId = parseInt(textarea.dataset.patientId);
+            const section = textarea.dataset.section;
+            const newValue = textarea.value;
+
+            if (section === 'earlyTerm') {
+                eosrState.earlyTermEdits[patientId] = newValue;
+            } else if (section === 'weight') {
+                eosrState.weightEdits[patientId] = newValue;
+            }
+        }
+
+        // Copy all EOSR content to clipboard
+        function copyEOSRToClipboard() {
+            let text = 'END OF SHIFT REPORT\n';
+            text += '=' .repeat(50) + '\n\n';
+
+            // Early Termination section
+            text += 'EARLY TERMINATION:\n';
+            const earlyTermTextareas = document.querySelectorAll('#eosrEarlyTermContent textarea');
+            if (earlyTermTextareas.length === 0) {
+                text += '• (none)\n';
+            } else {
+                earlyTermTextareas.forEach(ta => {
+                    const entry = ta.closest('.eosr-entry');
+                    const name = entry.querySelector('.eosr-entry-header span:first-child').textContent;
+                    text += `• ${name}: ${ta.value}\n`;
+                });
+            }
+            text += '\n';
+
+            // Weight section
+            text += 'PATIENTS LEAVING OVER/UNDER 1.5 KG OF DRY WEIGHT:\n';
+            const weightTextareas = document.querySelectorAll('#eosrWeightContent textarea');
+            if (weightTextareas.length === 0) {
+                text += '• (none)\n';
+            } else {
+                weightTextareas.forEach(ta => {
+                    const entry = ta.closest('.eosr-entry');
+                    const name = entry.querySelector('.eosr-entry-header span:first-child').textContent;
+                    text += `• ${name}: ${ta.value}\n`;
+                });
+            }
+
+            navigator.clipboard.writeText(text).then(() => {
+                alert('End of Shift Report copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy to clipboard. Please try again.');
+            });
         }
 
         // Render checklist tabs
