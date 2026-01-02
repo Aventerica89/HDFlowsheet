@@ -1,10 +1,18 @@
 <!DOCTYPE html>
 <!--
     HD Flowsheet & QA Tracker
-    Version: 1.9.11
-    Date: December 31, 2024
+    Version: 1.9.12
+    Date: January 2, 2025
 
     CHANGELOG:
+    v1.9.12 - Wheelchair Weight Calculation for TCH Patients
+        - NEW: Wheelchair weight calculation sub-section in Weight & UF Management (TCH patients only)
+        - Add custom equipment items (wheelchair, sling, cushion, etc.) with individual weights
+        - Enter total measured weight, system calculates actual patient weight
+        - "Use as Pre Weight" button auto-fills the Pre Weight field
+        - Copy button for clipboard access to calculated weight
+        - Equipment profiles persist by patient initials across sessions
+        - Collapsible section, expanded by default for TCH patients
     v1.9.11 - Theme-Aware Snippet Sections & Default Collapsed Sections
         - Pre Dialysis, Post Dialysis, and Treatment Time Documentation sections now use theme colors
         - Removed hardcoded blue/orange backgrounds that clashed with selected themes
@@ -1642,6 +1650,203 @@
             border-radius: 6px; padding: 10px; margin-top: 10px;
         }
         .alert-box h4 { color: #721c24; margin-bottom: 8px; font-size: 0.95em; }
+
+        /* Wheelchair Weight Calculation Section */
+        .wheelchair-section {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 2px solid #f59e0b;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .wheelchair-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        .wheelchair-header h4 {
+            margin: 0;
+            color: #92400e;
+            font-size: 1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .wheelchair-header .toggle-icon {
+            color: #92400e;
+            font-size: 0.9em;
+            transition: transform 0.2s;
+        }
+        .wheelchair-header.collapsed .toggle-icon {
+            transform: rotate(-90deg);
+        }
+        .wheelchair-content {
+            display: block;
+        }
+        .wheelchair-content.collapsed {
+            display: none;
+        }
+        .wheelchair-total-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .wheelchair-total-row label {
+            font-weight: 600;
+            color: #92400e;
+            min-width: 120px;
+        }
+        .wheelchair-total-row input {
+            flex: 1;
+            max-width: 120px;
+            padding: 8px 10px;
+            border: 2px solid #f59e0b;
+            border-radius: 6px;
+            font-size: 1em;
+            background: white;
+        }
+        .wheelchair-items-container {
+            margin: 12px 0;
+            border-top: 1px dashed #f59e0b;
+            padding-top: 12px;
+        }
+        .wheelchair-items-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .wheelchair-items-header h5 {
+            margin: 0;
+            color: #92400e;
+            font-size: 0.9em;
+        }
+        .wheelchair-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            background: rgba(255,255,255,0.7);
+            padding: 8px;
+            border-radius: 6px;
+        }
+        .wheelchair-item input[type="text"] {
+            flex: 2;
+            padding: 6px 10px;
+            border: 1px solid #d97706;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .wheelchair-item input[type="number"] {
+            flex: 1;
+            max-width: 80px;
+            padding: 6px 10px;
+            border: 1px solid #d97706;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .wheelchair-item .remove-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .wheelchair-item .remove-btn:hover {
+            background: #dc2626;
+        }
+        .add-item-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .add-item-btn:hover {
+            background: #059669;
+        }
+        .wheelchair-results {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 2px solid #f59e0b;
+        }
+        .wheelchair-result-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .wheelchair-result-group label {
+            font-size: 0.85em;
+            color: #92400e;
+            font-weight: 600;
+        }
+        .wheelchair-result-group input {
+            padding: 8px 10px;
+            border: 2px solid #f59e0b;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: bold;
+        }
+        .wheelchair-result-group input.calculated {
+            background: #fef9c3;
+        }
+        .wheelchair-result-group input.actual-weight {
+            background: linear-gradient(135deg, #bbf7d0 0%, #86efac 100%);
+            border-color: #22c55e;
+        }
+        .wheelchair-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .use-as-pre-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            flex: 1;
+        }
+        .use-as-pre-btn:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        }
+        .use-as-pre-btn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+        .copy-weight-btn {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        .copy-weight-btn:hover {
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+        }
+
         .checkbox-group {
             display: flex; align-items: center; gap: 6px; margin: 5px 0;
             position: relative; z-index: 1;
@@ -6685,6 +6890,10 @@
                     preWeight: '',
                     goalUF: '',
                     postWeight: '',
+
+                    // Wheelchair Weight Calculation (TCH patients)
+                    wheelchairTotalMeasured: '',
+                    wheelchairItems: loadWheelchairProfile(initials),
                     
                     // Time tracking
                     startTime: '',
@@ -6808,6 +7017,9 @@
                 bi: '', profile: '', na: '', k: '', ca: '',
                 dfr: '', bfr: '', arterialNeedleGauge: '', venousNeedleGauge: '', temp: '',
                 dryWeight: '', preWeight: '', goalUF: '', postWeight: '',
+                // Wheelchair Weight Calculation (TCH patients)
+                wheelchairTotalMeasured: '',
+                wheelchairItems: [],
                 startTime: '', endTime: '',
                 preCheck: false, thirtyMinCheck: false, medsComplete: false,
                 preCheckSubs: { machineCheck: false, preDialysis: false, orderVerify: false },
@@ -7221,7 +7433,247 @@
             if (!post || !dry) return false;
             return Math.abs(parseFloat(post) - parseFloat(dry)) > 1.5;
         }
-        
+
+        // ============================================
+        // Wheelchair Weight Calculation Functions
+        // ============================================
+
+        // Load wheelchair equipment profile from localStorage by patient initials
+        function loadWheelchairProfile(patientName) {
+            if (!patientName) return [];
+            const profiles = JSON.parse(localStorage.getItem('wheelchair_profiles') || '{}');
+            return profiles[patientName] || [];
+        }
+
+        // Save wheelchair equipment profile to localStorage by patient initials
+        function saveWheelchairProfile(patientName, items) {
+            if (!patientName) return;
+            const profiles = JSON.parse(localStorage.getItem('wheelchair_profiles') || '{}');
+            profiles[patientName] = items;
+            localStorage.setItem('wheelchair_profiles', JSON.stringify(profiles));
+        }
+
+        // Calculate the sum of all equipment weights
+        function calcEquipmentTotal(items) {
+            if (!items || items.length === 0) return 0;
+            return items.reduce((sum, item) => sum + (parseFloat(item.weight) || 0), 0);
+        }
+
+        // Calculate actual patient weight (total measured - equipment)
+        function calcWheelchairActualWeight(totalMeasured, items) {
+            const total = parseFloat(totalMeasured);
+            if (isNaN(total) || !totalMeasured) return '';
+            const equipmentTotal = calcEquipmentTotal(items);
+            return (total - equipmentTotal).toFixed(1);
+        }
+
+        // Add a new wheelchair equipment item
+        function addWheelchairItem(patientId) {
+            const patient = state.patients.find(p => p.id === patientId);
+            if (!patient) return;
+
+            if (!patient.wheelchairItems) {
+                patient.wheelchairItems = [];
+            }
+
+            patient.wheelchairItems.push({ name: '', weight: '' });
+            saveWheelchairProfile(patient.name, patient.wheelchairItems);
+            renderAll();
+        }
+
+        // Remove a wheelchair equipment item
+        function removeWheelchairItem(patientId, index) {
+            const patient = state.patients.find(p => p.id === patientId);
+            if (!patient || !patient.wheelchairItems) return;
+
+            patient.wheelchairItems.splice(index, 1);
+            saveWheelchairProfile(patient.name, patient.wheelchairItems);
+            renderAll();
+        }
+
+        // Update a wheelchair equipment item (name or weight)
+        function updateWheelchairItem(patientId, index, field, value) {
+            const patient = state.patients.find(p => p.id === patientId);
+            if (!patient || !patient.wheelchairItems || !patient.wheelchairItems[index]) return;
+
+            patient.wheelchairItems[index][field] = value;
+            saveWheelchairProfile(patient.name, patient.wheelchairItems);
+
+            // Update the calculated fields without full re-render
+            updateWheelchairCalculations(patientId);
+        }
+
+        // Update wheelchair total measured weight
+        function updateWheelchairTotalMeasured(patientId, value) {
+            const patient = state.patients.find(p => p.id === patientId);
+            if (!patient) return;
+
+            patient.wheelchairTotalMeasured = value;
+            updateWheelchairCalculations(patientId);
+        }
+
+        // Update the calculated display fields for wheelchair section
+        function updateWheelchairCalculations(patientId) {
+            const patient = state.patients.find(p => p.id === patientId);
+            if (!patient) return;
+
+            const equipmentTotal = calcEquipmentTotal(patient.wheelchairItems);
+            const actualWeight = calcWheelchairActualWeight(patient.wheelchairTotalMeasured, patient.wheelchairItems);
+
+            // Update DOM elements
+            const equipmentTotalEl = document.getElementById(`wheelchairEquipmentTotal_${patientId}`);
+            const actualWeightEl = document.getElementById(`wheelchairActualWeight_${patientId}`);
+            const useAsPreBtn = document.getElementById(`useAsPreBtn_${patientId}`);
+
+            if (equipmentTotalEl) {
+                equipmentTotalEl.value = equipmentTotal.toFixed(1);
+            }
+            if (actualWeightEl) {
+                actualWeightEl.value = actualWeight;
+            }
+            if (useAsPreBtn) {
+                useAsPreBtn.disabled = !actualWeight;
+            }
+        }
+
+        // Use wheelchair actual weight as Pre Weight
+        function useWheelchairAsPreWeight(patientId) {
+            const patient = state.patients.find(p => p.id === patientId);
+            if (!patient) return;
+
+            const actualWeight = calcWheelchairActualWeight(patient.wheelchairTotalMeasured, patient.wheelchairItems);
+            if (!actualWeight) return;
+
+            patient.preWeight = actualWeight;
+
+            // Visual feedback
+            const btn = document.getElementById(`useAsPreBtn_${patientId}`);
+            if (btn) {
+                const originalText = btn.textContent;
+                btn.textContent = '✓ Pre Weight Updated!';
+                btn.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '';
+                }, 1500);
+            }
+
+            renderAll();
+        }
+
+        // Copy wheelchair actual weight to clipboard
+        function copyWheelchairActualWeight(patientId) {
+            const patient = state.patients.find(p => p.id === patientId);
+            if (!patient) return;
+
+            const actualWeight = calcWheelchairActualWeight(patient.wheelchairTotalMeasured, patient.wheelchairItems);
+            if (!actualWeight) {
+                alert('No actual weight to copy');
+                return;
+            }
+
+            navigator.clipboard.writeText(actualWeight).then(() => {
+                const btn = document.querySelector(`#wheelchairSection_${patientId} .copy-weight-btn`);
+                if (btn) {
+                    const originalText = btn.textContent;
+                    btn.textContent = '✓ Copied!';
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                    }, 1000);
+                }
+            }).catch(err => {
+                console.error('Copy failed:', err);
+                alert('Failed to copy. Please copy manually.');
+            });
+        }
+
+        // Toggle wheelchair section collapse state
+        function toggleWheelchairSection(patientId) {
+            const header = document.querySelector(`#wheelchairSection_${patientId} .wheelchair-header`);
+            const content = document.querySelector(`#wheelchairSection_${patientId} .wheelchair-content`);
+
+            if (header && content) {
+                header.classList.toggle('collapsed');
+                content.classList.toggle('collapsed');
+            }
+        }
+
+        // Generate wheelchair section HTML for a patient
+        function renderWheelchairSection(patient) {
+            if (patient.section !== 'TCH') return '';
+
+            const items = patient.wheelchairItems || [];
+            const equipmentTotal = calcEquipmentTotal(items);
+            const actualWeight = calcWheelchairActualWeight(patient.wheelchairTotalMeasured, items);
+
+            const itemsHtml = items.map((item, index) => `
+                <div class="wheelchair-item">
+                    <input type="text" placeholder="Item name (e.g., Wheelchair)"
+                        value="${item.name || ''}"
+                        onchange="updateWheelchairItem(${patient.id}, ${index}, 'name', this.value)">
+                    <input type="number" step="0.1" placeholder="kg"
+                        value="${item.weight || ''}"
+                        onchange="updateWheelchairItem(${patient.id}, ${index}, 'weight', this.value)">
+                    <button class="remove-btn" onclick="removeWheelchairItem(${patient.id}, ${index})" title="Remove item">✕</button>
+                </div>
+            `).join('');
+
+            return `
+                <div class="wheelchair-section" id="wheelchairSection_${patient.id}">
+                    <div class="wheelchair-header" onclick="toggleWheelchairSection(${patient.id})">
+                        <h4>🦽 Wheelchair Weight Calculation</h4>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="wheelchair-content">
+                        <div class="wheelchair-total-row">
+                            <label>Total Measured:</label>
+                            <input type="number" step="0.1" placeholder="kg"
+                                value="${patient.wheelchairTotalMeasured || ''}"
+                                onchange="updateWheelchairTotalMeasured(${patient.id}, this.value)">
+                            <span style="color: #92400e;">kg</span>
+                        </div>
+
+                        <div class="wheelchair-items-container">
+                            <div class="wheelchair-items-header">
+                                <h5>Equipment to Subtract:</h5>
+                                <button class="add-item-btn" onclick="addWheelchairItem(${patient.id})">
+                                    + Add Item
+                                </button>
+                            </div>
+                            ${items.length === 0 ? '<p style="color: #92400e; font-size: 0.85em; font-style: italic;">No items added. Click "Add Item" to add wheelchair, sling, cushion, etc.</p>' : itemsHtml}
+                        </div>
+
+                        <div class="wheelchair-results">
+                            <div class="wheelchair-result-group">
+                                <label>Equipment Total (kg)</label>
+                                <input type="text" class="calculated"
+                                    id="wheelchairEquipmentTotal_${patient.id}"
+                                    value="${equipmentTotal.toFixed(1)}" readonly>
+                            </div>
+                            <div class="wheelchair-result-group">
+                                <label>Actual Patient Weight (kg)</label>
+                                <input type="text" class="actual-weight"
+                                    id="wheelchairActualWeight_${patient.id}"
+                                    value="${actualWeight}" readonly>
+                            </div>
+                        </div>
+
+                        <div class="wheelchair-actions">
+                            <button class="use-as-pre-btn"
+                                id="useAsPreBtn_${patient.id}"
+                                onclick="useWheelchairAsPreWeight(${patient.id})"
+                                ${!actualWeight ? 'disabled' : ''}>
+                                → Use as Pre Weight
+                            </button>
+                            <button class="copy-weight-btn" onclick="copyWheelchairActualWeight(${patient.id})">
+                                📋 Copy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
         function getPercentageColor(percentage) {
             if (!percentage) return '';
             const pct = parseFloat(percentage);
@@ -8579,15 +9031,16 @@
                             <span class="toggle-icon">▼</span>
                         </div>
                         <div class="section-content">
+                            ${renderWheelchairSection(patient)}
                             <div class="field-grid">
                                 <div class="field-group">
                                     <label class="field-label">Dry Weight (kg) ✏️</label>
-                                    <input type="number" step="0.1" class="field-input" value="${patient.dryWeight}" 
+                                    <input type="number" step="0.1" class="field-input" value="${patient.dryWeight}"
                                         onchange="updatePatient(${patient.id}, 'dryWeight', this.value)">
                                 </div>
                                 <div class="field-group">
                                     <label class="field-label">Pre Weight (kg) ✏️</label>
-                                    <input type="number" step="0.1" class="field-input ${preWeightClass}" value="${patient.preWeight}" 
+                                    <input type="number" step="0.1" class="field-input ${preWeightClass}" value="${patient.preWeight}"
                                         onchange="updatePatient(${patient.id}, 'preWeight', this.value)">
                                 </div>
                                 <div class="field-group">
