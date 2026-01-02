@@ -343,24 +343,25 @@
         .top-nav-tab {
             flex: 1;
             padding: 12px 24px;
-            border: none;
-            background: transparent;
-            color: white;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            background: rgba(255, 255, 255, 0.85);
+            color: #667eea;
             font-size: 1em;
             font-weight: 600;
             cursor: pointer;
             border-radius: 8px;
             transition: all 0.3s;
-            opacity: 0.7;
+            opacity: 1;
         }
         .top-nav-tab:hover {
-            opacity: 0.9;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.95);
+            border-color: rgba(102, 126, 234, 0.5);
         }
         .top-nav-tab.active {
             background: white;
             color: var(--theme-primary);
             opacity: 1;
+            border: 2px solid var(--theme-primary);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
 
