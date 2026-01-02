@@ -5028,11 +5028,15 @@
                 return { text: '', html: '' };
             }
 
-            const startFormatted = formatTime(patient.startTime);
-            const endFormatted = formatTime(patient.endTime);
+            const startFormatted = patient.startTime;
+            const endFormatted = patient.endTime;
             const actualDuration = calcActualDuration(patient.startTime, patient.endTime);
             const prescribedTime = patient.rxTime;
             const timeCheck = calcTimeShortfall(patient.rxTime, patient.startTime, patient.endTime);
+
+            if (!actualDuration) {
+                return { text: '', html: '' };
+            }
 
             let baseText = `Tx start/end ${startFormatted} - ${endFormatted}. Actual duration: ${actualDuration} of ${prescribedTime}.`;
             let baseHtml = baseText;
