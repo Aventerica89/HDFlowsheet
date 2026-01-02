@@ -4454,11 +4454,26 @@
             <!-- Patient Charting Page -->
             <div class="pt-charting-page active" id="ptChartingPage">
 
-            <!-- Re-import Button -->
+            <!-- Re-import Button & Data Management -->
             <div class="import-btn-header">
-                <button class="btn-reimport" onclick="showImportModal()">
-                    📥 Import/Re-import Patient Orders
-                </button>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center;">
+                    <button class="btn-reimport" onclick="showImportModal()">
+                        📥 Import/Re-import Patient Orders
+                    </button>
+                    <button class="btn-reimport" onclick="saveToServer()" style="background: #10b981;">
+                        💾 Save to Server
+                    </button>
+                    <button class="btn-reimport" onclick="loadFromServer()" style="background: #059669;">
+                        📂 Load from Server
+                    </button>
+                    <button class="btn-reimport" onclick="exportToFile()" style="background: #6366f1;">
+                        📥 Export to File
+                    </button>
+                    <button class="btn-reimport" onclick="document.getElementById('importFileHeader').click()" style="background: #8b5cf6;">
+                        📤 Import from File
+                    </button>
+                    <input type="file" id="importFileHeader" accept=".json" style="display: none;" onchange="importFromFile(event)">
+                </div>
             </div>
 
             <!-- Summary Dashboard -->
