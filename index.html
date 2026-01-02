@@ -2521,6 +2521,228 @@
             margin-left: 5px;
         }
 
+        /* Labs Section Styles */
+        .labs-section {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        .labs-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .labs-header.collapsed {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        .labs-header.collapsed span:first-child {
+            transform: rotate(-90deg);
+        }
+        .labs-content {
+            max-height: 2000px;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+            opacity: 1;
+        }
+        .labs-content.collapsed {
+            max-height: 0;
+            opacity: 0;
+        }
+        .labs-title {
+            font-weight: 700;
+            font-size: 1.1em;
+            color: #1e293b;
+        }
+        .labs-add-section {
+            background: white;
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+        .labs-snippets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .labs-snippet-btn {
+            padding: 6px 12px;
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fcd34d;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .labs-snippet-btn:hover {
+            background: #fde68a;
+            transform: translateY(-1px);
+        }
+        .labs-list {
+            margin-bottom: 15px;
+        }
+        .labs-list-header {
+            font-weight: 600;
+            font-size: 0.9em;
+            color: #64748b;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .labs-item {
+            display: flex;
+            flex-direction: column;
+            padding: 12px;
+            background: #fef9c3;
+            border: 2px solid #fcd34d;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: all 0.3s;
+        }
+        .labs-item.all-complete {
+            background: #dcfce7;
+            border-color: #86efac;
+        }
+        .labs-item-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+        }
+        .labs-item-name {
+            font-weight: 600;
+            font-size: 1em;
+            color: #1e293b;
+            flex: 1;
+        }
+        .labs-item-timestamp {
+            font-size: 0.8em;
+            color: #64748b;
+        }
+        .labs-item-delete {
+            padding: 4px 8px;
+            background: #fee2e2;
+            color: #dc2626;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.8em;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: all 0.2s;
+        }
+        .labs-item-delete:hover {
+            opacity: 1;
+            background: #fecaca;
+        }
+        .labs-item-body {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+        .labs-item-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-right: 15px;
+            border-right: 2px solid rgba(0,0,0,0.15);
+        }
+        .labs-main-checkbox {
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            accent-color: #16a34a;
+        }
+        .labs-item-right {
+            flex: 1;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 15px;
+            align-items: center;
+        }
+        .labs-sub-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.85em;
+            color: #374151;
+            cursor: pointer;
+        }
+        .labs-sub-checkbox input {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #16a34a;
+        }
+        .labs-sub-checkbox.checked {
+            color: #16a34a;
+            text-decoration: line-through;
+        }
+        .labs-result-input {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.85em;
+        }
+        .labs-result-input input[type="text"] {
+            width: 120px;
+            padding: 4px 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .labs-result-input input[type="text"]:focus {
+            outline: none;
+            border-color: #6366f1;
+        }
+        .labs-empty {
+            color: #94a3b8;
+            font-style: italic;
+            padding: 10px;
+            text-align: center;
+        }
+        .incomplete-labs-badge {
+            color: #dc2626;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+        .labs-complete-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85em;
+            color: #16a34a;
+            font-weight: 600;
+        }
+        .labs-complete-checkbox input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #16a34a;
+        }
+        /* Grid container for Misc ToDo and Labs */
+        .todo-labs-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        @media (max-width: 1200px) {
+            .todo-labs-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .btn {
             padding: 8px 16px; border: none; border-radius: 4px;
             font-size: 0.9em; font-weight: 600; cursor: pointer; transition: all 0.2s;
@@ -7923,9 +8145,10 @@
                     postWeight: false
                 },
                 chartClosed: false,
-                miscTodos: []  // Array of {id, text, completed, timestamp}
+                miscTodos: [],  // Array of {id, text, completed, timestamp}
+                labs: []  // Array of {id, name, timestamp, mainComplete, distributed, drawn, orderInNextGen, resultText, resultsSentEmail, resultsEnteredRenvio, actionTaken, sectionComplete}
             };
-            
+
             state.patients.push(patient);
             if (!state.activePatientId) {
                 state.activePatientId = patient.id;
@@ -8068,6 +8291,91 @@
         function hasIncompleteTodos(patient) {
             if (!patient.miscTodos || patient.miscTodos.length === 0) return false;
             return patient.miscTodos.some(t => !t.completed);
+        }
+
+        // Labs Section Functions
+        function addLab(patientId, labName) {
+            const patient = state.patients.find(p => p.id === patientId);
+            if (patient && labName.trim()) {
+                if (!patient.labs) patient.labs = [];
+                const now = new Date();
+                const timestamp = now.toLocaleString('en-US', {
+                    timeZone: 'America/Phoenix',
+                    month: 'short', day: 'numeric',
+                    hour: 'numeric', minute: '2-digit'
+                });
+                patient.labs.push({
+                    id: Date.now(),
+                    name: labName.trim(),
+                    timestamp: timestamp,
+                    mainComplete: false,
+                    distributed: false,
+                    drawn: false,
+                    orderInNextGen: false,
+                    resultText: '',
+                    resultsSentEmail: false,
+                    resultsEnteredRenvio: false,
+                    actionTaken: false,
+                    sectionComplete: false
+                });
+                renderAll();
+            }
+        }
+
+        function toggleLabCheckbox(patientId, labId, field, value) {
+            const patient = state.patients.find(p => p.id === patientId);
+            if (patient && patient.labs) {
+                const lab = patient.labs.find(l => l.id === labId);
+                if (lab) {
+                    lab[field] = value;
+                    renderAll();
+                }
+            }
+        }
+
+        function updateLabResultText(patientId, labId, value) {
+            const patient = state.patients.find(p => p.id === patientId);
+            if (patient && patient.labs) {
+                const lab = patient.labs.find(l => l.id === labId);
+                if (lab) {
+                    lab.resultText = value;
+                    // Don't renderAll() on every keystroke, just update state
+                }
+            }
+        }
+
+        function deleteLab(patientId, labId) {
+            const patient = state.patients.find(p => p.id === patientId);
+            if (patient && patient.labs) {
+                patient.labs = patient.labs.filter(l => l.id !== labId);
+                renderAll();
+            }
+        }
+
+        function isLabComplete(lab) {
+            return lab.mainComplete &&
+                   lab.distributed &&
+                   lab.drawn &&
+                   lab.orderInNextGen &&
+                   lab.resultsSentEmail &&
+                   lab.resultsEnteredRenvio &&
+                   lab.actionTaken;
+        }
+
+        function hasIncompleteLabs(patient) {
+            if (!patient.labs || patient.labs.length === 0) return false;
+            return patient.labs.some(l => !isLabComplete(l) || !l.sectionComplete);
+        }
+
+        function toggleLabSectionComplete(patientId, labId, value) {
+            const patient = state.patients.find(p => p.id === patientId);
+            if (patient && patient.labs) {
+                const lab = patient.labs.find(l => l.id === labId);
+                if (lab && isLabComplete(lab)) {
+                    lab.sectionComplete = value;
+                    renderAll();
+                }
+            }
         }
 
         // Check if patient has any missed tx sub-items checked
@@ -9873,70 +10181,187 @@
                                     </div>
                                 </div><!-- End qa-boxes-grid -->
 
-                                <!-- Misc To-Do List Section - COLLAPSIBLE SUBSECTION -->
-                                <div class="misc-todo-section" style="margin-top: 15px;">
-                                    <div class="misc-todo-header" data-section="${patient.id}_misctodo" onclick="toggleSection(${patient.id}, 'misctodo')" style="cursor: pointer; padding: 10px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 8px; display: flex; align-items: center; justify-content: space-between;">
-                                        <div style="display: flex; align-items: center; gap: 10px;">
-                                            <span style="font-size: 0.9em; transition: transform 0.2s;">▼</span>
-                                            <span class="misc-todo-title">📝 Misc To-Do List</span>
-                                            ${hasIncompleteTodos(patient) ? '<span class="incomplete-todos-badge">⚠️ Incomplete</span>' : ''}
+                                <!-- Misc To-Do List & Labs Grid -->
+                                <div class="todo-labs-grid">
+                                    <!-- Misc To-Do List Section -->
+                                    <div class="misc-todo-section" style="margin-top: 0;">
+                                        <div class="misc-todo-header" data-section="${patient.id}_misctodo" onclick="toggleSection(${patient.id}, 'misctodo')" style="cursor: pointer; padding: 10px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 8px; display: flex; align-items: center; justify-content: space-between;">
+                                            <div style="display: flex; align-items: center; gap: 10px;">
+                                                <span style="font-size: 0.9em; transition: transform 0.2s;">▼</span>
+                                                <span class="misc-todo-title">📝 Misc To-Do List</span>
+                                                ${hasIncompleteTodos(patient) ? '<span class="incomplete-todos-badge">⚠️ Incomplete</span>' : ''}
+                                            </div>
                                         </div>
+
+                                        <div class="misc-todo-content">
+                                        <!-- Add To Do -->
+                                        <div class="misc-todo-add-section">
+                                            <div class="misc-todo-input-row">
+                                                <input type="text" class="misc-todo-input" id="miscTodoInput_${patient.id}"
+                                                    placeholder="Enter a to-do item..."
+                                                    onkeypress="if(event.key==='Enter') addMiscTodoFromInput(${patient.id})">
+                                                <button class="misc-todo-add-btn" onclick="addMiscTodoFromInput(${patient.id})">+ Add To Do</button>
+                                            </div>
+                                            <div class="misc-todo-snippets">
+                                                <button class="misc-todo-snippet-btn" onclick="addMiscTodo(${patient.id}, 'Access assessment chart')">Access assessment chart</button>
+                                                <button class="misc-todo-snippet-btn" onclick="addMiscTodo(${patient.id}, 'Foot check')">Foot check</button>
+                                                <button class="misc-todo-snippet-btn" onclick="addMiscTodo(${patient.id}, 'Monthly progress note')">Monthly progress note</button>
+                                                <button class="misc-todo-snippet-btn" onclick="addMiscTodo(${patient.id}, 'Daily progress note')">Daily progress note</button>
+                                                <button class="misc-todo-snippet-btn" onclick="addMiscTodo(${patient.id}, 'Notify MD/NP')">Notify MD/NP</button>
+                                                <button class="misc-todo-snippet-btn" onclick="addMiscTodo(${patient.id}, 'PHN Call')">PHN Call</button>
+                                            </div>
+                                        </div>
+
+                                        <!-- To Do List -->
+                                        <div class="misc-todo-list">
+                                            <div class="misc-todo-list-header">📋 To Do</div>
+                                            ${(patient.miscTodos || []).filter(t => !t.completed).length === 0
+                                                ? '<div class="misc-todo-empty">No pending to-dos</div>'
+                                                : (patient.miscTodos || []).filter(t => !t.completed).map(todo => `
+                                                    <div class="misc-todo-item">
+                                                        <input type="checkbox" class="misc-todo-checkbox"
+                                                            onchange="toggleMiscTodo(${patient.id}, ${todo.id}, this.checked)">
+                                                        <span class="misc-todo-text">${todo.text}</span>
+                                                        <span class="misc-todo-timestamp">${todo.timestamp}</span>
+                                                        <button class="misc-todo-delete" onclick="deleteMiscTodo(${patient.id}, ${todo.id})">✕</button>
+                                                    </div>
+                                                `).join('')
+                                            }
+                                        </div>
+
+                                        <!-- Complete List -->
+                                        <div class="misc-todo-list">
+                                            <div class="misc-todo-list-header">✅ Complete</div>
+                                            ${(patient.miscTodos || []).filter(t => t.completed).length === 0
+                                                ? '<div class="misc-todo-empty">No completed to-dos</div>'
+                                                : (patient.miscTodos || []).filter(t => t.completed).map(todo => `
+                                                    <div class="misc-todo-item completed">
+                                                        <input type="checkbox" class="misc-todo-checkbox" checked
+                                                            onchange="toggleMiscTodo(${patient.id}, ${todo.id}, this.checked)">
+                                                        <span class="misc-todo-text">${todo.text}</span>
+                                                        <span class="misc-todo-timestamp">${todo.timestamp}</span>
+                                                        <button class="misc-todo-delete" onclick="deleteMiscTodo(${patient.id}, ${todo.id})">✕</button>
+                                                    </div>
+                                                `).join('')
+                                            }
+                                        </div>
+                                        </div><!-- End misc-todo-content -->
                                     </div>
 
-                                    <div class="misc-todo-content">
-                                    <!-- Add To Do -->
-                                    <div class="misc-todo-add-section">
-                                        <div class="misc-todo-input-row">
-                                            <input type="text" class="misc-todo-input" id="miscTodoInput_${patient.id}"
-                                                placeholder="Enter a to-do item..."
-                                                onkeypress="if(event.key==='Enter') addMiscTodoFromInput(${patient.id})">
-                                            <button class="misc-todo-add-btn" onclick="addMiscTodoFromInput(${patient.id})">+ Add To Do</button>
+                                    <!-- Labs Section -->
+                                    <div class="labs-section" style="margin-top: 0;">
+                                        <div class="labs-header" data-section="${patient.id}_labs" onclick="toggleSection(${patient.id}, 'labs')" style="cursor: pointer; padding: 10px; background: linear-gradient(135deg, #fef9c3 0%, #fef3c7 100%); border-radius: 8px; display: flex; align-items: center; justify-content: space-between;">
+                                            <div style="display: flex; align-items: center; gap: 10px;">
+                                                <span style="font-size: 0.9em; transition: transform 0.2s;">▼</span>
+                                                <span class="labs-title">🧪 Labs</span>
+                                                ${hasIncompleteLabs(patient) ? '<span class="incomplete-labs-badge">⚠️ Incomplete</span>' : ''}
+                                            </div>
                                         </div>
-                                        <div class="misc-todo-snippets">
-                                            <button class="misc-todo-snippet-btn" onclick="addMiscTodo(${patient.id}, 'Access assessment chart')">Access assessment chart</button>
-                                            <button class="misc-todo-snippet-btn" onclick="addMiscTodo(${patient.id}, 'Foot check')">Foot check</button>
-                                            <button class="misc-todo-snippet-btn" onclick="addMiscTodo(${patient.id}, 'Monthly progress note')">Monthly progress note</button>
-                                            <button class="misc-todo-snippet-btn" onclick="addMiscTodo(${patient.id}, 'Daily progress note')">Daily progress note</button>
-                                            <button class="misc-todo-snippet-btn" onclick="addMiscTodo(${patient.id}, 'Notify MD/NP')">Notify MD/NP</button>
-                                            <button class="misc-todo-snippet-btn" onclick="addMiscTodo(${patient.id}, 'PHN Call')">PHN Call</button>
+
+                                        <div class="labs-content">
+                                        <!-- Add Lab -->
+                                        <div class="labs-add-section">
+                                            <div class="labs-snippets">
+                                                <button class="labs-snippet-btn" onclick="addLab(${patient.id}, 'H&H - Post Hosp.')">H&H - Post Hosp.</button>
+                                                <button class="labs-snippet-btn" onclick="addLab(${patient.id}, 'BMP - 2+ Missed Tx')">BMP - 2+ Missed Tx</button>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <!-- To Do List -->
-                                    <div class="misc-todo-list">
-                                        <div class="misc-todo-list-header">📋 To Do</div>
-                                        ${(patient.miscTodos || []).filter(t => !t.completed).length === 0
-                                            ? '<div class="misc-todo-empty">No pending to-dos</div>'
-                                            : (patient.miscTodos || []).filter(t => !t.completed).map(todo => `
-                                                <div class="misc-todo-item">
-                                                    <input type="checkbox" class="misc-todo-checkbox"
-                                                        onchange="toggleMiscTodo(${patient.id}, ${todo.id}, this.checked)">
-                                                    <span class="misc-todo-text">${todo.text}</span>
-                                                    <span class="misc-todo-timestamp">${todo.timestamp}</span>
-                                                    <button class="misc-todo-delete" onclick="deleteMiscTodo(${patient.id}, ${todo.id})">✕</button>
-                                                </div>
-                                            `).join('')
-                                        }
-                                    </div>
+                                        <!-- Labs List -->
+                                        <div class="labs-list">
+                                            <div class="labs-list-header">🧪 Pending Labs</div>
+                                            ${(patient.labs || []).filter(l => !l.sectionComplete).length === 0
+                                                ? '<div class="labs-empty">No pending labs</div>'
+                                                : (patient.labs || []).filter(l => !l.sectionComplete).map(lab => {
+                                                    const allChecked = isLabComplete(lab);
+                                                    return `
+                                                    <div class="labs-item ${allChecked ? 'all-complete' : ''}">
+                                                        <div class="labs-item-header">
+                                                            <span class="labs-item-name">${lab.name}</span>
+                                                            <span class="labs-item-timestamp">${lab.timestamp}</span>
+                                                            <button class="labs-item-delete" onclick="deleteLab(${patient.id}, ${lab.id})">✕</button>
+                                                        </div>
+                                                        <div class="labs-item-body">
+                                                            <div class="labs-item-left">
+                                                                <input type="checkbox" class="labs-main-checkbox" ${lab.mainComplete ? 'checked' : ''}
+                                                                    onchange="toggleLabCheckbox(${patient.id}, ${lab.id}, 'mainComplete', this.checked)"
+                                                                    title="Main checkbox">
+                                                                <span style="font-weight: 500; font-size: 0.9em;">${lab.name}</span>
+                                                            </div>
+                                                            <div class="labs-item-right">
+                                                                <label class="labs-sub-checkbox ${lab.distributed ? 'checked' : ''}">
+                                                                    <input type="checkbox" ${lab.distributed ? 'checked' : ''}
+                                                                        onchange="toggleLabCheckbox(${patient.id}, ${lab.id}, 'distributed', this.checked)">
+                                                                    Distributed
+                                                                </label>
+                                                                <label class="labs-sub-checkbox ${lab.drawn ? 'checked' : ''}">
+                                                                    <input type="checkbox" ${lab.drawn ? 'checked' : ''}
+                                                                        onchange="toggleLabCheckbox(${patient.id}, ${lab.id}, 'drawn', this.checked)">
+                                                                    Drawn
+                                                                </label>
+                                                                <label class="labs-sub-checkbox ${lab.orderInNextGen ? 'checked' : ''}">
+                                                                    <input type="checkbox" ${lab.orderInNextGen ? 'checked' : ''}
+                                                                        onchange="toggleLabCheckbox(${patient.id}, ${lab.id}, 'orderInNextGen', this.checked)">
+                                                                    Order in NextGen
+                                                                </label>
+                                                                <div class="labs-result-input">
+                                                                    <span>Result:</span>
+                                                                    <input type="text" value="${lab.resultText || ''}"
+                                                                        onchange="updateLabResultText(${patient.id}, ${lab.id}, this.value)"
+                                                                        placeholder="Enter result...">
+                                                                </div>
+                                                                <label class="labs-sub-checkbox ${lab.resultsSentEmail ? 'checked' : ''}">
+                                                                    <input type="checkbox" ${lab.resultsSentEmail ? 'checked' : ''}
+                                                                        onchange="toggleLabCheckbox(${patient.id}, ${lab.id}, 'resultsSentEmail', this.checked)">
+                                                                    Results sent via Email
+                                                                </label>
+                                                                <label class="labs-sub-checkbox ${lab.resultsEnteredRenvio ? 'checked' : ''}">
+                                                                    <input type="checkbox" ${lab.resultsEnteredRenvio ? 'checked' : ''}
+                                                                        onchange="toggleLabCheckbox(${patient.id}, ${lab.id}, 'resultsEnteredRenvio', this.checked)">
+                                                                    Results entered in Renvio
+                                                                </label>
+                                                                <label class="labs-sub-checkbox ${lab.actionTaken ? 'checked' : ''}">
+                                                                    <input type="checkbox" ${lab.actionTaken ? 'checked' : ''}
+                                                                        onchange="toggleLabCheckbox(${patient.id}, ${lab.id}, 'actionTaken', this.checked)">
+                                                                    Action taken if out of parameters
+                                                                </label>
+                                                                ${allChecked ? `
+                                                                <label class="labs-complete-checkbox" style="margin-left: auto;">
+                                                                    <input type="checkbox" ${lab.sectionComplete ? 'checked' : ''}
+                                                                        onchange="toggleLabSectionComplete(${patient.id}, ${lab.id}, this.checked)">
+                                                                    Mark Complete
+                                                                </label>
+                                                                ` : ''}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                `}).join('')
+                                            }
+                                        </div>
 
-                                    <!-- Complete List -->
-                                    <div class="misc-todo-list">
-                                        <div class="misc-todo-list-header">✅ Complete</div>
-                                        ${(patient.miscTodos || []).filter(t => t.completed).length === 0
-                                            ? '<div class="misc-todo-empty">No completed to-dos</div>'
-                                            : (patient.miscTodos || []).filter(t => t.completed).map(todo => `
-                                                <div class="misc-todo-item completed">
-                                                    <input type="checkbox" class="misc-todo-checkbox" checked
-                                                        onchange="toggleMiscTodo(${patient.id}, ${todo.id}, this.checked)">
-                                                    <span class="misc-todo-text">${todo.text}</span>
-                                                    <span class="misc-todo-timestamp">${todo.timestamp}</span>
-                                                    <button class="misc-todo-delete" onclick="deleteMiscTodo(${patient.id}, ${todo.id})">✕</button>
-                                                </div>
-                                            `).join('')
-                                        }
+                                        <!-- Completed Labs -->
+                                        <div class="labs-list">
+                                            <div class="labs-list-header">✅ Completed Labs</div>
+                                            ${(patient.labs || []).filter(l => l.sectionComplete).length === 0
+                                                ? '<div class="labs-empty">No completed labs</div>'
+                                                : (patient.labs || []).filter(l => l.sectionComplete).map(lab => `
+                                                    <div class="labs-item all-complete" style="opacity: 0.8;">
+                                                        <div class="labs-item-header">
+                                                            <label class="labs-complete-checkbox">
+                                                                <input type="checkbox" checked
+                                                                    onchange="toggleLabSectionComplete(${patient.id}, ${lab.id}, this.checked)">
+                                                            </label>
+                                                            <span class="labs-item-name" style="text-decoration: line-through;">${lab.name}</span>
+                                                            <span class="labs-item-timestamp">${lab.timestamp}</span>
+                                                            <button class="labs-item-delete" onclick="deleteLab(${patient.id}, ${lab.id})">✕</button>
+                                                        </div>
+                                                    </div>
+                                                `).join('')
+                                            }
+                                        </div>
+                                        </div><!-- End labs-content -->
                                     </div>
-                                    </div><!-- End misc-todo-content -->
-                                </div>
+                                </div><!-- End todo-labs-grid -->
                             </div>
                         </div>
                     </div>
