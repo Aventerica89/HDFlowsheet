@@ -7,10 +7,12 @@
     CHANGELOG:
     v1.9.12 - Wheelchair Weight Calculation for TCH Patients
         - NEW: Wheelchair weight calculation sub-section in Weight & UF Management (TCH patients only)
+        - Dual-column layout: PRE Weight (arrival) and POST Weight (end of treatment)
         - Add custom equipment items (wheelchair, sling, cushion, etc.) with individual weights
-        - Enter total measured weight, system calculates actual patient weight
-        - "Use as Pre Weight" button auto-fills the Pre Weight field
-        - Copy button for clipboard access to calculated weight
+        - Shared equipment list with independent checkboxes per column (uncheck items removed during treatment)
+        - Each column has: measured weight input, equipment toggles, calculated actual weight
+        - "Use as Pre/Post Weight" buttons auto-fill the respective weight fields
+        - Copy buttons for clipboard access to calculated weights
         - Equipment profiles persist by patient initials across sessions
         - Collapsible section, expanded by default for TCH patients
     v1.9.11 - Theme-Aware Snippet Sections & Default Collapsed Sections
@@ -1657,6 +1659,7 @@
             border: 2px solid #f59e0b;
             border-radius: 8px;
             padding: 15px;
+            margin-top: 15px;
             margin-bottom: 15px;
         }
         .wheelchair-header {
@@ -1688,50 +1691,35 @@
         .wheelchair-content.collapsed {
             display: none;
         }
-        .wheelchair-total-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-        .wheelchair-total-row label {
-            font-weight: 600;
-            color: #92400e;
-            min-width: 120px;
-        }
-        .wheelchair-total-row input {
-            flex: 1;
-            max-width: 120px;
-            padding: 8px 10px;
-            border: 2px solid #f59e0b;
-            border-radius: 6px;
-            font-size: 1em;
-            background: white;
-        }
-        .wheelchair-items-container {
-            margin: 12px 0;
-            border-top: 1px dashed #f59e0b;
-            padding-top: 12px;
+
+        /* Equipment Items Section (shared, at top) */
+        .wheelchair-items-section {
+            background: rgba(255,255,255,0.5);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
         }
         .wheelchair-items-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
         .wheelchair-items-header h5 {
             margin: 0;
             color: #92400e;
-            font-size: 0.9em;
+            font-size: 0.95em;
+            font-weight: 600;
         }
         .wheelchair-item {
             display: flex;
             align-items: center;
             gap: 8px;
             margin-bottom: 8px;
-            background: rgba(255,255,255,0.7);
-            padding: 8px;
+            background: rgba(255,255,255,0.8);
+            padding: 8px 10px;
             border-radius: 6px;
+            border: 1px solid #f59e0b;
         }
         .wheelchair-item input[type="text"] {
             flex: 2;
@@ -1741,8 +1729,7 @@
             font-size: 0.9em;
         }
         .wheelchair-item input[type="number"] {
-            flex: 1;
-            max-width: 80px;
+            width: 80px;
             padding: 6px 10px;
             border: 1px solid #d97706;
             border-radius: 4px;
@@ -1760,6 +1747,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
         }
         .wheelchair-item .remove-btn:hover {
             background: #dc2626;
@@ -1779,72 +1767,166 @@
         .add-item-btn:hover {
             background: #059669;
         }
-        .wheelchair-results {
+
+        /* Pre/Post Calculation Columns */
+        .wheelchair-columns {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 2px solid #f59e0b;
+            gap: 15px;
         }
-        .wheelchair-result-group {
+        .wheelchair-column {
+            background: rgba(255,255,255,0.6);
+            border-radius: 8px;
+            padding: 12px;
+            border: 2px solid transparent;
+        }
+        .wheelchair-column.pre-column {
+            border-color: #3b82f6;
+        }
+        .wheelchair-column.post-column {
+            border-color: #8b5cf6;
+        }
+        .wheelchair-column h5 {
+            margin: 0 0 12px 0;
+            font-size: 0.95em;
             display: flex;
-            flex-direction: column;
-            gap: 4px;
+            align-items: center;
+            gap: 6px;
         }
-        .wheelchair-result-group label {
+        .wheelchair-column.pre-column h5 {
+            color: #1d4ed8;
+        }
+        .wheelchair-column.post-column h5 {
+            color: #6d28d9;
+        }
+        .wheelchair-measured-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .wheelchair-measured-row label {
+            font-weight: 600;
+            color: #92400e;
             font-size: 0.85em;
+        }
+        .wheelchair-measured-row input {
+            width: 100px;
+            padding: 6px 10px;
+            border: 2px solid #f59e0b;
+            border-radius: 6px;
+            font-size: 0.95em;
+            background: white;
+        }
+
+        /* Equipment checkboxes in each column */
+        .wheelchair-equipment-checks {
+            margin: 10px 0;
+            padding: 8px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 6px;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+        .wheelchair-equipment-check {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+            font-size: 0.85em;
+            color: #92400e;
+        }
+        .wheelchair-equipment-check input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        .wheelchair-equipment-check .item-weight {
+            margin-left: auto;
+            font-weight: 600;
+            color: #d97706;
+        }
+        .wheelchair-equipment-check.unchecked {
+            opacity: 0.5;
+            text-decoration: line-through;
+        }
+
+        /* Results row */
+        .wheelchair-result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-top: 1px dashed #f59e0b;
+            margin-top: 8px;
+        }
+        .wheelchair-result-row label {
+            font-size: 0.8em;
             color: #92400e;
             font-weight: 600;
         }
-        .wheelchair-result-group input {
-            padding: 8px 10px;
+        .wheelchair-result-row input {
+            width: 80px;
+            padding: 6px 8px;
             border: 2px solid #f59e0b;
-            border-radius: 6px;
-            font-size: 1em;
+            border-radius: 4px;
+            font-size: 0.9em;
             font-weight: bold;
+            text-align: center;
         }
-        .wheelchair-result-group input.calculated {
+        .wheelchair-result-row input.calculated {
             background: #fef9c3;
         }
-        .wheelchair-result-group input.actual-weight {
+        .wheelchair-result-row.actual-row input {
             background: linear-gradient(135deg, #bbf7d0 0%, #86efac 100%);
             border-color: #22c55e;
+            font-size: 1em;
+            width: 90px;
         }
-        .wheelchair-actions {
+
+        /* Action buttons */
+        .wheelchair-column-actions {
             display: flex;
-            gap: 8px;
-            margin-top: 12px;
+            gap: 6px;
+            margin-top: 10px;
         }
-        .use-as-pre-btn {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        .use-weight-btn {
+            flex: 1;
             color: white;
             border: none;
             border-radius: 6px;
-            padding: 10px 16px;
+            padding: 8px 12px;
             cursor: pointer;
-            font-size: 0.9em;
+            font-size: 0.85em;
             font-weight: 600;
-            flex: 1;
         }
-        .use-as-pre-btn:hover {
+        .use-weight-btn.pre-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+        .use-weight-btn.pre-btn:hover {
             background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
         }
-        .use-as-pre-btn:disabled {
+        .use-weight-btn.post-btn {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        }
+        .use-weight-btn.post-btn:hover {
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+        }
+        .use-weight-btn:disabled {
             background: #94a3b8;
             cursor: not-allowed;
         }
         .copy-weight-btn {
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
             color: white;
             border: none;
             border-radius: 6px;
-            padding: 10px 16px;
+            padding: 8px 10px;
             cursor: pointer;
-            font-size: 0.9em;
+            font-size: 0.85em;
         }
         .copy-weight-btn:hover {
-            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+            background: linear-gradient(135deg, #475569 0%, #334155 100%);
         }
 
         .checkbox-group {
@@ -6892,7 +6974,8 @@
                     postWeight: '',
 
                     // Wheelchair Weight Calculation (TCH patients)
-                    wheelchairTotalMeasured: '',
+                    wheelchairPreMeasured: '',
+                    wheelchairPostMeasured: '',
                     wheelchairItems: loadWheelchairProfile(initials),
                     
                     // Time tracking
@@ -7018,7 +7101,8 @@
                 dfr: '', bfr: '', arterialNeedleGauge: '', venousNeedleGauge: '', temp: '',
                 dryWeight: '', preWeight: '', goalUF: '', postWeight: '',
                 // Wheelchair Weight Calculation (TCH patients)
-                wheelchairTotalMeasured: '',
+                wheelchairPreMeasured: '',
+                wheelchairPostMeasured: '',
                 wheelchairItems: [],
                 startTime: '', endTime: '',
                 preCheck: false, thirtyMinCheck: false, medsComplete: false,
@@ -7442,7 +7526,13 @@
         function loadWheelchairProfile(patientName) {
             if (!patientName) return [];
             const profiles = JSON.parse(localStorage.getItem('wheelchair_profiles') || '{}');
-            return profiles[patientName] || [];
+            const items = profiles[patientName] || [];
+            // Ensure all items have activeForPre and activeForPost flags
+            return items.map(item => ({
+                ...item,
+                activeForPre: item.activeForPre !== false,
+                activeForPost: item.activeForPost !== false
+            }));
         }
 
         // Save wheelchair equipment profile to localStorage by patient initials
@@ -7453,21 +7543,24 @@
             localStorage.setItem('wheelchair_profiles', JSON.stringify(profiles));
         }
 
-        // Calculate the sum of all equipment weights
-        function calcEquipmentTotal(items) {
+        // Calculate the sum of equipment weights for a specific column (pre or post)
+        function calcEquipmentTotal(items, column = 'pre') {
             if (!items || items.length === 0) return 0;
-            return items.reduce((sum, item) => sum + (parseFloat(item.weight) || 0), 0);
+            const activeKey = column === 'pre' ? 'activeForPre' : 'activeForPost';
+            return items
+                .filter(item => item[activeKey] !== false)
+                .reduce((sum, item) => sum + (parseFloat(item.weight) || 0), 0);
         }
 
-        // Calculate actual patient weight (total measured - equipment)
-        function calcWheelchairActualWeight(totalMeasured, items) {
+        // Calculate actual patient weight (total measured - equipment) for a column
+        function calcWheelchairActualWeight(totalMeasured, items, column = 'pre') {
             const total = parseFloat(totalMeasured);
             if (isNaN(total) || !totalMeasured) return '';
-            const equipmentTotal = calcEquipmentTotal(items);
+            const equipmentTotal = calcEquipmentTotal(items, column);
             return (total - equipmentTotal).toFixed(1);
         }
 
-        // Add a new wheelchair equipment item
+        // Add a new wheelchair equipment item (active for both pre and post by default)
         function addWheelchairItem(patientId) {
             const patient = state.patients.find(p => p.id === patientId);
             if (!patient) return;
@@ -7476,7 +7569,12 @@
                 patient.wheelchairItems = [];
             }
 
-            patient.wheelchairItems.push({ name: '', weight: '' });
+            patient.wheelchairItems.push({
+                name: '',
+                weight: '',
+                activeForPre: true,
+                activeForPost: true
+            });
             saveWheelchairProfile(patient.name, patient.wheelchairItems);
             renderAll();
         }
@@ -7503,37 +7601,78 @@
             updateWheelchairCalculations(patientId);
         }
 
-        // Update wheelchair total measured weight
-        function updateWheelchairTotalMeasured(patientId, value) {
+        // Toggle an item's active state for a specific column (pre or post)
+        function toggleWheelchairItemActive(patientId, index, column) {
             const patient = state.patients.find(p => p.id === patientId);
-            if (!patient) return;
+            if (!patient || !patient.wheelchairItems || !patient.wheelchairItems[index]) return;
 
-            patient.wheelchairTotalMeasured = value;
+            const activeKey = column === 'pre' ? 'activeForPre' : 'activeForPost';
+            patient.wheelchairItems[index][activeKey] = !patient.wheelchairItems[index][activeKey];
+            saveWheelchairProfile(patient.name, patient.wheelchairItems);
+
+            // Update calculations for the specific column
             updateWheelchairCalculations(patientId);
         }
 
-        // Update the calculated display fields for wheelchair section
+        // Update wheelchair measured weight for a specific column
+        function updateWheelchairMeasured(patientId, column, value) {
+            const patient = state.patients.find(p => p.id === patientId);
+            if (!patient) return;
+
+            if (column === 'pre') {
+                patient.wheelchairPreMeasured = value;
+            } else {
+                patient.wheelchairPostMeasured = value;
+            }
+            updateWheelchairCalculations(patientId);
+        }
+
+        // Update the calculated display fields for both wheelchair columns
         function updateWheelchairCalculations(patientId) {
             const patient = state.patients.find(p => p.id === patientId);
             if (!patient) return;
 
-            const equipmentTotal = calcEquipmentTotal(patient.wheelchairItems);
-            const actualWeight = calcWheelchairActualWeight(patient.wheelchairTotalMeasured, patient.wheelchairItems);
+            // Pre column calculations
+            const preEquipmentTotal = calcEquipmentTotal(patient.wheelchairItems, 'pre');
+            const preActualWeight = calcWheelchairActualWeight(patient.wheelchairPreMeasured, patient.wheelchairItems, 'pre');
 
-            // Update DOM elements
-            const equipmentTotalEl = document.getElementById(`wheelchairEquipmentTotal_${patientId}`);
-            const actualWeightEl = document.getElementById(`wheelchairActualWeight_${patientId}`);
-            const useAsPreBtn = document.getElementById(`useAsPreBtn_${patientId}`);
+            // Post column calculations
+            const postEquipmentTotal = calcEquipmentTotal(patient.wheelchairItems, 'post');
+            const postActualWeight = calcWheelchairActualWeight(patient.wheelchairPostMeasured, patient.wheelchairItems, 'post');
 
-            if (equipmentTotalEl) {
-                equipmentTotalEl.value = equipmentTotal.toFixed(1);
-            }
-            if (actualWeightEl) {
-                actualWeightEl.value = actualWeight;
-            }
-            if (useAsPreBtn) {
-                useAsPreBtn.disabled = !actualWeight;
-            }
+            // Update Pre column DOM elements
+            const preEquipTotalEl = document.getElementById(`wheelchairPreEquipTotal_${patientId}`);
+            const preActualEl = document.getElementById(`wheelchairPreActual_${patientId}`);
+            const usePreBtn = document.getElementById(`useAsPreBtn_${patientId}`);
+
+            if (preEquipTotalEl) preEquipTotalEl.value = preEquipmentTotal.toFixed(1);
+            if (preActualEl) preActualEl.value = preActualWeight;
+            if (usePreBtn) usePreBtn.disabled = !preActualWeight;
+
+            // Update Post column DOM elements
+            const postEquipTotalEl = document.getElementById(`wheelchairPostEquipTotal_${patientId}`);
+            const postActualEl = document.getElementById(`wheelchairPostActual_${patientId}`);
+            const usePostBtn = document.getElementById(`useAsPostBtn_${patientId}`);
+
+            if (postEquipTotalEl) postEquipTotalEl.value = postEquipmentTotal.toFixed(1);
+            if (postActualEl) postActualEl.value = postActualWeight;
+            if (usePostBtn) usePostBtn.disabled = !postActualWeight;
+
+            // Update checkbox styling
+            const items = patient.wheelchairItems || [];
+            items.forEach((item, index) => {
+                const preCheck = document.getElementById(`wheelchairPreCheck_${patientId}_${index}`);
+                const postCheck = document.getElementById(`wheelchairPostCheck_${patientId}_${index}`);
+                const preLabel = preCheck?.closest('.wheelchair-equipment-check');
+                const postLabel = postCheck?.closest('.wheelchair-equipment-check');
+
+                if (preLabel) {
+                    preLabel.classList.toggle('unchecked', !item.activeForPre);
+                }
+                if (postLabel) {
+                    postLabel.classList.toggle('unchecked', !item.activeForPost);
+                }
+            });
         }
 
         // Use wheelchair actual weight as Pre Weight
@@ -7541,7 +7680,7 @@
             const patient = state.patients.find(p => p.id === patientId);
             if (!patient) return;
 
-            const actualWeight = calcWheelchairActualWeight(patient.wheelchairTotalMeasured, patient.wheelchairItems);
+            const actualWeight = calcWheelchairActualWeight(patient.wheelchairPreMeasured, patient.wheelchairItems, 'pre');
             if (!actualWeight) return;
 
             patient.preWeight = actualWeight;
@@ -7550,7 +7689,32 @@
             const btn = document.getElementById(`useAsPreBtn_${patientId}`);
             if (btn) {
                 const originalText = btn.textContent;
-                btn.textContent = '✓ Pre Weight Updated!';
+                btn.textContent = '✓ Updated!';
+                btn.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '';
+                }, 1500);
+            }
+
+            renderAll();
+        }
+
+        // Use wheelchair actual weight as Post Weight
+        function useWheelchairAsPostWeight(patientId) {
+            const patient = state.patients.find(p => p.id === patientId);
+            if (!patient) return;
+
+            const actualWeight = calcWheelchairActualWeight(patient.wheelchairPostMeasured, patient.wheelchairItems, 'post');
+            if (!actualWeight) return;
+
+            patient.postWeight = actualWeight;
+
+            // Visual feedback
+            const btn = document.getElementById(`useAsPostBtn_${patientId}`);
+            if (btn) {
+                const originalText = btn.textContent;
+                btn.textContent = '✓ Updated!';
                 btn.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
                 setTimeout(() => {
                     btn.textContent = originalText;
@@ -7562,21 +7726,23 @@
         }
 
         // Copy wheelchair actual weight to clipboard
-        function copyWheelchairActualWeight(patientId) {
+        function copyWheelchairWeight(patientId, column) {
             const patient = state.patients.find(p => p.id === patientId);
             if (!patient) return;
 
-            const actualWeight = calcWheelchairActualWeight(patient.wheelchairTotalMeasured, patient.wheelchairItems);
+            const measured = column === 'pre' ? patient.wheelchairPreMeasured : patient.wheelchairPostMeasured;
+            const actualWeight = calcWheelchairActualWeight(measured, patient.wheelchairItems, column);
+
             if (!actualWeight) {
-                alert('No actual weight to copy');
+                alert('No weight to copy');
                 return;
             }
 
             navigator.clipboard.writeText(actualWeight).then(() => {
-                const btn = document.querySelector(`#wheelchairSection_${patientId} .copy-weight-btn`);
+                const btn = document.getElementById(`copyBtn_${column}_${patientId}`);
                 if (btn) {
                     const originalText = btn.textContent;
-                    btn.textContent = '✓ Copied!';
+                    btn.textContent = '✓';
                     setTimeout(() => {
                         btn.textContent = originalText;
                     }, 1000);
@@ -7598,14 +7764,48 @@
             }
         }
 
+        // Generate equipment checkboxes for a column
+        function renderEquipmentChecks(patient, column) {
+            const items = patient.wheelchairItems || [];
+            if (items.length === 0) {
+                return '<p style="color: #92400e; font-size: 0.8em; font-style: italic; margin: 5px 0;">No equipment items</p>';
+            }
+
+            const activeKey = column === 'pre' ? 'activeForPre' : 'activeForPost';
+
+            return items.map((item, index) => {
+                const isActive = item[activeKey] !== false;
+                const displayName = item.name || `Item ${index + 1}`;
+                const displayWeight = item.weight ? `${item.weight} kg` : '—';
+
+                return `
+                    <label class="wheelchair-equipment-check ${isActive ? '' : 'unchecked'}">
+                        <input type="checkbox"
+                            id="wheelchair${column === 'pre' ? 'Pre' : 'Post'}Check_${patient.id}_${index}"
+                            ${isActive ? 'checked' : ''}
+                            onchange="toggleWheelchairItemActive(${patient.id}, ${index}, '${column}')">
+                        <span>${displayName}</span>
+                        <span class="item-weight">${displayWeight}</span>
+                    </label>
+                `;
+            }).join('');
+        }
+
         // Generate wheelchair section HTML for a patient
         function renderWheelchairSection(patient) {
             if (patient.section !== 'TCH') return '';
 
             const items = patient.wheelchairItems || [];
-            const equipmentTotal = calcEquipmentTotal(items);
-            const actualWeight = calcWheelchairActualWeight(patient.wheelchairTotalMeasured, items);
 
+            // Pre column calculations
+            const preEquipmentTotal = calcEquipmentTotal(items, 'pre');
+            const preActualWeight = calcWheelchairActualWeight(patient.wheelchairPreMeasured, items, 'pre');
+
+            // Post column calculations
+            const postEquipmentTotal = calcEquipmentTotal(items, 'post');
+            const postActualWeight = calcWheelchairActualWeight(patient.wheelchairPostMeasured, items, 'post');
+
+            // Equipment items editor (shared section at top)
             const itemsHtml = items.map((item, index) => `
                 <div class="wheelchair-item">
                     <input type="text" placeholder="Item name (e.g., Wheelchair)"
@@ -7625,49 +7825,108 @@
                         <span class="toggle-icon">▼</span>
                     </div>
                     <div class="wheelchair-content">
-                        <div class="wheelchair-total-row">
-                            <label>Total Measured:</label>
-                            <input type="number" step="0.1" placeholder="kg"
-                                value="${patient.wheelchairTotalMeasured || ''}"
-                                onchange="updateWheelchairTotalMeasured(${patient.id}, this.value)">
-                            <span style="color: #92400e;">kg</span>
-                        </div>
-
-                        <div class="wheelchair-items-container">
+                        <!-- Shared Equipment Items Section -->
+                        <div class="wheelchair-items-section">
                             <div class="wheelchair-items-header">
-                                <h5>Equipment to Subtract:</h5>
+                                <h5>Equipment Items (shared for Pre & Post)</h5>
                                 <button class="add-item-btn" onclick="addWheelchairItem(${patient.id})">
                                     + Add Item
                                 </button>
                             </div>
-                            ${items.length === 0 ? '<p style="color: #92400e; font-size: 0.85em; font-style: italic;">No items added. Click "Add Item" to add wheelchair, sling, cushion, etc.</p>' : itemsHtml}
+                            ${items.length === 0 ?
+                                '<p style="color: #92400e; font-size: 0.85em; font-style: italic;">No items added. Click "+ Add Item" to add wheelchair, sling, cushion, etc.</p>'
+                                : itemsHtml}
                         </div>
 
-                        <div class="wheelchair-results">
-                            <div class="wheelchair-result-group">
-                                <label>Equipment Total (kg)</label>
-                                <input type="text" class="calculated"
-                                    id="wheelchairEquipmentTotal_${patient.id}"
-                                    value="${equipmentTotal.toFixed(1)}" readonly>
-                            </div>
-                            <div class="wheelchair-result-group">
-                                <label>Actual Patient Weight (kg)</label>
-                                <input type="text" class="actual-weight"
-                                    id="wheelchairActualWeight_${patient.id}"
-                                    value="${actualWeight}" readonly>
-                            </div>
-                        </div>
+                        <!-- Pre/Post Calculation Columns -->
+                        <div class="wheelchair-columns">
+                            <!-- Pre Weight Column -->
+                            <div class="wheelchair-column pre-column">
+                                <h5>⬇️ PRE Weight (Arrival)</h5>
 
-                        <div class="wheelchair-actions">
-                            <button class="use-as-pre-btn"
-                                id="useAsPreBtn_${patient.id}"
-                                onclick="useWheelchairAsPreWeight(${patient.id})"
-                                ${!actualWeight ? 'disabled' : ''}>
-                                → Use as Pre Weight
-                            </button>
-                            <button class="copy-weight-btn" onclick="copyWheelchairActualWeight(${patient.id})">
-                                📋 Copy
-                            </button>
+                                <div class="wheelchair-measured-row">
+                                    <label>Measured:</label>
+                                    <input type="number" step="0.1" placeholder="kg"
+                                        value="${patient.wheelchairPreMeasured || ''}"
+                                        onchange="updateWheelchairMeasured(${patient.id}, 'pre', this.value)">
+                                    <span style="color: #92400e; font-size: 0.85em;">kg</span>
+                                </div>
+
+                                <div class="wheelchair-equipment-checks">
+                                    ${renderEquipmentChecks(patient, 'pre')}
+                                </div>
+
+                                <div class="wheelchair-result-row">
+                                    <label>Equipment:</label>
+                                    <input type="text" class="calculated"
+                                        id="wheelchairPreEquipTotal_${patient.id}"
+                                        value="${preEquipmentTotal.toFixed(1)}" readonly>
+                                </div>
+                                <div class="wheelchair-result-row actual-row">
+                                    <label>Actual Weight:</label>
+                                    <input type="text"
+                                        id="wheelchairPreActual_${patient.id}"
+                                        value="${preActualWeight}" readonly>
+                                </div>
+
+                                <div class="wheelchair-column-actions">
+                                    <button class="use-weight-btn pre-btn"
+                                        id="useAsPreBtn_${patient.id}"
+                                        onclick="useWheelchairAsPreWeight(${patient.id})"
+                                        ${!preActualWeight ? 'disabled' : ''}>
+                                        → Pre Weight
+                                    </button>
+                                    <button class="copy-weight-btn"
+                                        id="copyBtn_pre_${patient.id}"
+                                        onclick="copyWheelchairWeight(${patient.id}, 'pre')">
+                                        📋
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Post Weight Column -->
+                            <div class="wheelchair-column post-column">
+                                <h5>⬆️ POST Weight (End)</h5>
+
+                                <div class="wheelchair-measured-row">
+                                    <label>Measured:</label>
+                                    <input type="number" step="0.1" placeholder="kg"
+                                        value="${patient.wheelchairPostMeasured || ''}"
+                                        onchange="updateWheelchairMeasured(${patient.id}, 'post', this.value)">
+                                    <span style="color: #92400e; font-size: 0.85em;">kg</span>
+                                </div>
+
+                                <div class="wheelchair-equipment-checks">
+                                    ${renderEquipmentChecks(patient, 'post')}
+                                </div>
+
+                                <div class="wheelchair-result-row">
+                                    <label>Equipment:</label>
+                                    <input type="text" class="calculated"
+                                        id="wheelchairPostEquipTotal_${patient.id}"
+                                        value="${postEquipmentTotal.toFixed(1)}" readonly>
+                                </div>
+                                <div class="wheelchair-result-row actual-row">
+                                    <label>Actual Weight:</label>
+                                    <input type="text"
+                                        id="wheelchairPostActual_${patient.id}"
+                                        value="${postActualWeight}" readonly>
+                                </div>
+
+                                <div class="wheelchair-column-actions">
+                                    <button class="use-weight-btn post-btn"
+                                        id="useAsPostBtn_${patient.id}"
+                                        onclick="useWheelchairAsPostWeight(${patient.id})"
+                                        ${!postActualWeight ? 'disabled' : ''}>
+                                        → Post Weight
+                                    </button>
+                                    <button class="copy-weight-btn"
+                                        id="copyBtn_post_${patient.id}"
+                                        onclick="copyWheelchairWeight(${patient.id}, 'post')">
+                                        📋
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
