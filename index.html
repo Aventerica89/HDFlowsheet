@@ -520,6 +520,25 @@
             font-size: 12px;
             font-weight: 500;
         }
+        .eosr-bullet-placeholder {
+            color: #6b7280;
+            padding: 8px 0;
+            font-size: 16px;
+        }
+        .eosr-patient-name {
+            font-weight: 700;
+        }
+        .eosr-alert-text {
+            font-weight: 700;
+            color: #dc2626;
+        }
+        .eosr-entry-display {
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .eosr-entry-display:last-child {
+            border-bottom: none;
+        }
 
         .ops-header {
             display: flex;
@@ -4713,14 +4732,14 @@
                         <button class="eosr-btn eosr-btn-copy" onclick="copyEOSRToClipboard()">📋 Copy All to Clipboard</button>
                     </div>
 
-                    <!-- Early Termination Section -->
+                    <!-- COVID-19 Presumptive Section -->
                     <div class="eosr-section">
                         <div class="eosr-section-header">
-                            <span>Early Termination</span>
-                            <span class="eosr-section-count" id="eosrEarlyTermCount">0 patients</span>
+                            <span>COVID-19 Presumptive</span>
+                            <span class="eosr-section-count" id="eosrCovidCount">0 patients</span>
                         </div>
-                        <div class="eosr-section-content" id="eosrEarlyTermContent">
-                            <div class="eosr-empty">No patients with early termination (>15 min) this shift.</div>
+                        <div class="eosr-section-content" id="eosrCovidContent">
+                            <div class="eosr-bullet-placeholder">•</div>
                         </div>
                     </div>
 
@@ -4731,7 +4750,128 @@
                             <span class="eosr-section-count" id="eosrWeightCount">0 patients</span>
                         </div>
                         <div class="eosr-section-content" id="eosrWeightContent">
-                            <div class="eosr-empty">No patients leaving &gt;1.5 kg from dry weight this shift.</div>
+                            <div class="eosr-bullet-placeholder">•</div>
+                        </div>
+                    </div>
+
+                    <!-- Early Termination Section -->
+                    <div class="eosr-section">
+                        <div class="eosr-section-header">
+                            <span>Early Termination</span>
+                            <span class="eosr-section-count" id="eosrEarlyTermCount">0 patients</span>
+                        </div>
+                        <div class="eosr-section-content" id="eosrEarlyTermContent">
+                            <div class="eosr-bullet-placeholder">•</div>
+                        </div>
+                    </div>
+
+                    <!-- Missed treatments Section -->
+                    <div class="eosr-section">
+                        <div class="eosr-section-header">
+                            <span>Missed treatments</span>
+                            <span class="eosr-section-count" id="eosrMissedCount">0 patients</span>
+                        </div>
+                        <div class="eosr-section-content" id="eosrMissedContent">
+                            <div class="eosr-bullet-placeholder">•</div>
+                        </div>
+                    </div>
+
+                    <!-- Medications Rescheduled Section -->
+                    <div class="eosr-section">
+                        <div class="eosr-section-header">
+                            <span>Medications Rescheduled</span>
+                            <span class="eosr-section-count" id="eosrMedsCount">0 patients</span>
+                        </div>
+                        <div class="eosr-section-content" id="eosrMedsContent">
+                            <div class="eosr-bullet-placeholder">•</div>
+                        </div>
+                    </div>
+
+                    <!-- STAT Labs Section -->
+                    <div class="eosr-section">
+                        <div class="eosr-section-header">
+                            <span>STAT Labs (please see separate email)</span>
+                            <span class="eosr-section-count" id="eosrStatLabsCount">0 patients</span>
+                        </div>
+                        <div class="eosr-section-content" id="eosrStatLabsContent">
+                            <div class="eosr-bullet-placeholder">•</div>
+                        </div>
+                    </div>
+
+                    <!-- Patients sent out to ED/Hospital Section -->
+                    <div class="eosr-section">
+                        <div class="eosr-section-header">
+                            <span>Patients sent out to ED/Hospital</span>
+                            <span class="eosr-section-count" id="eosrSentOutCount">0 patients</span>
+                        </div>
+                        <div class="eosr-section-content" id="eosrSentOutContent">
+                            <div class="eosr-bullet-placeholder">•</div>
+                        </div>
+                    </div>
+
+                    <!-- Hospitalization Section -->
+                    <div class="eosr-section">
+                        <div class="eosr-section-header">
+                            <span>Hospitalization</span>
+                            <span class="eosr-section-count" id="eosrHospCount">0 patients</span>
+                        </div>
+                        <div class="eosr-section-content" id="eosrHospContent">
+                            <div class="eosr-bullet-placeholder">•</div>
+                        </div>
+                    </div>
+
+                    <!-- Welfare Check Section -->
+                    <div class="eosr-section">
+                        <div class="eosr-section-header">
+                            <span>Welfare Check</span>
+                            <span class="eosr-section-count" id="eosrWelfareCount">0 patients</span>
+                        </div>
+                        <div class="eosr-section-content" id="eosrWelfareContent">
+                            <div class="eosr-bullet-placeholder">•</div>
+                        </div>
+                    </div>
+
+                    <!-- New Patients Section -->
+                    <div class="eosr-section">
+                        <div class="eosr-section-header">
+                            <span>New Patients</span>
+                            <span class="eosr-section-count" id="eosrNewPtsCount">0 patients</span>
+                        </div>
+                        <div class="eosr-section-content" id="eosrNewPtsContent">
+                            <div class="eosr-bullet-placeholder">•</div>
+                        </div>
+                    </div>
+
+                    <!-- MIDAS Report Created Section -->
+                    <div class="eosr-section">
+                        <div class="eosr-section-header">
+                            <span>MIDAS Report Created</span>
+                            <span class="eosr-section-count" id="eosrMidasCount">0 patients</span>
+                        </div>
+                        <div class="eosr-section-content" id="eosrMidasContent">
+                            <div class="eosr-bullet-placeholder">•</div>
+                        </div>
+                    </div>
+
+                    <!-- Access Complications Section -->
+                    <div class="eosr-section">
+                        <div class="eosr-section-header">
+                            <span>Access Complications Documented in Renvio</span>
+                            <span class="eosr-section-count" id="eosrAccessCount">0 patients</span>
+                        </div>
+                        <div class="eosr-section-content" id="eosrAccessContent">
+                            <div class="eosr-bullet-placeholder">•</div>
+                        </div>
+                    </div>
+
+                    <!-- Disinfection Logs Section -->
+                    <div class="eosr-section">
+                        <div class="eosr-section-header">
+                            <span>All Disinfection Logs completed and signed off? Yes/No N/A</span>
+                            <span class="eosr-section-count" id="eosrDisinfectCount"></span>
+                        </div>
+                        <div class="eosr-section-content" id="eosrDisinfectContent">
+                            <div class="eosr-bullet-placeholder">•</div>
                         </div>
                     </div>
                 </div>
@@ -4868,6 +5008,75 @@
             weightEdits: {}      // {patientId: editedText}
         };
 
+        // Format patient initials from "F.L." to "L, F -"
+        function formatEOSRInitials(patient) {
+            const initials = patient.initials || '';
+            // If initials are in format "F.L." or "FL", convert to "L, F -"
+            if (initials.length >= 2) {
+                const cleaned = initials.replace(/\./g, '').toUpperCase();
+                if (cleaned.length >= 2) {
+                    // First char is first name initial, second is last name initial
+                    return `${cleaned[1]}, ${cleaned[0]} -`;
+                }
+            }
+            return initials ? `${initials} -` : 'Patient -';
+        }
+
+        // Generate early termination snippet with formatting
+        function generateEOSRTimeSnippet(patient) {
+            if (!patient.startTime || !patient.endTime || !patient.rxTime) {
+                return { text: '', html: '' };
+            }
+
+            const startFormatted = formatTime(patient.startTime);
+            const endFormatted = formatTime(patient.endTime);
+            const actualDuration = calcActualDuration(patient.startTime, patient.endTime);
+            const prescribedTime = patient.rxTime;
+            const timeCheck = calcTimeShortfall(patient.rxTime, patient.startTime, patient.endTime);
+
+            let baseText = `Tx start/end ${startFormatted} - ${endFormatted}. Actual duration: ${actualDuration} of ${prescribedTime}.`;
+            let baseHtml = baseText;
+
+            if (timeCheck.isShort && timeCheck.shortfall) {
+                const shortfallFormatted = timeCheck.shortfall.replace('-', '');
+                const alertText = `Tx ended ${shortfallFormatted} early.`;
+                baseText += ` ${alertText}`;
+                baseHtml += ` <span class="eosr-alert-text">${alertText}</span>`;
+            }
+
+            return { text: baseText, html: baseHtml };
+        }
+
+        // Generate weight snippet with formatting
+        function generateEOSRWeightSnippet(patient) {
+            const preOverDW = calcPreOverDW(patient.preWeight, patient.dryWeight);
+            const totalRemoved = calcTotalRemoved(patient.preWeight, patient.postWeight);
+            const postVsDW = calcPostVsDW(patient.postWeight, patient.dryWeight);
+
+            if (!preOverDW || !totalRemoved || !postVsDW) {
+                return { text: '', html: '' };
+            }
+
+            const dryWeight = parseFloat(patient.dryWeight).toFixed(1);
+            const aboveBelow = parseFloat(postVsDW) >= 0 ? 'above' : 'below';
+            const postVsDWAbs = Math.abs(parseFloat(postVsDW)).toFixed(1);
+            const isOverThreshold = Math.abs(parseFloat(postVsDW)) > 1.5;
+            const preSign = parseFloat(preOverDW) >= 0 ? '+' : '';
+
+            const baseText = `Pt arrived ${preSign}${preOverDW} kg over DW of ${dryWeight} kg. Pt removed ${totalRemoved} kg, leaving ${postVsDWAbs} kg ${aboveBelow} dry weight.`;
+
+            const alertPortion = `${postVsDWAbs} kg ${aboveBelow} dry weight.`;
+            let baseHtml = `Pt arrived ${preSign}${preOverDW} kg over DW of ${dryWeight} kg. Pt removed ${totalRemoved} kg, leaving `;
+
+            if (isOverThreshold) {
+                baseHtml += `<span class="eosr-alert-text">${alertPortion}</span>`;
+            } else {
+                baseHtml += alertPortion;
+            }
+
+            return { text: baseText, html: baseHtml };
+        }
+
         // Refresh EOSR data from current patient data
         function refreshEOSR() {
             renderEOSREarlyTerm();
@@ -4883,19 +5092,19 @@
             const earlyTermPatients = state.patients.filter(p => {
                 if (!p.rxTime || !p.startTime || !p.endTime) return false;
                 const timeCheck = calcTimeShortfall(p.rxTime, p.startTime, p.endTime);
-                return timeCheck.isShort; // isShort is true when >15 mins early
+                return timeCheck.isShort;
             });
 
             countEl.textContent = `${earlyTermPatients.length} patient${earlyTermPatients.length !== 1 ? 's' : ''}`;
 
             if (earlyTermPatients.length === 0) {
-                container.innerHTML = '<div class="eosr-empty">No patients with early termination (>15 min) this shift.</div>';
+                container.innerHTML = '<div class="eosr-bullet-placeholder">•</div>';
                 return;
             }
 
             container.innerHTML = earlyTermPatients.map(p => {
-                const snippet = generateTimeSnippet(p);
-                // Check if we have an edited version
+                const snippet = generateEOSRTimeSnippet(p);
+                const formattedName = formatEOSRInitials(p);
                 const editedText = eosrState.earlyTermEdits[p.id] !== undefined
                     ? eosrState.earlyTermEdits[p.id]
                     : snippet.text;
@@ -4903,13 +5112,14 @@
                 return `
                     <div class="eosr-entry">
                         <div class="eosr-entry-header">
-                            <span>${p.name || p.initials || 'Patient'}</span>
+                            <span><span class="eosr-patient-name">${formattedName}</span></span>
                             <span class="eosr-patient-badge">Chair ${p.chair || 'N/A'}</span>
                         </div>
                         <textarea class="eosr-entry-text"
                             data-patient-id="${p.id}"
                             data-section="earlyTerm"
-                            onchange="updateEOSREntry(this)">${editedText}</textarea>
+                            data-name="${formattedName}"
+                            oninput="updateEOSREntry(this)">${editedText}</textarea>
                     </div>
                 `;
             }).join('');
@@ -4923,19 +5133,19 @@
             // Get patients leaving >1.5 kg from dry weight
             const weightPatients = state.patients.filter(p => {
                 if (!p.postWeight || !p.dryWeight) return false;
-                return checkWeightAlert(p.postWeight, p.dryWeight); // Returns true if |post - dry| > 1.5
+                return checkWeightAlert(p.postWeight, p.dryWeight);
             });
 
             countEl.textContent = `${weightPatients.length} patient${weightPatients.length !== 1 ? 's' : ''}`;
 
             if (weightPatients.length === 0) {
-                container.innerHTML = '<div class="eosr-empty">No patients leaving &gt;1.5 kg from dry weight this shift.</div>';
+                container.innerHTML = '<div class="eosr-bullet-placeholder">•</div>';
                 return;
             }
 
             container.innerHTML = weightPatients.map(p => {
-                const snippet = generateUFSnippet(p);
-                // Check if we have an edited version
+                const snippet = generateEOSRWeightSnippet(p);
+                const formattedName = formatEOSRInitials(p);
                 const editedText = eosrState.weightEdits[p.id] !== undefined
                     ? eosrState.weightEdits[p.id]
                     : snippet.text;
@@ -4943,13 +5153,14 @@
                 return `
                     <div class="eosr-entry">
                         <div class="eosr-entry-header">
-                            <span>${p.name || p.initials || 'Patient'}</span>
+                            <span><span class="eosr-patient-name">${formattedName}</span></span>
                             <span class="eosr-patient-badge">Chair ${p.chair || 'N/A'}</span>
                         </div>
                         <textarea class="eosr-entry-text"
                             data-patient-id="${p.id}"
                             data-section="weight"
-                            onchange="updateEOSREntry(this)">${editedText}</textarea>
+                            data-name="${formattedName}"
+                            oninput="updateEOSREntry(this)">${editedText}</textarea>
                     </div>
                 `;
             }).join('');
@@ -4968,43 +5179,86 @@
             }
         }
 
-        // Copy all EOSR content to clipboard
+        // EOSR section definitions in order
+        const eosrSections = [
+            { id: 'Covid', title: 'COVID-19 Presumptive', contentId: 'eosrCovidContent' },
+            { id: 'Weight', title: 'Patients leaving over/under 1.5 kg of dry weight', contentId: 'eosrWeightContent' },
+            { id: 'EarlyTerm', title: 'Early Termination', contentId: 'eosrEarlyTermContent' },
+            { id: 'Missed', title: 'Missed treatments', contentId: 'eosrMissedContent' },
+            { id: 'Meds', title: 'Medications Rescheduled', contentId: 'eosrMedsContent' },
+            { id: 'StatLabs', title: 'STAT Labs (please see separate email)', contentId: 'eosrStatLabsContent' },
+            { id: 'SentOut', title: 'Patients sent out to ED/Hospital', contentId: 'eosrSentOutContent' },
+            { id: 'Hosp', title: 'Hospitalization', contentId: 'eosrHospContent' },
+            { id: 'Welfare', title: 'Welfare Check', contentId: 'eosrWelfareContent' },
+            { id: 'NewPts', title: 'New Patients', contentId: 'eosrNewPtsContent' },
+            { id: 'Midas', title: 'MIDAS Report Created', contentId: 'eosrMidasContent' },
+            { id: 'Access', title: 'Access Complications Documented in Renvio', contentId: 'eosrAccessContent' },
+            { id: 'Disinfect', title: 'All Disinfection Logs completed and signed off? Yes/No N/A', contentId: 'eosrDisinfectContent' }
+        ];
+
+        // Copy all EOSR content to clipboard with rich text
         function copyEOSRToClipboard() {
-            let text = 'END OF SHIFT REPORT\n';
-            text += '=' .repeat(50) + '\n\n';
+            let plainText = '';
+            let html = '';
 
-            // Early Termination section
-            text += 'EARLY TERMINATION:\n';
-            const earlyTermTextareas = document.querySelectorAll('#eosrEarlyTermContent textarea');
-            if (earlyTermTextareas.length === 0) {
-                text += '• (none)\n';
-            } else {
-                earlyTermTextareas.forEach(ta => {
-                    const entry = ta.closest('.eosr-entry');
-                    const name = entry.querySelector('.eosr-entry-header span:first-child').textContent;
-                    text += `• ${name}: ${ta.value}\n`;
-                });
-            }
-            text += '\n';
+            eosrSections.forEach(section => {
+                const container = document.getElementById(section.contentId);
+                const textareas = container.querySelectorAll('textarea');
 
-            // Weight section
-            text += 'PATIENTS LEAVING OVER/UNDER 1.5 KG OF DRY WEIGHT:\n';
-            const weightTextareas = document.querySelectorAll('#eosrWeightContent textarea');
-            if (weightTextareas.length === 0) {
-                text += '• (none)\n';
-            } else {
-                weightTextareas.forEach(ta => {
-                    const entry = ta.closest('.eosr-entry');
-                    const name = entry.querySelector('.eosr-entry-header span:first-child').textContent;
-                    text += `• ${name}: ${ta.value}\n`;
-                });
-            }
+                // Add section header (bold)
+                plainText += `${section.title}\n`;
+                html += `<p><strong>${section.title}</strong></p>`;
 
-            navigator.clipboard.writeText(text).then(() => {
+                if (textareas.length === 0) {
+                    // Empty section - just bullet
+                    plainText += `\t•\n`;
+                    html += `<ul><li></li></ul>`;
+                } else {
+                    textareas.forEach(ta => {
+                        const name = ta.dataset.name || 'Patient';
+                        const text = ta.value;
+
+                        // Parse text to find and highlight alert portions
+                        let formattedHtml = text;
+
+                        // Highlight "Tx ended XX:XX early." in red+bold
+                        formattedHtml = formattedHtml.replace(
+                            /(Tx ended \d{2}:\d{2} early\.)/g,
+                            '<span style="color: red; font-weight: bold;">$1</span>'
+                        );
+
+                        // Highlight weight deviations like "2.6 kg above dry weight." in red+bold
+                        formattedHtml = formattedHtml.replace(
+                            /(\d+\.\d+ kg (?:above|below) dry weight\.)/g,
+                            '<span style="color: red; font-weight: bold;">$1</span>'
+                        );
+
+                        plainText += `\t• ${name} ${text}\n`;
+                        html += `<ul><li><strong>${name}</strong> ${formattedHtml}</li></ul>`;
+                    });
+                }
+                plainText += '\n';
+            });
+
+            // Copy both plain text and HTML to clipboard
+            const blob = new Blob([html], { type: 'text/html' });
+            const textBlob = new Blob([plainText], { type: 'text/plain' });
+
+            navigator.clipboard.write([
+                new ClipboardItem({
+                    'text/html': blob,
+                    'text/plain': textBlob
+                })
+            ]).then(() => {
                 alert('End of Shift Report copied to clipboard!');
             }).catch(err => {
-                console.error('Failed to copy:', err);
-                alert('Failed to copy to clipboard. Please try again.');
+                // Fallback to plain text
+                navigator.clipboard.writeText(plainText).then(() => {
+                    alert('End of Shift Report copied to clipboard (plain text)!');
+                }).catch(err2 => {
+                    console.error('Failed to copy:', err2);
+                    alert('Failed to copy to clipboard. Please try again.');
+                });
             });
         }
 
