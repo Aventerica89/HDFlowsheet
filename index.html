@@ -5092,7 +5092,7 @@
                     <button class="settings-btn" onclick="openSettingsModal()" title="Settings">⚙️</button>
                     <div>
                         <h1 style="margin-bottom: 5px;">🏥 HD Flowsheet & QA Tracker</h1>
-                        <div class="version">Version 1.9.14</div>
+                        <div class="version">Version 1.9.15</div>
                     </div>
                 </div>
             </div>
@@ -5824,6 +5824,67 @@
         function refreshEOSR() {
             renderEOSREarlyTerm();
             renderEOSRWeight();
+            renderEOSRStatLabs();
+        }
+
+        // Render STAT Labs section from Operations Labs and patient chart labs
+        function renderEOSRStatLabs() {
+            const container = document.getElementById('eosrStatLabsContent');
+            const countEl = document.getElementById('eosrStatLabsCount');
+
+            // Collect all labs from Operations Labs section
+            const saved = localStorage.getItem('hd_labs_data');
+            let opsLabs = [];
+            if (saved) {
+                const data = JSON.parse(saved);
+                opsLabs = data.entries || [];
+            }
+
+            // Also collect completed labs directly from patient charts (in case not synced yet)
+            const patientLabs = [];
+            state.patients.forEach(patient => {
+                if (patient.labs) {
+                    patient.labs.filter(lab => lab.sectionComplete).forEach(lab => {
+                        // Check if this lab is already in opsLabs
+                        const alreadySynced = opsLabs.some(e =>
+                            e.sourcePatientId === patient.id && e.sourceLabId === lab.id
+                        );
+                        if (!alreadySynced) {
+                            const patientName = patient.initials || patient.name || `Pt #${patient.number}`;
+                            patientLabs.push({
+                                id: lab.id,
+                                patientName: patientName,
+                                labResult: lab.name + (lab.resultText ? ` - ${lab.resultText}` : ''),
+                                dateTime: lab.timestamp || ''
+                            });
+                        }
+                    });
+                }
+            });
+
+            // Combine all labs
+            const allLabs = [...opsLabs, ...patientLabs];
+
+            countEl.textContent = `${allLabs.length} patient${allLabs.length !== 1 ? 's' : ''}`;
+
+            if (allLabs.length === 0) {
+                container.innerHTML = '<div class="eosr-bullet-placeholder">•</div>';
+                return;
+            }
+
+            // Render labs as entries (similar to other EOSR sections but read-only display)
+            container.innerHTML = allLabs.map(lab => `
+                <div class="eosr-entry">
+                    <div class="eosr-entry-header">
+                        <span><span class="eosr-patient-name">${lab.patientName}</span></span>
+                    </div>
+                    <textarea class="eosr-entry-text"
+                        data-patient-id="${lab.id}"
+                        data-section="statLabs"
+                        data-name="${lab.patientName}"
+                        oninput="updateEOSREntry(this)">${lab.labResult}</textarea>
+                </div>
+            `).join('');
         }
 
         // Render Early Termination section
@@ -5939,10 +6000,11 @@
             { id: 'Disinfect', title: 'All Disinfection Logs completed and signed off? Yes/No N/A', contentId: 'eosrDisinfectContent' }
         ];
 
-        // Copy all EOSR content to clipboard with rich text
+        // Copy all EOSR content to clipboard with rich text (Outlook-compatible HTML)
         function copyEOSRToClipboard() {
             let plainText = '';
-            let html = '';
+            // Outlook-compatible HTML with inline styles
+            let html = '<div style="font-family: Calibri, Arial, sans-serif; font-size: 11pt;">';
 
             eosrSections.forEach(section => {
                 const container = document.getElementById(section.contentId);
@@ -5950,13 +6012,15 @@
 
                 // Add section header (bold)
                 plainText += `${section.title}\n`;
-                html += `<p><strong>${section.title}</strong></p>`;
+                html += `<p style="margin: 10px 0 5px 0;"><strong>${section.title}</strong></p>`;
 
                 if (textareas.length === 0) {
-                    // Empty section - just bullet
+                    // Empty section - just bullet (Outlook-compatible)
                     plainText += `\t•\n`;
-                    html += `<ul><li></li></ul>`;
+                    html += `<ul style="margin: 0 0 0 20px; padding: 0;"><li style="margin: 2px 0;">&nbsp;</li></ul>`;
                 } else {
+                    // Start bullet list with Outlook-compatible styles
+                    html += `<ul style="margin: 0 0 0 20px; padding: 0; list-style-type: disc;">`;
                     textareas.forEach(ta => {
                         const name = ta.dataset.name || 'Patient';
                         const text = ta.value;
@@ -5977,11 +6041,15 @@
                         );
 
                         plainText += `\t• ${name} ${text}\n`;
-                        html += `<ul><li><strong>${name}</strong> ${formattedHtml}</li></ul>`;
+                        // Bold patient name for Outlook
+                        html += `<li style="margin: 2px 0;"><strong style="font-weight: bold;">${name}</strong> ${formattedHtml}</li>`;
                     });
+                    html += `</ul>`;
                 }
                 plainText += '\n';
             });
+
+            html += '</div>';
 
             // Copy both plain text and HTML to clipboard
             const blob = new Blob([html], { type: 'text/html' });
