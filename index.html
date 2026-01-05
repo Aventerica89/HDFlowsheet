@@ -5344,7 +5344,10 @@
                     </div>
                     <input type="checkbox" class="auto-save-toggle" id="autoSaveToggle" onchange="toggleAutoSave()">
                 </div>
-                <div class="auto-save-countdown" id="autoSaveCountdown">Auto-save off</div>
+                <div class="auto-save-countdown" id="autoSaveCountdown">Auto-save in 60s</div>
+                <button class="refresh-app-btn" id="refreshAppBtn" onclick="refreshApp()" title="Save data, clear cache, and reload app with latest code">
+                    🔄 Refresh App
+                </button>
             </div>
         </nav>
         <button class="floating-nav-toggle" onclick="toggleFloatingNav()" id="floatingNavToggle" title="Hide Navigation">
@@ -7839,6 +7842,98 @@
             } catch (error) {
                 console.error('Load error:', error);
                 showSaveStatus('Failed to load. Check console for details.', true);
+            }
+        }
+
+        // Refresh App - saves data, sets auto-load flag, and reloads with cache busting
+        async function refreshApp() {
+            const btn = document.getElementById('refreshAppBtn');
+
+            if (!confirm('This will:\n1. Save all current data to server\n2. Reload the app with latest code (clears cache)\n3. Automatically load your data back\n\nContinue?')) {
+                return;
+            }
+
+            try {
+                // Disable button and show progress
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = '⏳ Saving...';
+                }
+
+                // Save all data to server first
+                const saveResult = await saveToServer();
+
+                if (!saveResult || !saveResult.success) {
+                    throw new Error('Failed to save data to server');
+                }
+
+                // Also save operations data
+                await saveOpsToServerAsync();
+
+                if (btn) {
+                    btn.innerHTML = '🔄 Reloading...';
+                }
+
+                // Set flag to auto-load from server after refresh
+                localStorage.setItem('hd_pending_server_load', 'true');
+
+                // Reload with cache-busting query parameter
+                // This forces the browser to fetch fresh HTML/JS/CSS
+                const currentUrl = window.location.href.split('?')[0];
+                window.location.href = currentUrl + '?v=' + Date.now();
+
+            } catch (error) {
+                console.error('Refresh error:', error);
+                alert('Failed to save data before refresh. Please try again or save manually first.');
+
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '🔄 Refresh App';
+                }
+            }
+        }
+
+        // Auto-load from server (called after refresh if flag is set)
+        async function autoLoadFromServer() {
+            try {
+                showSaveStatus('Auto-loading saved data...');
+                const response = await fetch('api/load.php');
+
+                if (response.status === 404) {
+                    showSaveStatus('No saved data found on server.', true);
+                    return false;
+                }
+
+                if (!response.ok) throw new Error('Server error');
+
+                const data = await response.json();
+
+                // Restore state
+                if (data.patients) state.patients = data.patients;
+                if (data.technicians) {
+                    state.technicians = data.technicians;
+                    saveTechnicians();
+                }
+                if (data.currentSection) {
+                    state.currentSection = data.currentSection;
+                    saveSection();
+                }
+                if (data.selectedShifts) {
+                    state.selectedShifts = data.selectedShifts;
+                    saveShifts();
+                }
+                if (data.timestampLogs) {
+                    timestampState.logs = data.timestampLogs;
+                    saveTimestampLogs();
+                }
+
+                renderAll();
+                showSaveStatus(`Data restored from server (${data.savedAt || 'saved'})`);
+                return true;
+            } catch (error) {
+                console.error('Auto-load error:', error);
+                showSaveStatus('Failed to auto-load. Use Load from Server manually.', true);
+                return false;
             }
         }
 
@@ -12386,7 +12481,7 @@
         }, 30000);
         
         // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             loadTheme(); // Load theme first to avoid flash
             loadShifts(); // Load selected shifts
             loadTechnicians();
@@ -12395,6 +12490,23 @@
             initFloatingNav(); // Initialize floating navigation sidebar
             showImportModal(); // Show import modal with section selector on page load
             // Auto-save is OFF by default - user must enable it to prevent overwriting from other sessions
+
+            // Check if we're returning from a refresh (auto-load from server)
+            const pendingServerLoad = localStorage.getItem('hd_pending_server_load');
+            if (pendingServerLoad === 'true') {
+                // Clear the flag first
+                localStorage.removeItem('hd_pending_server_load');
+                // Auto-load data from server (skip import modal)
+                const loaded = await autoLoadFromServer();
+                if (!loaded) {
+                    // If auto-load fails, show import modal as fallback
+                    showImportModal();
+                }
+            } else {
+                showImportModal(); // Show import modal with section selector on page load
+            }
+
+            startAutoSave(); // Start auto-save (every 60 seconds)
         });
     </script>
     
