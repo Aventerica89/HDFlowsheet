@@ -5001,20 +5001,27 @@
         }
 
         /* ========== FLOATING NAVIGATION SIDEBAR ========== */
-        .floating-nav {
+        .floating-nav-wrapper {
             position: fixed;
             left: 0;
-            top: 50%;
-            transform: translateY(-50%);
+            top: 20px;
             z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+        .floating-nav-wrapper.collapsed {
+            transform: translateX(-100%);
+        }
+        .floating-nav {
             display: flex;
             flex-direction: column;
             gap: 4px;
             padding: 10px 6px;
             background: rgba(255, 255, 255, 0.95);
-            border-radius: 0 16px 16px 0;
+            border-radius: 0 16px 0 0;
             box-shadow: 2px 0 20px rgba(0, 0, 0, 0.15);
-            max-height: 80vh;
+            max-height: 70vh;
             overflow-y: auto;
             scrollbar-width: thin;
             scrollbar-color: rgba(102, 126, 234, 0.3) transparent;
@@ -5060,7 +5067,7 @@
         }
         .floating-nav-sub {
             margin-left: 16px;
-            padding: 8px 12px;
+            padding: 10px 14px;
             font-size: 12px;
             font-weight: 500;
             min-width: 100px;
@@ -5082,13 +5089,36 @@
             margin: 6px 8px;
         }
         .floating-nav-toggle {
+            width: 100%;
+            height: 32px;
+            background: var(--theme-primary, #667eea);
+            border: none;
+            border-radius: 0 0 12px 0;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 500;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+        .floating-nav-toggle:hover {
+            background: var(--theme-secondary, #764ba2);
+        }
+        .floating-nav-toggle .arrow {
+            font-size: 12px;
+            transition: transform 0.3s ease;
+        }
+        .floating-nav-expand-btn {
             position: fixed;
             left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 10000;
-            width: 28px;
-            height: 60px;
+            top: 20px;
+            z-index: 9998;
+            width: 36px;
+            height: 36px;
             background: var(--theme-primary, #667eea);
             border: none;
             border-radius: 0 8px 8px 0;
@@ -5099,20 +5129,16 @@
             justify-content: center;
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
             transition: all 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
         }
-        .floating-nav-toggle:hover {
-            width: 32px;
+        .floating-nav-expand-btn.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .floating-nav-expand-btn:hover {
+            width: 40px;
             background: var(--theme-secondary, #764ba2);
-        }
-        .floating-nav-toggle .arrow {
-            font-size: 14px;
-            transition: transform 0.3s ease;
-        }
-        .floating-nav.collapsed {
-            transform: translateX(-100%) translateY(-50%);
-        }
-        .floating-nav.collapsed + .floating-nav-toggle .arrow {
-            transform: rotate(180deg);
         }
         @media (max-width: 768px) {
             .floating-nav {
@@ -5133,43 +5159,48 @@
 </head>
 <body>
     <!-- Floating Navigation Sidebar -->
-    <nav class="floating-nav" id="floatingNav">
-        <!-- Pt Charting Section -->
-        <div class="floating-nav-section">
-            <button class="floating-nav-btn active" onclick="floatingNavTo('charting')" id="floatNavCharting">
-                📋 Pt Charting
-            </button>
-        </div>
+    <div class="floating-nav-wrapper" id="floatingNavWrapper">
+        <nav class="floating-nav" id="floatingNav">
+            <!-- Pt Charting Section -->
+            <div class="floating-nav-section">
+                <button class="floating-nav-btn active" onclick="floatingNavTo('charting')" id="floatNavCharting">
+                    📋 Pt Charting
+                </button>
+            </div>
 
-        <div class="floating-nav-divider"></div>
+            <div class="floating-nav-divider"></div>
 
-        <!-- Operations Section -->
-        <div class="floating-nav-section">
-            <button class="floating-nav-btn" onclick="floatingNavTo('operations')" id="floatNavOperations">
-                ⚙️ Operations
-            </button>
-            <button class="floating-nav-btn floating-nav-sub" onclick="floatingNavTo('operations', 'checklists')" id="floatNavChecklists">
-                📋 Checklists
-            </button>
-            <button class="floating-nav-btn floating-nav-sub" onclick="floatingNavTo('operations', 'labs')" id="floatNavLabs">
-                🧪 Labs
-            </button>
-        </div>
+            <!-- Operations Section -->
+            <div class="floating-nav-section">
+                <button class="floating-nav-btn" onclick="floatingNavTo('operations')" id="floatNavOperations">
+                    ⚙️ Operations
+                </button>
+                <button class="floating-nav-btn floating-nav-sub" onclick="floatingNavTo('operations', 'checklists')" id="floatNavChecklists">
+                    📋 Checklists
+                </button>
+                <button class="floating-nav-btn floating-nav-sub" onclick="floatingNavTo('operations', 'labs')" id="floatNavLabs">
+                    🧪 Labs
+                </button>
+            </div>
 
-        <div class="floating-nav-divider"></div>
+            <div class="floating-nav-divider"></div>
 
-        <!-- Reports Section -->
-        <div class="floating-nav-section">
-            <button class="floating-nav-btn" onclick="floatingNavTo('reports')" id="floatNavReports">
-                📊 Reports
-            </button>
-            <button class="floating-nav-btn floating-nav-sub" onclick="floatingNavTo('reports', 'eosr')" id="floatNavEOSR">
-                📋 End of Shift
-            </button>
-        </div>
-    </nav>
-    <button class="floating-nav-toggle" onclick="toggleFloatingNav()" id="floatingNavToggle" title="Toggle Navigation">
-        <span class="arrow">◀</span>
+            <!-- Reports Section -->
+            <div class="floating-nav-section">
+                <button class="floating-nav-btn" onclick="floatingNavTo('reports')" id="floatNavReports">
+                    📊 Reports
+                </button>
+                <button class="floating-nav-btn floating-nav-sub" onclick="floatingNavTo('reports', 'eosr')" id="floatNavEOSR">
+                    📋 End of Shift
+                </button>
+            </div>
+        </nav>
+        <button class="floating-nav-toggle" onclick="toggleFloatingNav()" id="floatingNavToggle" title="Hide Navigation">
+            <span class="arrow">▲</span> Hide
+        </button>
+    </div>
+    <button class="floating-nav-expand-btn" onclick="toggleFloatingNav()" id="floatingNavExpandBtn" title="Show Navigation">
+        ▶
     </button>
 
     <div class="container">
@@ -5713,23 +5744,20 @@
 
         // Toggle floating navigation visibility
         function toggleFloatingNav() {
-            const nav = document.getElementById('floatingNav');
-            const toggle = document.getElementById('floatingNavToggle');
-            const arrow = toggle.querySelector('.arrow');
+            const wrapper = document.getElementById('floatingNavWrapper');
+            const expandBtn = document.getElementById('floatingNavExpandBtn');
 
-            nav.classList.toggle('collapsed');
+            wrapper.classList.toggle('collapsed');
 
-            // Update arrow direction
-            if (nav.classList.contains('collapsed')) {
-                arrow.textContent = '▶';
-                toggle.style.left = '0';
+            // Show/hide expand button
+            if (wrapper.classList.contains('collapsed')) {
+                expandBtn.classList.add('visible');
             } else {
-                arrow.textContent = '◀';
-                toggle.style.left = nav.offsetWidth + 'px';
+                expandBtn.classList.remove('visible');
             }
 
             // Save preference
-            localStorage.setItem('hd_floating_nav_collapsed', nav.classList.contains('collapsed'));
+            localStorage.setItem('hd_floating_nav_collapsed', wrapper.classList.contains('collapsed'));
         }
 
         // Navigate to a tab/sub-tab via floating navigation
@@ -5785,29 +5813,15 @@
             }
         }
 
-        // Position floating nav toggle button
-        function positionFloatingNavToggle() {
-            const nav = document.getElementById('floatingNav');
-            const toggle = document.getElementById('floatingNavToggle');
-            if (!nav.classList.contains('collapsed')) {
-                toggle.style.left = nav.offsetWidth + 'px';
-            }
-        }
-
         // Initialize floating navigation state
         function initFloatingNav() {
             const collapsed = localStorage.getItem('hd_floating_nav_collapsed') === 'true';
-            const nav = document.getElementById('floatingNav');
-            const toggle = document.getElementById('floatingNavToggle');
-            const arrow = toggle.querySelector('.arrow');
+            const wrapper = document.getElementById('floatingNavWrapper');
+            const expandBtn = document.getElementById('floatingNavExpandBtn');
 
             if (collapsed) {
-                nav.classList.add('collapsed');
-                arrow.textContent = '▶';
-                toggle.style.left = '0';
-            } else {
-                // Position toggle button after nav is rendered
-                setTimeout(positionFloatingNavToggle, 100);
+                wrapper.classList.add('collapsed');
+                expandBtn.classList.add('visible');
             }
 
             // Set initial active state
