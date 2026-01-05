@@ -1,10 +1,18 @@
 <!DOCTYPE html>
 <!--
     HD Flowsheet & QA Tracker
-    Version: 1.9.12
-    Date: January 2, 2025
+    Version: 1.9.16
+    Date: January 5, 2026
 
     CHANGELOG:
+    v1.9.16 - Floating Navigation Sidebar
+        - NEW: Floating navigation sidebar on the left side of the page
+        - Quick access to all main tabs (Pt Charting, Operations, Reports)
+        - Sub-tabs indented under each main tab (Checklists, Labs under Operations; End of Shift under Reports)
+        - Toggle button to collapse/expand the sidebar
+        - Remembers collapsed state across sessions
+        - Automatically syncs with main navigation tabs
+        - Smooth scroll to top when navigating
     v1.9.12 - Wheelchair Weight Calculation for TCH Patients
         - NEW: Wheelchair weight calculation sub-section in Weight & UF Management (TCH patients only)
         - Dual-column layout: PRE Weight (arrival) and POST Weight (end of treatment)
@@ -4991,9 +4999,179 @@
             color: #065f46;
             border-color: #86efac;
         }
+
+        /* ========== FLOATING NAVIGATION SIDEBAR ========== */
+        .floating-nav {
+            position: fixed;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 10px 6px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 0 16px 16px 0;
+            box-shadow: 2px 0 20px rgba(0, 0, 0, 0.15);
+            max-height: 80vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(102, 126, 234, 0.3) transparent;
+        }
+        .floating-nav::-webkit-scrollbar {
+            width: 4px;
+        }
+        .floating-nav::-webkit-scrollbar-thumb {
+            background: rgba(102, 126, 234, 0.3);
+            border-radius: 4px;
+        }
+        .floating-nav-section {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .floating-nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            color: #667eea;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            min-width: 120px;
+        }
+        .floating-nav-btn:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: var(--theme-primary, #667eea);
+            transform: translateX(3px);
+        }
+        .floating-nav-btn.active {
+            background: var(--theme-primary, #667eea);
+            color: white;
+            border-color: var(--theme-primary, #667eea);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+        }
+        .floating-nav-sub {
+            margin-left: 16px;
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 500;
+            min-width: 100px;
+            border-width: 1px;
+            background: rgba(248, 250, 252, 0.9);
+        }
+        .floating-nav-sub:hover {
+            background: rgba(102, 126, 234, 0.08);
+        }
+        .floating-nav-sub.active {
+            background: rgba(102, 126, 234, 0.15);
+            color: var(--theme-primary, #667eea);
+            border-color: var(--theme-primary, #667eea);
+            font-weight: 600;
+        }
+        .floating-nav-divider {
+            height: 1px;
+            background: rgba(102, 126, 234, 0.2);
+            margin: 6px 8px;
+        }
+        .floating-nav-toggle {
+            position: fixed;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10000;
+            width: 28px;
+            height: 60px;
+            background: var(--theme-primary, #667eea);
+            border: none;
+            border-radius: 0 8px 8px 0;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        .floating-nav-toggle:hover {
+            width: 32px;
+            background: var(--theme-secondary, #764ba2);
+        }
+        .floating-nav-toggle .arrow {
+            font-size: 14px;
+            transition: transform 0.3s ease;
+        }
+        .floating-nav.collapsed {
+            transform: translateX(-100%) translateY(-50%);
+        }
+        .floating-nav.collapsed + .floating-nav-toggle .arrow {
+            transform: rotate(180deg);
+        }
+        @media (max-width: 768px) {
+            .floating-nav {
+                padding: 8px 4px;
+            }
+            .floating-nav-btn {
+                padding: 8px 10px;
+                font-size: 11px;
+                min-width: 100px;
+            }
+            .floating-nav-sub {
+                margin-left: 12px;
+                padding: 6px 10px;
+                font-size: 10px;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Floating Navigation Sidebar -->
+    <nav class="floating-nav" id="floatingNav">
+        <!-- Pt Charting Section -->
+        <div class="floating-nav-section">
+            <button class="floating-nav-btn active" onclick="floatingNavTo('charting')" id="floatNavCharting">
+                📋 Pt Charting
+            </button>
+        </div>
+
+        <div class="floating-nav-divider"></div>
+
+        <!-- Operations Section -->
+        <div class="floating-nav-section">
+            <button class="floating-nav-btn" onclick="floatingNavTo('operations')" id="floatNavOperations">
+                ⚙️ Operations
+            </button>
+            <button class="floating-nav-btn floating-nav-sub" onclick="floatingNavTo('operations', 'checklists')" id="floatNavChecklists">
+                📋 Checklists
+            </button>
+            <button class="floating-nav-btn floating-nav-sub" onclick="floatingNavTo('operations', 'labs')" id="floatNavLabs">
+                🧪 Labs
+            </button>
+        </div>
+
+        <div class="floating-nav-divider"></div>
+
+        <!-- Reports Section -->
+        <div class="floating-nav-section">
+            <button class="floating-nav-btn" onclick="floatingNavTo('reports')" id="floatNavReports">
+                📊 Reports
+            </button>
+            <button class="floating-nav-btn floating-nav-sub" onclick="floatingNavTo('reports', 'eosr')" id="floatNavEOSR">
+                📋 End of Shift
+            </button>
+        </div>
+    </nav>
+    <button class="floating-nav-toggle" onclick="toggleFloatingNav()" id="floatingNavToggle" title="Toggle Navigation">
+        <span class="arrow">◀</span>
+    </button>
+
     <div class="container">
         <!-- Import Modal -->
         <div class="modal-overlay hidden" id="importModal">
@@ -5069,7 +5247,7 @@
                     <button class="settings-btn" onclick="openSettingsModal()" title="Settings">⚙️</button>
                     <div>
                         <h1 style="margin-bottom: 5px;">🏥 HD Flowsheet & QA Tracker</h1>
-                        <div class="version">Version 1.9.15</div>
+                        <div class="version">Version 1.9.16</div>
                     </div>
                 </div>
             </div>
@@ -5515,6 +5693,9 @@
             if (tab === 'reports') {
                 refreshEOSR();
             }
+
+            // Update floating navigation
+            updateFloatingNav(tab);
         }
 
         // Switch between report tabs (for future expansion)
@@ -5524,6 +5705,113 @@
             if (tab === 'eosr') {
                 refreshEOSR();
             }
+            // Update floating nav sub-tab
+            updateFloatingNavSubTab('reports', tab);
+        }
+
+        // ========== FLOATING NAVIGATION FUNCTIONS ==========
+
+        // Toggle floating navigation visibility
+        function toggleFloatingNav() {
+            const nav = document.getElementById('floatingNav');
+            const toggle = document.getElementById('floatingNavToggle');
+            const arrow = toggle.querySelector('.arrow');
+
+            nav.classList.toggle('collapsed');
+
+            // Update arrow direction
+            if (nav.classList.contains('collapsed')) {
+                arrow.textContent = '▶';
+                toggle.style.left = '0';
+            } else {
+                arrow.textContent = '◀';
+                toggle.style.left = nav.offsetWidth + 'px';
+            }
+
+            // Save preference
+            localStorage.setItem('hd_floating_nav_collapsed', nav.classList.contains('collapsed'));
+        }
+
+        // Navigate to a tab/sub-tab via floating navigation
+        function floatingNavTo(tab, subTab) {
+            // Switch to main tab
+            switchTopNav(tab);
+
+            // If sub-tab specified, switch to it
+            if (subTab) {
+                if (tab === 'operations') {
+                    switchOpsSubTab(subTab);
+                } else if (tab === 'reports') {
+                    switchReportTab(subTab);
+                }
+            }
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Update floating navigation main tab state
+        function updateFloatingNav(activeTab) {
+            // Update main tab buttons
+            document.getElementById('floatNavCharting').classList.toggle('active', activeTab === 'charting');
+            document.getElementById('floatNavOperations').classList.toggle('active', activeTab === 'operations');
+            document.getElementById('floatNavReports').classList.toggle('active', activeTab === 'reports');
+
+            // Reset sub-tab highlighting based on active main tab
+            if (activeTab === 'operations') {
+                const currentSubTab = labsState.activeOpsSubTab || 'checklists';
+                updateFloatingNavSubTab('operations', currentSubTab);
+            } else {
+                // Clear operations sub-tab highlighting
+                document.getElementById('floatNavChecklists').classList.remove('active');
+                document.getElementById('floatNavLabs').classList.remove('active');
+            }
+
+            if (activeTab === 'reports') {
+                updateFloatingNavSubTab('reports', 'eosr');
+            } else {
+                // Clear reports sub-tab highlighting
+                document.getElementById('floatNavEOSR').classList.remove('active');
+            }
+        }
+
+        // Update floating navigation sub-tab state
+        function updateFloatingNavSubTab(mainTab, subTab) {
+            if (mainTab === 'operations') {
+                document.getElementById('floatNavChecklists').classList.toggle('active', subTab === 'checklists');
+                document.getElementById('floatNavLabs').classList.toggle('active', subTab === 'labs');
+            } else if (mainTab === 'reports') {
+                document.getElementById('floatNavEOSR').classList.toggle('active', subTab === 'eosr');
+            }
+        }
+
+        // Position floating nav toggle button
+        function positionFloatingNavToggle() {
+            const nav = document.getElementById('floatingNav');
+            const toggle = document.getElementById('floatingNavToggle');
+            if (!nav.classList.contains('collapsed')) {
+                toggle.style.left = nav.offsetWidth + 'px';
+            }
+        }
+
+        // Initialize floating navigation state
+        function initFloatingNav() {
+            const collapsed = localStorage.getItem('hd_floating_nav_collapsed') === 'true';
+            const nav = document.getElementById('floatingNav');
+            const toggle = document.getElementById('floatingNavToggle');
+            const arrow = toggle.querySelector('.arrow');
+
+            if (collapsed) {
+                nav.classList.add('collapsed');
+                arrow.textContent = '▶';
+                toggle.style.left = '0';
+            } else {
+                // Position toggle button after nav is rendered
+                setTimeout(positionFloatingNavToggle, 100);
+            }
+
+            // Set initial active state
+            updateFloatingNav('charting');
         }
 
         // EOSR state to track edits
@@ -5600,6 +5888,9 @@
             } else {
                 loadOpsData();
             }
+
+            // Update floating nav sub-tab
+            updateFloatingNavSubTab('operations', tab);
         }
 
         // Add a new lab entry
@@ -11805,6 +12096,7 @@
             loadTechnicians();
             loadSection();
             loadSectionOrder(); // Load saved section order
+            initFloatingNav(); // Initialize floating navigation sidebar
             showImportModal(); // Show import modal with section selector on page load
         });
     </script>
