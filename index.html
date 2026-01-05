@@ -5992,6 +5992,19 @@
             activeOpsSubTab: 'checklists'  // 'checklists' or 'labs'
         };
 
+        // Clear EOSR and Labs state when loading new flowsheet data
+        // This prevents stale data from previous sessions appearing in reports
+        function clearEOSRAndLabsState() {
+            // Clear EOSR edits
+            eosrState.completeEdits = {};
+            eosrState.earlyTermEdits = {};
+            eosrState.weightEdits = {};
+
+            // Clear labs state and localStorage
+            labsState.entries = [];
+            localStorage.removeItem('hd_labs_data');
+        }
+
         // Load labs data from localStorage
         function loadLabsData() {
             const saved = localStorage.getItem('hd_labs_data');
@@ -7818,6 +7831,9 @@
 
                 const data = await response.json();
 
+                // Clear EOSR edits and labs data from previous session
+                clearEOSRAndLabsState();
+
                 // Restore state
                 if (data.patients) state.patients = data.patients;
                 if (data.technicians) {
@@ -7907,6 +7923,9 @@
                 if (!response.ok) throw new Error('Server error');
 
                 const data = await response.json();
+
+                // Clear EOSR edits and labs data from previous session
+                clearEOSRAndLabsState();
 
                 // Restore state
                 if (data.patients) state.patients = data.patients;
