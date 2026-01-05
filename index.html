@@ -5272,6 +5272,25 @@
             text-align: center;
             padding: 2px 0;
         }
+        /* Warning state when auto-save is off */
+        .floating-nav-save-section.auto-save-warning {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid #ef4444;
+            border-radius: 8px;
+            padding: 10px 8px;
+            animation: warningPulse 2s ease-in-out infinite;
+        }
+        @keyframes warningPulse {
+            0%, 100% { border-color: #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.3); }
+            50% { border-color: #f87171; box-shadow: 0 0 16px rgba(239, 68, 68, 0.5); }
+        }
+        .floating-nav-save-section.auto-save-warning .auto-save-countdown {
+            color: #ef4444;
+            font-weight: 600;
+        }
+        .floating-nav-save-section.auto-save-warning .auto-save-indicator {
+            background: #ef4444;
+        }
     </style>
 </head>
 <body>
@@ -5313,19 +5332,19 @@
             </div>
 
             <!-- Universal Save Section -->
-            <div class="floating-nav-save-section">
+            <div class="floating-nav-save-section auto-save-warning" id="saveSection">
                 <button class="universal-save-btn" id="universalSaveBtn" onclick="saveAll()">
                     💾 Save All
                 </button>
                 <div class="universal-save-status" id="universalSaveStatus"></div>
                 <div class="auto-save-container">
                     <div class="auto-save-label">
-                        <span class="auto-save-indicator active" id="autoSaveIndicator"></span>
+                        <span class="auto-save-indicator" id="autoSaveIndicator"></span>
                         Auto-save
                     </div>
-                    <input type="checkbox" class="auto-save-toggle" id="autoSaveToggle" checked onchange="toggleAutoSave()">
+                    <input type="checkbox" class="auto-save-toggle" id="autoSaveToggle" onchange="toggleAutoSave()">
                 </div>
-                <div class="auto-save-countdown" id="autoSaveCountdown">Auto-save in 60s</div>
+                <div class="auto-save-countdown" id="autoSaveCountdown">Auto-save off</div>
             </div>
         </nav>
         <button class="floating-nav-toggle" onclick="toggleFloatingNav()" id="floatingNavToggle" title="Hide Navigation">
@@ -7759,6 +7778,7 @@
         function toggleAutoSave() {
             const toggle = document.getElementById('autoSaveToggle');
             const indicator = document.getElementById('autoSaveIndicator');
+            const saveSection = document.getElementById('saveSection');
 
             if (autoSaveInterval) {
                 // Turn off auto-save
@@ -7768,11 +7788,13 @@
                 countdownInterval = null;
                 if (toggle) toggle.checked = false;
                 if (indicator) indicator.classList.remove('active');
+                if (saveSection) saveSection.classList.add('auto-save-warning');
                 document.getElementById('autoSaveCountdown').textContent = 'Auto-save off';
             } else {
                 // Turn on auto-save
                 if (toggle) toggle.checked = true;
                 if (indicator) indicator.classList.add('active');
+                if (saveSection) saveSection.classList.remove('auto-save-warning');
                 startAutoSave();
             }
         }
@@ -12372,7 +12394,7 @@
             loadSectionOrder(); // Load saved section order
             initFloatingNav(); // Initialize floating navigation sidebar
             showImportModal(); // Show import modal with section selector on page load
-            startAutoSave(); // Start auto-save (every 60 seconds)
+            // Auto-save is OFF by default - user must enable it to prevent overwriting from other sessions
         });
     </script>
     
