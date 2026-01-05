@@ -5272,38 +5272,24 @@
             text-align: center;
             padding: 2px 0;
         }
-        /* Refresh App Button Styles */
-        .refresh-app-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-            padding: 10px 14px;
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            border: none;
-            color: white;
-            cursor: pointer;
+        /* Warning state when auto-save is off */
+        .floating-nav-save-section.auto-save-warning {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid #ef4444;
             border-radius: 8px;
-            font-size: 13px;
+            padding: 10px 8px;
+            animation: warningPulse 2s ease-in-out infinite;
+        }
+        @keyframes warningPulse {
+            0%, 100% { border-color: #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.3); }
+            50% { border-color: #f87171; box-shadow: 0 0 16px rgba(239, 68, 68, 0.5); }
+        }
+        .floating-nav-save-section.auto-save-warning .auto-save-countdown {
+            color: #ef4444;
             font-weight: 600;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
-            margin-top: 8px;
         }
-        .refresh-app-btn:hover {
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5);
-        }
-        .refresh-app-btn:active {
-            transform: translateY(0);
-        }
-        .refresh-app-btn:disabled {
-            background: #9ca3af;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
+        .floating-nav-save-section.auto-save-warning .auto-save-indicator {
+            background: #ef4444;
         }
     </style>
 </head>
@@ -5346,17 +5332,17 @@
             </div>
 
             <!-- Universal Save Section -->
-            <div class="floating-nav-save-section">
+            <div class="floating-nav-save-section auto-save-warning" id="saveSection">
                 <button class="universal-save-btn" id="universalSaveBtn" onclick="saveAll()">
                     💾 Save All
                 </button>
                 <div class="universal-save-status" id="universalSaveStatus"></div>
                 <div class="auto-save-container">
                     <div class="auto-save-label">
-                        <span class="auto-save-indicator active" id="autoSaveIndicator"></span>
+                        <span class="auto-save-indicator" id="autoSaveIndicator"></span>
                         Auto-save
                     </div>
-                    <input type="checkbox" class="auto-save-toggle" id="autoSaveToggle" checked onchange="toggleAutoSave()">
+                    <input type="checkbox" class="auto-save-toggle" id="autoSaveToggle" onchange="toggleAutoSave()">
                 </div>
                 <div class="auto-save-countdown" id="autoSaveCountdown">Auto-save in 60s</div>
                 <button class="refresh-app-btn" id="refreshAppBtn" onclick="refreshApp()" title="Save data, clear cache, and reload app with latest code">
@@ -7795,6 +7781,7 @@
         function toggleAutoSave() {
             const toggle = document.getElementById('autoSaveToggle');
             const indicator = document.getElementById('autoSaveIndicator');
+            const saveSection = document.getElementById('saveSection');
 
             if (autoSaveInterval) {
                 // Turn off auto-save
@@ -7804,11 +7791,13 @@
                 countdownInterval = null;
                 if (toggle) toggle.checked = false;
                 if (indicator) indicator.classList.remove('active');
+                if (saveSection) saveSection.classList.add('auto-save-warning');
                 document.getElementById('autoSaveCountdown').textContent = 'Auto-save off';
             } else {
                 // Turn on auto-save
                 if (toggle) toggle.checked = true;
                 if (indicator) indicator.classList.add('active');
+                if (saveSection) saveSection.classList.remove('auto-save-warning');
                 startAutoSave();
             }
         }
@@ -12499,6 +12488,8 @@
             loadSection();
             loadSectionOrder(); // Load saved section order
             initFloatingNav(); // Initialize floating navigation sidebar
+            showImportModal(); // Show import modal with section selector on page load
+            // Auto-save is OFF by default - user must enable it to prevent overwriting from other sessions
 
             // Check if we're returning from a refresh (auto-load from server)
             const pendingServerLoad = localStorage.getItem('hd_pending_server_load');
