@@ -5155,6 +5155,123 @@
                 font-size: 10px;
             }
         }
+
+        /* Universal Save Button Styles */
+        .floating-nav-save-section {
+            margin-top: auto;
+            padding-top: 10px;
+            border-top: 2px solid rgba(102, 126, 234, 0.2);
+        }
+        .universal-save-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 12px 14px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+        }
+        .universal-save-btn:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.5);
+        }
+        .universal-save-btn:active {
+            transform: translateY(0);
+        }
+        .universal-save-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .universal-save-status {
+            font-size: 10px;
+            text-align: center;
+            padding: 4px 0;
+            color: #64748b;
+            min-height: 18px;
+        }
+        .universal-save-status.success {
+            color: #10b981;
+        }
+        .universal-save-status.error {
+            color: #ef4444;
+        }
+        .auto-save-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 8px;
+            background: rgba(248, 250, 252, 0.9);
+            border-radius: 6px;
+            margin-top: 6px;
+        }
+        .auto-save-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: #64748b;
+        }
+        .auto-save-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #d1d5db;
+            transition: all 0.3s ease;
+        }
+        .auto-save-indicator.active {
+            background: #10b981;
+            box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+        }
+        .auto-save-indicator.flash {
+            animation: saveFlash 1s ease;
+        }
+        @keyframes saveFlash {
+            0%, 100% { box-shadow: 0 0 6px rgba(16, 185, 129, 0.6); }
+            50% { box-shadow: 0 0 16px rgba(16, 185, 129, 1); background: #34d399; }
+        }
+        .auto-save-toggle {
+            position: relative;
+            width: 36px;
+            height: 20px;
+            background: #d1d5db;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .auto-save-toggle:checked {
+            background: #10b981;
+        }
+        .auto-save-toggle::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+        .auto-save-toggle:checked::before {
+            transform: translateX(16px);
+        }
+        .auto-save-countdown {
+            font-size: 10px;
+            color: #94a3b8;
+            text-align: center;
+            padding: 2px 0;
+        }
     </style>
 </head>
 <body>
@@ -5193,6 +5310,22 @@
                 <button class="floating-nav-btn floating-nav-sub" onclick="floatingNavTo('reports', 'eosr')" id="floatNavEOSR">
                     📋 End of Shift
                 </button>
+            </div>
+
+            <!-- Universal Save Section -->
+            <div class="floating-nav-save-section">
+                <button class="universal-save-btn" id="universalSaveBtn" onclick="saveAll()">
+                    💾 Save All
+                </button>
+                <div class="universal-save-status" id="universalSaveStatus"></div>
+                <div class="auto-save-container">
+                    <div class="auto-save-label">
+                        <span class="auto-save-indicator active" id="autoSaveIndicator"></span>
+                        Auto-save
+                    </div>
+                    <input type="checkbox" class="auto-save-toggle" id="autoSaveToggle" checked onchange="toggleAutoSave()">
+                </div>
+                <div class="auto-save-countdown" id="autoSaveCountdown">Auto-save in 60s</div>
             </div>
         </nav>
         <button class="floating-nav-toggle" onclick="toggleFloatingNav()" id="floatingNavToggle" title="Hide Navigation">
@@ -5299,9 +5432,6 @@
                     <button class="btn-reimport" onclick="showImportModal()">
                         📥 Import/Re-import Patient Orders
                     </button>
-                    <button class="btn-reimport" onclick="saveToServer()">
-                        💾 Save to Server
-                    </button>
                     <button class="btn-reimport" onclick="loadFromServer()">
                         📂 Load from Server
                     </button>
@@ -5366,7 +5496,6 @@
                     <h2 class="ops-title">⚙️ Operations</h2>
                     <div class="ops-actions" id="opsChecklistActions">
                         <button class="ops-btn ops-btn-primary" onclick="openChecklistEditor()">+ New Checklist</button>
-                        <button class="ops-btn ops-btn-success" onclick="saveOpsToServer()">💾 Save to Server</button>
                         <button class="ops-btn" style="background: #f3f4f6; color: #374151;" onclick="exportOpsData()">📥 Export JSON</button>
                         <button class="ops-btn" style="background: #f3f4f6; color: #374151;" onclick="document.getElementById('opsImportFile').click()">📤 Import JSON</button>
                         <input type="file" id="opsImportFile" accept=".json" style="display: none;" onchange="importOpsData(event)">
@@ -7489,9 +7618,9 @@
             }
         }
 
-        async function saveToServer() {
+        async function saveToServer(silent = false) {
             try {
-                showSaveStatus('Saving...');
+                if (!silent) showSaveStatus('Saving...');
                 const data = {
                     patients: state.patients,
                     technicians: state.technicians,
@@ -7510,10 +7639,141 @@
                 if (!response.ok) throw new Error('Server error');
 
                 const result = await response.json();
-                showSaveStatus(`Saved successfully at ${result.timestamp}`);
+                return { success: true, timestamp: result.timestamp };
             } catch (error) {
                 console.error('Save error:', error);
+                return { success: false, error: error.message };
+            }
+        }
+
+        // Universal Save All function - saves flowsheet and operations data
+        async function saveAll(isAutoSave = false) {
+            const saveBtn = document.getElementById('universalSaveBtn');
+            const saveStatus = document.getElementById('universalSaveStatus');
+            const autoSaveIndicator = document.getElementById('autoSaveIndicator');
+
+            if (saveBtn) {
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '⏳ Saving...';
+            }
+
+            try {
+                // Save flowsheet data
+                const flowsheetResult = await saveToServer(true);
+
+                // Save operations data
+                const opsResult = await saveOpsToServerAsync();
+
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+
+                if (flowsheetResult.success && opsResult.success) {
+                    if (saveStatus) {
+                        saveStatus.textContent = `Last saved: ${timeStr}`;
+                        saveStatus.className = 'universal-save-status success';
+                    }
+                    if (autoSaveIndicator && isAutoSave) {
+                        autoSaveIndicator.classList.add('flash');
+                        setTimeout(() => autoSaveIndicator.classList.remove('flash'), 1000);
+                    }
+                    showSaveStatus(`All data saved at ${timeStr}`);
+                } else {
+                    const errors = [];
+                    if (!flowsheetResult.success) errors.push('flowsheet');
+                    if (!opsResult.success) errors.push('operations');
+                    if (saveStatus) {
+                        saveStatus.textContent = `Failed: ${errors.join(', ')}`;
+                        saveStatus.className = 'universal-save-status error';
+                    }
+                    showSaveStatus(`Save failed for: ${errors.join(', ')}`, true);
+                }
+            } catch (error) {
+                console.error('SaveAll error:', error);
+                if (saveStatus) {
+                    saveStatus.textContent = 'Save failed';
+                    saveStatus.className = 'universal-save-status error';
+                }
                 showSaveStatus('Failed to save. Check console for details.', true);
+            } finally {
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '💾 Save All';
+                }
+            }
+        }
+
+        // Async version of saveOpsToServer for use in saveAll
+        async function saveOpsToServerAsync() {
+            const data = {
+                checklists: opsState.checklists,
+                completions: opsState.completions
+            };
+
+            try {
+                const response = await fetch('api/save.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type: 'operations', data: data })
+                });
+                const result = await response.json();
+                return { success: result.success };
+            } catch (err) {
+                return { success: false, error: err.message };
+            }
+        }
+
+        // Auto-save state
+        let autoSaveInterval = null;
+        let autoSaveCountdown = 60;
+        let countdownInterval = null;
+
+        function startAutoSave() {
+            // Clear any existing intervals
+            if (autoSaveInterval) clearInterval(autoSaveInterval);
+            if (countdownInterval) clearInterval(countdownInterval);
+
+            autoSaveCountdown = 60;
+            updateAutoSaveCountdown();
+
+            // Countdown timer - updates every second
+            countdownInterval = setInterval(() => {
+                autoSaveCountdown--;
+                if (autoSaveCountdown < 0) autoSaveCountdown = 60;
+                updateAutoSaveCountdown();
+            }, 1000);
+
+            // Auto-save every 60 seconds
+            autoSaveInterval = setInterval(() => {
+                autoSaveCountdown = 60;
+                saveAll(true);
+            }, 60000);
+        }
+
+        function updateAutoSaveCountdown() {
+            const countdownEl = document.getElementById('autoSaveCountdown');
+            if (countdownEl) {
+                countdownEl.textContent = `Auto-save in ${autoSaveCountdown}s`;
+            }
+        }
+
+        function toggleAutoSave() {
+            const toggle = document.getElementById('autoSaveToggle');
+            const indicator = document.getElementById('autoSaveIndicator');
+
+            if (autoSaveInterval) {
+                // Turn off auto-save
+                clearInterval(autoSaveInterval);
+                clearInterval(countdownInterval);
+                autoSaveInterval = null;
+                countdownInterval = null;
+                if (toggle) toggle.checked = false;
+                if (indicator) indicator.classList.remove('active');
+                document.getElementById('autoSaveCountdown').textContent = 'Auto-save off';
+            } else {
+                // Turn on auto-save
+                if (toggle) toggle.checked = true;
+                if (indicator) indicator.classList.add('active');
+                startAutoSave();
             }
         }
 
@@ -12112,6 +12372,7 @@
             loadSectionOrder(); // Load saved section order
             initFloatingNav(); // Initialize floating navigation sidebar
             showImportModal(); // Show import modal with section selector on page load
+            startAutoSave(); // Start auto-save (every 60 seconds)
         });
     </script>
     
@@ -12126,8 +12387,8 @@
         <button class="floating-btn" onclick="openQuickNotes()">
             📝 Quick Notes
         </button>
-        <button class="floating-btn" onclick="saveToServer()">
-            💾 Save
+        <button class="floating-btn" onclick="saveAll()">
+            💾 Save All
         </button>
     </div>
 
@@ -12563,8 +12824,8 @@
                 <div class="theme-selector-section">
                     <div class="theme-selector-title">💾 Data Management</div>
                     <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                        <button class="btn-add" onclick="saveToServer()" style="flex: 1; padding: 12px;">
-                            💾 Save to Server
+                        <button class="btn-add" onclick="saveAll()" style="flex: 1; padding: 12px;">
+                            💾 Save All
                         </button>
                         <button class="btn-add" onclick="loadFromServer()" style="flex: 1; padding: 12px; background: #10b981;">
                             📂 Load from Server
