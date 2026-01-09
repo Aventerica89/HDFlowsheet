@@ -798,6 +798,528 @@
             text-transform: uppercase;
         }
 
+        /* Snippet Manager Styles */
+        .snippets-manager-container {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .snippets-manager-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        .snippets-manager-title {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
+        }
+        .snippets-manager-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .snippet-config-tabs-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 12px;
+            background: #f9fafb;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+        .snippet-config-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: nowrap;
+        }
+        .snippet-config-tab {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .snippet-config-tab:hover {
+            border-color: var(--theme-primary);
+            background: #f8fafc;
+        }
+        .snippet-config-tab.active {
+            background: var(--theme-primary);
+            border-color: var(--theme-primary);
+            color: white;
+        }
+        .snippet-config-tab.dragging {
+            opacity: 0.5;
+        }
+        .snippet-config-tab.drag-over-left {
+            border-left: 3px solid #10b981;
+        }
+        .snippet-config-tab.drag-over-right {
+            border-right: 3px solid #10b981;
+        }
+        .snippet-config-tab-name {
+            font-weight: 600;
+        }
+        .snippet-config-tab-edit {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 2px;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        .snippet-config-tab-edit:hover {
+            opacity: 1;
+        }
+        .snippet-config-tab.active .snippet-config-tab-edit {
+            opacity: 0.9;
+        }
+        .snippet-config-tab-add {
+            padding: 10px 16px;
+            background: white;
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            color: #6b7280;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .snippet-config-tab-add:hover {
+            border-color: var(--theme-primary);
+            color: var(--theme-primary);
+        }
+        .snippet-config-content {
+            min-height: 300px;
+        }
+        .snippet-config-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            text-align: center;
+            color: #6b7280;
+        }
+        .snippet-config-empty-icon {
+            font-size: 4em;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        .snippet-config-empty-text {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            max-width: 400px;
+        }
+        .snippet-sections-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .snippet-sections-header h4 {
+            margin: 0;
+            font-size: 1.1em;
+            color: #374151;
+        }
+        .snippet-sections-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .snippet-section-empty {
+            text-align: center;
+            color: #9ca3af;
+            padding: 40px 20px;
+            font-style: italic;
+        }
+        .snippet-section-card {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .snippet-section-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .snippet-section-card-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .snippet-section-icon {
+            font-size: 1.4em;
+        }
+        .snippet-section-name {
+            font-weight: 700;
+            font-size: 1.1em;
+            color: #1e293b;
+        }
+        .snippet-section-count {
+            background: #e0e7ff;
+            color: #4338ca;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        .snippet-section-card-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .snippet-section-btn {
+            padding: 8px 14px;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .snippet-section-btn:hover {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+        }
+        .snippet-section-btn-danger {
+            color: #dc2626;
+        }
+        .snippet-section-btn-danger:hover {
+            background: #fef2f2;
+            border-color: #fca5a5;
+        }
+        .snippet-section-card-body {
+            padding: 16px 20px;
+        }
+        .snippet-items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .snippet-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 12px 16px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            gap: 12px;
+        }
+        .snippet-item:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        .snippet-item-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .snippet-item-text {
+            font-size: 14px;
+            color: #374151;
+            margin-bottom: 8px;
+            word-break: break-word;
+        }
+        .snippet-item-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .snippet-tag {
+            display: inline-block;
+            padding: 3px 8px;
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            color: #4338ca;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 4px;
+        }
+        .snippet-item-actions {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        .snippet-item-btn {
+            padding: 6px 10px;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .snippet-item-btn:hover {
+            background: #e5e7eb;
+        }
+        .snippet-item-btn-danger:hover {
+            background: #fef2f2;
+            border-color: #fca5a5;
+        }
+        .snippet-add-btn {
+            width: 100%;
+            padding: 10px;
+            background: white;
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            color: #6b7280;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .snippet-add-btn:hover {
+            border-color: var(--theme-primary);
+            color: var(--theme-primary);
+            background: #f8fafc;
+        }
+
+        /* Snippet Modal Styles */
+        .snippet-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+        .snippet-modal.open {
+            display: flex;
+        }
+        .snippet-modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 450px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+        .snippet-modal-wide {
+            max-width: 600px;
+        }
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .snippet-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 16px 16px 0 0;
+        }
+        .snippet-modal-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .snippet-modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 4px 8px;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+        .snippet-modal-close:hover {
+            color: #ef4444;
+        }
+        .snippet-modal-body {
+            padding: 24px;
+        }
+        .snippet-modal-field {
+            margin-bottom: 20px;
+        }
+        .snippet-modal-field:last-child {
+            margin-bottom: 0;
+        }
+        .snippet-modal-label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .snippet-modal-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
+        }
+        .snippet-modal-input:focus {
+            outline: none;
+            border-color: var(--theme-primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .snippet-modal-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
+        }
+        .snippet-modal-textarea:focus {
+            outline: none;
+            border-color: var(--theme-primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .snippet-tag-suggestions-container {
+            margin-top: 12px;
+        }
+        .snippet-tag-suggestions-label {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+        .snippet-tag-suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+        .snippet-tag-suggestion {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #f3f4f6;
+            color: #4b5563;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .snippet-tag-suggestion:hover {
+            background: #e0e7ff;
+            color: #4338ca;
+        }
+        .snippet-modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            padding: 16px 24px;
+            border-top: 1px solid #e5e7eb;
+            background: #f9fafb;
+            border-radius: 0 0 16px 16px;
+        }
+        .snippet-modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .snippet-modal-cancel {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+        .snippet-modal-cancel:hover {
+            background: #e5e7eb;
+        }
+        .snippet-modal-save {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .snippet-modal-save:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .snippet-modal-delete {
+            background: #fef2f2;
+            color: #dc2626;
+            margin-right: auto;
+        }
+        .snippet-modal-delete:hover {
+            background: #fee2e2;
+        }
+
+        /* Drawer Tag Filter Styles */
+        .drawer-tags-filter {
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 12px;
+            border-radius: 8px;
+        }
+        .drawer-tags-filter-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .drawer-tags-filter-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .drawer-tag-filter {
+            display: inline-block;
+            padding: 4px 10px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            color: #64748b;
+            font-size: 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .drawer-tag-filter:hover {
+            border-color: var(--theme-primary);
+            color: var(--theme-primary);
+        }
+        .drawer-tag-filter.active {
+            background: var(--theme-primary);
+            border-color: var(--theme-primary);
+            color: white;
+        }
+        .drawer-tag-clear {
+            font-size: 11px;
+            color: #94a3b8;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+        .drawer-tag-clear:hover {
+            color: #ef4444;
+        }
+
         /* Checklist Tabs */
         .checklist-tabs-container {
             background: white;
@@ -5317,6 +5839,9 @@
                 <button class="floating-nav-btn floating-nav-sub" onclick="floatingNavTo('operations', 'labs')" id="floatNavLabs">
                     🧪 Labs
                 </button>
+                <button class="floating-nav-btn floating-nav-sub" onclick="floatingNavTo('operations', 'snippets')" id="floatNavSnippets">
+                    ✂️ Snippets
+                </button>
             </div>
 
             <div class="floating-nav-divider"></div>
@@ -5528,6 +6053,7 @@
                 <div class="ops-sub-tabs">
                     <button class="ops-sub-tab active" onclick="switchOpsSubTab('checklists')" id="opsSubTabChecklists">📋 Checklists</button>
                     <button class="ops-sub-tab" onclick="switchOpsSubTab('labs')" id="opsSubTabLabs">🧪 Labs</button>
+                    <button class="ops-sub-tab" onclick="switchOpsSubTab('snippets')" id="opsSubTabSnippets">✂️ Snippets</button>
                 </div>
 
                 <!-- Checklists Sub-Content -->
@@ -5582,6 +6108,39 @@
                         <!-- Labs List -->
                         <div class="labs-list" id="labsList">
                             <div class="labs-empty">No lab entries yet. Add a lab result above to get started.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Snippets Sub-Content -->
+                <div class="ops-sub-content" id="opsSnippetsContent">
+                    <div class="snippets-manager-container">
+                        <!-- Snippet Manager Header -->
+                        <div class="snippets-manager-header">
+                            <h3 class="snippets-manager-title">✂️ Snippet Manager</h3>
+                            <div class="snippets-manager-actions">
+                                <button class="ops-btn ops-btn-primary" onclick="openSnippetConfigEditor()">+ New Configuration</button>
+                                <button class="ops-btn" style="background: #f3f4f6; color: #374151;" onclick="exportSnippetData()">📥 Export</button>
+                                <button class="ops-btn" style="background: #f3f4f6; color: #374151;" onclick="document.getElementById('snippetImportFile').click()">📤 Import</button>
+                                <input type="file" id="snippetImportFile" accept=".json" style="display: none;" onchange="importSnippetData(event)">
+                            </div>
+                        </div>
+
+                        <!-- Draggable Configuration Tabs -->
+                        <div class="snippet-config-tabs-container">
+                            <div class="snippet-config-tabs" id="snippetConfigTabs">
+                                <!-- Populated by JS -->
+                            </div>
+                            <button class="snippet-config-tab-add" onclick="openSnippetConfigEditor()">+ Add</button>
+                        </div>
+
+                        <!-- Active Configuration Content -->
+                        <div class="snippet-config-content" id="snippetConfigContent">
+                            <div class="snippet-config-empty">
+                                <div class="snippet-config-empty-icon">✂️</div>
+                                <div class="snippet-config-empty-text">No snippet configurations yet. Create your first configuration to get started!</div>
+                                <button class="ops-btn ops-btn-primary" onclick="openSnippetConfigEditor()">+ Create Configuration</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -5789,6 +6348,83 @@
         </div>
     </div>
 
+    <!-- Snippet Configuration Modal -->
+    <div class="snippet-modal" id="snippetConfigModal">
+        <div class="snippet-modal-content">
+            <div class="snippet-modal-header">
+                <span class="snippet-modal-title" id="snippetConfigModalTitle">New Configuration</span>
+                <button class="snippet-modal-close" onclick="closeSnippetConfigEditor()">×</button>
+            </div>
+            <div class="snippet-modal-body">
+                <div class="snippet-modal-field">
+                    <label class="snippet-modal-label">Configuration Name</label>
+                    <input type="text" class="snippet-modal-input" id="snippetConfigNameInput" placeholder="e.g., Default, Custom, Clinical">
+                </div>
+            </div>
+            <div class="snippet-modal-footer">
+                <button class="snippet-modal-btn snippet-modal-delete" id="snippetConfigDeleteBtn" style="display: none;" onclick="deleteSnippetConfig()">🗑️ Delete</button>
+                <button class="snippet-modal-btn snippet-modal-cancel" onclick="closeSnippetConfigEditor()">Cancel</button>
+                <button class="snippet-modal-btn snippet-modal-save" onclick="saveSnippetConfig()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Snippet Section Modal -->
+    <div class="snippet-modal" id="snippetSectionModal">
+        <div class="snippet-modal-content">
+            <div class="snippet-modal-header">
+                <span class="snippet-modal-title" id="snippetSectionModalTitle">New Section</span>
+                <button class="snippet-modal-close" onclick="closeSectionEditor()">×</button>
+            </div>
+            <div class="snippet-modal-body">
+                <div class="snippet-modal-field">
+                    <label class="snippet-modal-label">Section Name</label>
+                    <input type="text" class="snippet-modal-input" id="snippetSectionNameInput" placeholder="e.g., Hypertension Management">
+                </div>
+                <div class="snippet-modal-field">
+                    <label class="snippet-modal-label">Icon (emoji)</label>
+                    <input type="text" class="snippet-modal-input" id="snippetSectionIconInput" placeholder="e.g., 🔴, 💉, ⚖️" maxlength="4">
+                </div>
+            </div>
+            <div class="snippet-modal-footer">
+                <button class="snippet-modal-btn snippet-modal-delete" id="snippetSectionDeleteBtn" style="display: none;" onclick="deleteSection(snippetState.editingSectionId)">🗑️ Delete</button>
+                <button class="snippet-modal-btn snippet-modal-cancel" onclick="closeSectionEditor()">Cancel</button>
+                <button class="snippet-modal-btn snippet-modal-save" onclick="saveSection()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Snippet Item Modal -->
+    <div class="snippet-modal" id="snippetItemModal">
+        <div class="snippet-modal-content snippet-modal-wide">
+            <div class="snippet-modal-header">
+                <span class="snippet-modal-title" id="snippetItemModalTitle">New Snippet</span>
+                <button class="snippet-modal-close" onclick="closeSnippetEditor()">×</button>
+            </div>
+            <div class="snippet-modal-body">
+                <div class="snippet-modal-field">
+                    <label class="snippet-modal-label">Snippet Text</label>
+                    <textarea class="snippet-modal-textarea" id="snippetItemTextInput" placeholder="Enter the snippet text that will appear in the charting drawer..." rows="4"></textarea>
+                </div>
+                <div class="snippet-modal-field">
+                    <label class="snippet-modal-label">Tags (comma-separated)</label>
+                    <input type="text" class="snippet-modal-input" id="snippetItemTagsInput" placeholder="e.g., hypertension, bp-support, medication">
+                    <div class="snippet-tag-suggestions-container">
+                        <div class="snippet-tag-suggestions-label">Click to add existing tags:</div>
+                        <div class="snippet-tag-suggestions" id="snippetTagSuggestions">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="snippet-modal-footer">
+                <button class="snippet-modal-btn snippet-modal-delete" id="snippetItemDeleteBtn" style="display: none;" onclick="deleteSnippet(snippetState.editingSectionId, snippetState.editingSnippetId)">🗑️ Delete</button>
+                <button class="snippet-modal-btn snippet-modal-cancel" onclick="closeSnippetEditor()">Cancel</button>
+                <button class="snippet-modal-btn snippet-modal-save" onclick="saveSnippet()">Save</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // State management
         let state = {
@@ -5944,6 +6580,7 @@
                 // Clear operations sub-tab highlighting
                 document.getElementById('floatNavChecklists').classList.remove('active');
                 document.getElementById('floatNavLabs').classList.remove('active');
+                document.getElementById('floatNavSnippets').classList.remove('active');
             }
 
             if (activeTab === 'reports') {
@@ -5959,6 +6596,7 @@
             if (mainTab === 'operations') {
                 document.getElementById('floatNavChecklists').classList.toggle('active', subTab === 'checklists');
                 document.getElementById('floatNavLabs').classList.toggle('active', subTab === 'labs');
+                document.getElementById('floatNavSnippets').classList.toggle('active', subTab === 'snippets');
             } else if (mainTab === 'reports') {
                 document.getElementById('floatNavEOSR').classList.toggle('active', subTab === 'eosr');
             }
@@ -6045,17 +6683,19 @@
             }
         }
 
-        // Switch between Operations sub-tabs (Checklists / Labs)
+        // Switch between Operations sub-tabs (Checklists / Labs / Snippets)
         function switchOpsSubTab(tab) {
             labsState.activeOpsSubTab = tab;
 
             // Update sub-tab buttons
             document.getElementById('opsSubTabChecklists').classList.toggle('active', tab === 'checklists');
             document.getElementById('opsSubTabLabs').classList.toggle('active', tab === 'labs');
+            document.getElementById('opsSubTabSnippets').classList.toggle('active', tab === 'snippets');
 
             // Update sub-content visibility
             document.getElementById('opsChecklistsContent').classList.toggle('active', tab === 'checklists');
             document.getElementById('opsLabsContent').classList.toggle('active', tab === 'labs');
+            document.getElementById('opsSnippetsContent').classList.toggle('active', tab === 'snippets');
 
             // Update header actions visibility
             document.getElementById('opsChecklistActions').style.display = tab === 'checklists' ? 'flex' : 'none';
@@ -6063,6 +6703,8 @@
             // Load data for the active tab
             if (tab === 'labs') {
                 loadLabsData();
+            } else if (tab === 'snippets') {
+                loadSnippetData();
             } else {
                 loadOpsData();
             }
@@ -6203,6 +6845,697 @@
                     </div>
                 </div>
             `).join('');
+        }
+
+        // ========== SNIPPET MANAGER STATE & FUNCTIONS ==========
+        let snippetState = {
+            configurations: [],  // Array of {id, name, order, sections: [{id, name, icon, order, snippets: [{id, text, tags: [], order}]}]}
+            activeConfigId: null,
+            editingConfigId: null,  // null = new, number = editing existing
+            editingSectionId: null,
+            editingSnippetId: null,
+            selectedTags: new Set(),  // Tags currently selected for filtering in drawer
+            allTags: []  // Cached list of all unique tags
+        };
+
+        // Drag state for snippet config tabs
+        let snippetDragState = {
+            draggedTab: null,
+            draggedTabId: null,
+            dropPosition: null
+        };
+
+        // Load snippet data from localStorage
+        function loadSnippetData() {
+            const saved = localStorage.getItem('hd_snippet_data');
+            if (saved) {
+                const data = JSON.parse(saved);
+                snippetState.configurations = data.configurations || [];
+                snippetState.activeConfigId = data.activeConfigId || null;
+            }
+
+            // Initialize with default configuration if none exist
+            if (snippetState.configurations.length === 0) {
+                initializeDefaultSnippets();
+            }
+
+            // Set active config if not set
+            if (!snippetState.activeConfigId && snippetState.configurations.length > 0) {
+                snippetState.activeConfigId = snippetState.configurations[0].id;
+            }
+
+            updateAllTags();
+            renderSnippetConfigTabs();
+            renderSnippetConfigContent();
+        }
+
+        // Save snippet data to localStorage
+        function saveSnippetData() {
+            localStorage.setItem('hd_snippet_data', JSON.stringify({
+                configurations: snippetState.configurations,
+                activeConfigId: snippetState.activeConfigId
+            }));
+            updateAllTags();
+        }
+
+        // Initialize with default snippet configuration based on existing drawer snippets
+        function initializeDefaultSnippets() {
+            const defaultConfig = {
+                id: Date.now(),
+                name: 'Default',
+                order: 0,
+                sections: [
+                    {
+                        id: 1,
+                        name: 'Weight & UF Management',
+                        icon: '⚖️',
+                        order: 0,
+                        snippets: [
+                            { id: 101, text: 'Pt denies any pains / SOB. No other voiced concerns.', tags: ['assessment', 'pre-treatment'], order: 0 }
+                        ]
+                    },
+                    {
+                        id: 2,
+                        name: 'Pre Dialysis',
+                        icon: '🏥',
+                        order: 1,
+                        snippets: [
+                            { id: 201, text: 'Weight and goal reviewed and verified with pt.', tags: ['weight', 'pre-treatment'], order: 0 },
+                            { id: 202, text: 'Pt denies any pains / SOB. No other voiced concerns.', tags: ['assessment'], order: 1 },
+                            { id: 203, text: '5 mg Midodrine given for BP support.', tags: ['medication', 'bp-support'], order: 2 },
+                            { id: 204, text: 'T to 36.5 for BP support.', tags: ['temperature', 'bp-support'], order: 3 },
+                            { id: 205, text: 'T to 36.0 for BP support.', tags: ['temperature', 'bp-support'], order: 4 }
+                        ]
+                    },
+                    {
+                        id: 3,
+                        name: 'Treatment Initiated',
+                        icon: '💉',
+                        order: 2,
+                        snippets: [
+                            { id: 301, text: 'Treatment initiated per orders. BFR [BFR], UF goal [UF Goal].', tags: ['initiation', 'orders'], order: 0 },
+                            { id: 302, text: 'Pt tolerated treatment initiation without complaint.', tags: ['initiation', 'stable'], order: 1 },
+                            { id: 303, text: 'Access cannulated without difficulty.', tags: ['access', 'initiation'], order: 2 },
+                            { id: 304, text: 'Good arterial/venous flow noted.', tags: ['access', 'flow'], order: 3 }
+                        ]
+                    },
+                    {
+                        id: 4,
+                        name: 'During Treatment',
+                        icon: '⏱️',
+                        order: 3,
+                        snippets: [
+                            { id: 401, text: 'Pt experiencing cramping.', tags: ['cramping', 'complication'], order: 0 },
+                            { id: 402, text: 'UF to minimum.', tags: ['uf-adjustment', 'intervention'], order: 1 }
+                        ]
+                    },
+                    {
+                        id: 5,
+                        name: 'Hypertension Management',
+                        icon: '🔴',
+                        order: 4,
+                        snippets: [
+                            { id: 501, text: 'Pt BP elevated.', tags: ['hypertension', 'bp'], order: 0 },
+                            { id: 502, text: 'Pt denies any chest pain, SOB, dizziness or headache.', tags: ['assessment', 'hypertension'], order: 1 },
+                            { id: 503, text: 'Pt reports taking his BP meds before tx.', tags: ['medication', 'hypertension'], order: 2 },
+                            { id: 504, text: '0.1 mg clonidine given for BP support.', tags: ['medication', 'hypertension'], order: 3 },
+                            { id: 505, text: 'BP stabilized after intervention.', tags: ['stable', 'hypertension'], order: 4 },
+                            { id: 506, text: 'Will continue to monitor BP closely.', tags: ['monitoring', 'hypertension'], order: 5 },
+                            { id: 507, text: 'T to 37 for BP support.', tags: ['temperature', 'hypertension'], order: 6 }
+                        ]
+                    },
+                    {
+                        id: 6,
+                        name: 'Hypotension Management',
+                        icon: '🔵',
+                        order: 5,
+                        snippets: [
+                            { id: 601, text: 'Pt experiencing hypotension during treatment.', tags: ['hypotension', 'complication'], order: 0 },
+                            { id: 602, text: 'Pt BP low side.', tags: ['hypotension', 'bp'], order: 1 },
+                            { id: 603, text: 'Pt experienced > 20 pt SBP drop.', tags: ['hypotension', 'bp-drop'], order: 2 },
+                            { id: 604, text: 'Pt experiencing side effects d/t hypotension - dizzy / light headedness.', tags: ['hypotension', 'symptoms'], order: 3 },
+                            { id: 605, text: 'Pt denies any s/s of hypotension such as light headedness, chest pain or SOB.', tags: ['hypotension', 'assessment'], order: 4 },
+                            { id: 606, text: '5 mg Midodrine given for BP support.', tags: ['medication', 'bp-support'], order: 5 },
+                            { id: 607, text: '100mL NS bolus given for BP support.', tags: ['fluid', 'bp-support'], order: 6 },
+                            { id: 608, text: 'BP stabilized, treatment continued.', tags: ['stable', 'hypotension'], order: 7 },
+                            { id: 609, text: 'UF to min for BP support.', tags: ['uf-adjustment', 'bp-support'], order: 8 },
+                            { id: 610, text: 'T to 36.5 for BP support.', tags: ['temperature', 'bp-support'], order: 9 },
+                            { id: 611, text: 'T already at 36.0.', tags: ['temperature', 'hypotension'], order: 10 },
+                            { id: 612, text: 'MAP remains > 70.', tags: ['bp', 'monitoring'], order: 11 }
+                        ]
+                    },
+                    {
+                        id: 7,
+                        name: 'No Changes / Stable',
+                        icon: '✅',
+                        order: 6,
+                        snippets: [
+                            { id: 701, text: 'Pt stable throughout treatment.', tags: ['stable'], order: 0 },
+                            { id: 702, text: 'No complaints voiced.', tags: ['stable', 'assessment'], order: 1 },
+                            { id: 703, text: 'Tolerating treatment well without intervention.', tags: ['stable'], order: 2 },
+                            { id: 704, text: 'VS within normal limits.', tags: ['stable', 'vitals'], order: 3 },
+                            { id: 705, text: 'No changes / Stable.', tags: ['stable'], order: 4 },
+                            { id: 706, text: 'Pt resting comfortably in chair watching TV.', tags: ['stable', 'comfort'], order: 5 },
+                            { id: 707, text: 'Pt resting comfortably in chair playing with phone.', tags: ['stable', 'comfort'], order: 6 },
+                            { id: 708, text: 'Pt sleeping comfortably with head back and legs elevated. Chest rising and falling appropriately. No signs of distress.', tags: ['stable', 'sleeping'], order: 7 }
+                        ]
+                    },
+                    {
+                        id: 8,
+                        name: 'Access & Lines',
+                        icon: '🩸',
+                        order: 7,
+                        snippets: [
+                            { id: 801, text: 'Fistula assessment: good thrill and bruit noted.', tags: ['access', 'fistula'], order: 0 },
+                            { id: 802, text: 'Graft assessment: patent, no signs of infection.', tags: ['access', 'graft'], order: 1 },
+                            { id: 803, text: 'Catheter site clean, dry, intact.', tags: ['access', 'catheter'], order: 2 },
+                            { id: 804, text: 'Dressing changed per protocol.', tags: ['access', 'dressing'], order: 3 },
+                            { id: 805, text: 'No signs of bleeding or hematoma at access site.', tags: ['access', 'assessment'], order: 4 },
+                            { id: 806, text: 'Good hemostasis achieved post-treatment.', tags: ['access', 'post-treatment'], order: 5 }
+                        ]
+                    },
+                    {
+                        id: 9,
+                        name: 'Fluid Management',
+                        icon: '💧',
+                        order: 8,
+                        snippets: [
+                            { id: 901, text: 'IDWG within acceptable range.', tags: ['fluid', 'weight'], order: 0 },
+                            { id: 902, text: 'Significant IDWG noted, fluid restriction education reinforced.', tags: ['fluid', 'education'], order: 1 },
+                            { id: 903, text: 'UF goal met without difficulty.', tags: ['fluid', 'uf'], order: 2 },
+                            { id: 904, text: 'Pt reports improved adherence to fluid restriction.', tags: ['fluid', 'compliance'], order: 3 },
+                            { id: 905, text: 'Dietitian consult recommended for fluid management.', tags: ['fluid', 'referral'], order: 4 },
+                            { id: 906, text: 'Signs/symptoms of fluid overload: SOB, edema, JVD.', tags: ['fluid', 'overload'], order: 5 },
+                            { id: 907, text: 'Post-treatment weight at/near dry weight.', tags: ['fluid', 'weight'], order: 6 }
+                        ]
+                    }
+                ]
+            };
+            snippetState.configurations.push(defaultConfig);
+            saveSnippetData();
+        }
+
+        // Update cached list of all unique tags
+        function updateAllTags() {
+            const tagSet = new Set();
+            snippetState.configurations.forEach(config => {
+                config.sections.forEach(section => {
+                    section.snippets.forEach(snippet => {
+                        (snippet.tags || []).forEach(tag => tagSet.add(tag));
+                    });
+                });
+            });
+            snippetState.allTags = Array.from(tagSet).sort();
+        }
+
+        // Select a snippet configuration
+        function selectSnippetConfig(configId) {
+            snippetState.activeConfigId = configId;
+            saveSnippetData();
+            renderSnippetConfigTabs();
+            renderSnippetConfigContent();
+        }
+
+        // Render snippet configuration tabs
+        function renderSnippetConfigTabs() {
+            const container = document.getElementById('snippetConfigTabs');
+            if (!container) return;
+
+            const sortedConfigs = [...snippetState.configurations].sort((a, b) => a.order - b.order);
+
+            container.innerHTML = sortedConfigs.map(config => `
+                <div class="snippet-config-tab ${config.id === snippetState.activeConfigId ? 'active' : ''}"
+                    draggable="true"
+                    data-config-id="${config.id}"
+                    ondragstart="handleConfigDragStart(event, ${config.id})"
+                    ondragover="handleConfigDragOver(event)"
+                    ondrop="handleConfigDrop(event, ${config.id})"
+                    ondragend="handleConfigDragEnd(event)"
+                    onclick="selectSnippetConfig(${config.id})">
+                    <span class="snippet-config-tab-name">${config.name}</span>
+                    <button class="snippet-config-tab-edit" onclick="event.stopPropagation(); openSnippetConfigEditor(${config.id})">✏️</button>
+                </div>
+            `).join('');
+        }
+
+        // Render active configuration content
+        function renderSnippetConfigContent() {
+            const container = document.getElementById('snippetConfigContent');
+            if (!container) return;
+
+            const config = snippetState.configurations.find(c => c.id === snippetState.activeConfigId);
+
+            if (!config) {
+                container.innerHTML = `
+                    <div class="snippet-config-empty">
+                        <div class="snippet-config-empty-icon">✂️</div>
+                        <div class="snippet-config-empty-text">No snippet configurations yet. Create your first configuration to get started!</div>
+                        <button class="ops-btn ops-btn-primary" onclick="openSnippetConfigEditor()">+ Create Configuration</button>
+                    </div>
+                `;
+                return;
+            }
+
+            const sortedSections = [...config.sections].sort((a, b) => a.order - b.order);
+
+            container.innerHTML = `
+                <div class="snippet-sections-header">
+                    <h4>Sections in "${config.name}"</h4>
+                    <button class="ops-btn ops-btn-primary" onclick="openSectionEditor()">+ Add Section</button>
+                </div>
+                <div class="snippet-sections-list">
+                    ${sortedSections.length === 0 ? `
+                        <div class="snippet-section-empty">No sections yet. Add your first section to start building snippets.</div>
+                    ` : sortedSections.map(section => `
+                        <div class="snippet-section-card" data-section-id="${section.id}">
+                            <div class="snippet-section-card-header">
+                                <div class="snippet-section-card-title">
+                                    <span class="snippet-section-icon">${section.icon || '📝'}</span>
+                                    <span class="snippet-section-name">${section.name}</span>
+                                    <span class="snippet-section-count">${section.snippets.length} snippets</span>
+                                </div>
+                                <div class="snippet-section-card-actions">
+                                    <button class="snippet-section-btn" onclick="openSectionEditor(${section.id})">✏️ Edit</button>
+                                    <button class="snippet-section-btn snippet-section-btn-danger" onclick="deleteSection(${section.id})">🗑️</button>
+                                </div>
+                            </div>
+                            <div class="snippet-section-card-body">
+                                <div class="snippet-items-list">
+                                    ${section.snippets.sort((a, b) => a.order - b.order).map(snippet => `
+                                        <div class="snippet-item" data-snippet-id="${snippet.id}">
+                                            <div class="snippet-item-content">
+                                                <div class="snippet-item-text">${snippet.text}</div>
+                                                <div class="snippet-item-tags">
+                                                    ${(snippet.tags || []).map(tag => `<span class="snippet-tag">${tag}</span>`).join('')}
+                                                </div>
+                                            </div>
+                                            <div class="snippet-item-actions">
+                                                <button class="snippet-item-btn" onclick="openSnippetEditor(${section.id}, ${snippet.id})">✏️</button>
+                                                <button class="snippet-item-btn snippet-item-btn-danger" onclick="deleteSnippet(${section.id}, ${snippet.id})">🗑️</button>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                <button class="snippet-add-btn" onclick="openSnippetEditor(${section.id})">+ Add Snippet</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Configuration tab drag handlers
+        function handleConfigDragStart(event, configId) {
+            snippetDragState.draggedTab = event.target;
+            snippetDragState.draggedTabId = configId;
+            event.target.classList.add('dragging');
+            event.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleConfigDragOver(event) {
+            event.preventDefault();
+            const tab = event.target.closest('.snippet-config-tab');
+            if (tab && tab !== snippetDragState.draggedTab) {
+                const rect = tab.getBoundingClientRect();
+                const midpoint = rect.left + rect.width / 2;
+                if (event.clientX < midpoint) {
+                    tab.classList.add('drag-over-left');
+                    tab.classList.remove('drag-over-right');
+                    snippetDragState.dropPosition = 'before';
+                } else {
+                    tab.classList.add('drag-over-right');
+                    tab.classList.remove('drag-over-left');
+                    snippetDragState.dropPosition = 'after';
+                }
+            }
+        }
+
+        function handleConfigDrop(event, targetId) {
+            event.preventDefault();
+            const tabs = document.querySelectorAll('.snippet-config-tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('drag-over-left', 'drag-over-right');
+            });
+
+            if (snippetDragState.draggedTabId === targetId) return;
+
+            const configs = snippetState.configurations;
+            const draggedConfig = configs.find(c => c.id === snippetDragState.draggedTabId);
+            const targetConfig = configs.find(c => c.id === targetId);
+
+            if (!draggedConfig || !targetConfig) return;
+
+            // Calculate new order values
+            const sortedConfigs = [...configs].sort((a, b) => a.order - b.order);
+            const targetIndex = sortedConfigs.findIndex(c => c.id === targetId);
+
+            let newOrder;
+            if (snippetDragState.dropPosition === 'before') {
+                const prevConfig = sortedConfigs[targetIndex - 1];
+                newOrder = prevConfig ? (prevConfig.order + targetConfig.order) / 2 : targetConfig.order - 1;
+            } else {
+                const nextConfig = sortedConfigs[targetIndex + 1];
+                newOrder = nextConfig ? (targetConfig.order + nextConfig.order) / 2 : targetConfig.order + 1;
+            }
+
+            draggedConfig.order = newOrder;
+            saveSnippetData();
+            renderSnippetConfigTabs();
+        }
+
+        function handleConfigDragEnd(event) {
+            event.target.classList.remove('dragging');
+            const tabs = document.querySelectorAll('.snippet-config-tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('drag-over-left', 'drag-over-right');
+            });
+            snippetDragState.draggedTab = null;
+            snippetDragState.draggedTabId = null;
+            snippetDragState.dropPosition = null;
+        }
+
+        // Open configuration editor modal
+        function openSnippetConfigEditor(configId = null) {
+            snippetState.editingConfigId = configId;
+            const modal = document.getElementById('snippetConfigModal');
+            const titleEl = document.getElementById('snippetConfigModalTitle');
+            const nameInput = document.getElementById('snippetConfigNameInput');
+            const deleteBtn = document.getElementById('snippetConfigDeleteBtn');
+
+            if (configId) {
+                const config = snippetState.configurations.find(c => c.id === configId);
+                titleEl.textContent = 'Edit Configuration';
+                nameInput.value = config ? config.name : '';
+                deleteBtn.style.display = 'block';
+            } else {
+                titleEl.textContent = 'New Configuration';
+                nameInput.value = '';
+                deleteBtn.style.display = 'none';
+            }
+
+            modal.classList.add('open');
+            nameInput.focus();
+        }
+
+        function closeSnippetConfigEditor() {
+            document.getElementById('snippetConfigModal').classList.remove('open');
+            snippetState.editingConfigId = null;
+        }
+
+        function saveSnippetConfig() {
+            const nameInput = document.getElementById('snippetConfigNameInput');
+            const name = nameInput.value.trim();
+
+            if (!name) {
+                alert('Please enter a configuration name.');
+                return;
+            }
+
+            if (snippetState.editingConfigId) {
+                // Update existing
+                const config = snippetState.configurations.find(c => c.id === snippetState.editingConfigId);
+                if (config) {
+                    config.name = name;
+                }
+            } else {
+                // Create new
+                const maxOrder = Math.max(0, ...snippetState.configurations.map(c => c.order));
+                const newConfig = {
+                    id: Date.now(),
+                    name: name,
+                    order: maxOrder + 1,
+                    sections: []
+                };
+                snippetState.configurations.push(newConfig);
+                snippetState.activeConfigId = newConfig.id;
+            }
+
+            saveSnippetData();
+            closeSnippetConfigEditor();
+            renderSnippetConfigTabs();
+            renderSnippetConfigContent();
+        }
+
+        function deleteSnippetConfig() {
+            if (!snippetState.editingConfigId) return;
+            if (!confirm('Delete this configuration and all its sections/snippets?')) return;
+
+            snippetState.configurations = snippetState.configurations.filter(c => c.id !== snippetState.editingConfigId);
+
+            if (snippetState.activeConfigId === snippetState.editingConfigId) {
+                snippetState.activeConfigId = snippetState.configurations.length > 0 ? snippetState.configurations[0].id : null;
+            }
+
+            saveSnippetData();
+            closeSnippetConfigEditor();
+            renderSnippetConfigTabs();
+            renderSnippetConfigContent();
+        }
+
+        // Section editor modal functions
+        function openSectionEditor(sectionId = null) {
+            snippetState.editingSectionId = sectionId;
+            const modal = document.getElementById('snippetSectionModal');
+            const titleEl = document.getElementById('snippetSectionModalTitle');
+            const nameInput = document.getElementById('snippetSectionNameInput');
+            const iconInput = document.getElementById('snippetSectionIconInput');
+            const deleteBtn = document.getElementById('snippetSectionDeleteBtn');
+
+            const config = snippetState.configurations.find(c => c.id === snippetState.activeConfigId);
+
+            if (sectionId && config) {
+                const section = config.sections.find(s => s.id === sectionId);
+                titleEl.textContent = 'Edit Section';
+                nameInput.value = section ? section.name : '';
+                iconInput.value = section ? section.icon : '';
+                deleteBtn.style.display = 'block';
+            } else {
+                titleEl.textContent = 'New Section';
+                nameInput.value = '';
+                iconInput.value = '📝';
+                deleteBtn.style.display = 'none';
+            }
+
+            modal.classList.add('open');
+            nameInput.focus();
+        }
+
+        function closeSectionEditor() {
+            document.getElementById('snippetSectionModal').classList.remove('open');
+            snippetState.editingSectionId = null;
+        }
+
+        function saveSection() {
+            const nameInput = document.getElementById('snippetSectionNameInput');
+            const iconInput = document.getElementById('snippetSectionIconInput');
+            const name = nameInput.value.trim();
+            const icon = iconInput.value.trim() || '📝';
+
+            if (!name) {
+                alert('Please enter a section name.');
+                return;
+            }
+
+            const config = snippetState.configurations.find(c => c.id === snippetState.activeConfigId);
+            if (!config) return;
+
+            if (snippetState.editingSectionId) {
+                // Update existing
+                const section = config.sections.find(s => s.id === snippetState.editingSectionId);
+                if (section) {
+                    section.name = name;
+                    section.icon = icon;
+                }
+            } else {
+                // Create new
+                const maxOrder = Math.max(0, ...config.sections.map(s => s.order));
+                const newSection = {
+                    id: Date.now(),
+                    name: name,
+                    icon: icon,
+                    order: maxOrder + 1,
+                    snippets: []
+                };
+                config.sections.push(newSection);
+            }
+
+            saveSnippetData();
+            closeSectionEditor();
+            renderSnippetConfigContent();
+        }
+
+        function deleteSection(sectionId) {
+            if (!confirm('Delete this section and all its snippets?')) return;
+
+            const config = snippetState.configurations.find(c => c.id === snippetState.activeConfigId);
+            if (!config) return;
+
+            config.sections = config.sections.filter(s => s.id !== sectionId);
+            saveSnippetData();
+            renderSnippetConfigContent();
+        }
+
+        // Snippet editor modal functions
+        function openSnippetEditor(sectionId, snippetId = null) {
+            snippetState.editingSectionId = sectionId;
+            snippetState.editingSnippetId = snippetId;
+
+            const modal = document.getElementById('snippetItemModal');
+            const titleEl = document.getElementById('snippetItemModalTitle');
+            const textInput = document.getElementById('snippetItemTextInput');
+            const tagsInput = document.getElementById('snippetItemTagsInput');
+            const deleteBtn = document.getElementById('snippetItemDeleteBtn');
+
+            const config = snippetState.configurations.find(c => c.id === snippetState.activeConfigId);
+            const section = config ? config.sections.find(s => s.id === sectionId) : null;
+
+            if (snippetId && section) {
+                const snippet = section.snippets.find(sn => sn.id === snippetId);
+                titleEl.textContent = 'Edit Snippet';
+                textInput.value = snippet ? snippet.text : '';
+                tagsInput.value = snippet ? (snippet.tags || []).join(', ') : '';
+                deleteBtn.style.display = 'block';
+            } else {
+                titleEl.textContent = 'New Snippet';
+                textInput.value = '';
+                tagsInput.value = '';
+                deleteBtn.style.display = 'none';
+            }
+
+            // Render tag suggestions
+            renderTagSuggestions();
+
+            modal.classList.add('open');
+            textInput.focus();
+        }
+
+        function closeSnippetEditor() {
+            document.getElementById('snippetItemModal').classList.remove('open');
+            snippetState.editingSectionId = null;
+            snippetState.editingSnippetId = null;
+        }
+
+        function renderTagSuggestions() {
+            const container = document.getElementById('snippetTagSuggestions');
+            if (!container) return;
+
+            container.innerHTML = snippetState.allTags.map(tag => `
+                <span class="snippet-tag-suggestion" onclick="addTagToInput('${tag}')">${tag}</span>
+            `).join('');
+        }
+
+        function addTagToInput(tag) {
+            const tagsInput = document.getElementById('snippetItemTagsInput');
+            const currentTags = tagsInput.value.split(',').map(t => t.trim()).filter(t => t);
+
+            if (!currentTags.includes(tag)) {
+                currentTags.push(tag);
+                tagsInput.value = currentTags.join(', ');
+            }
+        }
+
+        function saveSnippet() {
+            const textInput = document.getElementById('snippetItemTextInput');
+            const tagsInput = document.getElementById('snippetItemTagsInput');
+            const text = textInput.value.trim();
+            const tags = tagsInput.value.split(',').map(t => t.trim().toLowerCase()).filter(t => t);
+
+            if (!text) {
+                alert('Please enter snippet text.');
+                return;
+            }
+
+            const config = snippetState.configurations.find(c => c.id === snippetState.activeConfigId);
+            const section = config ? config.sections.find(s => s.id === snippetState.editingSectionId) : null;
+
+            if (!section) return;
+
+            if (snippetState.editingSnippetId) {
+                // Update existing
+                const snippet = section.snippets.find(sn => sn.id === snippetState.editingSnippetId);
+                if (snippet) {
+                    snippet.text = text;
+                    snippet.tags = tags;
+                }
+            } else {
+                // Create new
+                const maxOrder = Math.max(0, ...section.snippets.map(sn => sn.order));
+                const newSnippet = {
+                    id: Date.now(),
+                    text: text,
+                    tags: tags,
+                    order: maxOrder + 1
+                };
+                section.snippets.push(newSnippet);
+            }
+
+            saveSnippetData();
+            closeSnippetEditor();
+            renderSnippetConfigContent();
+        }
+
+        function deleteSnippet(sectionId, snippetId) {
+            if (!confirm('Delete this snippet?')) return;
+
+            const config = snippetState.configurations.find(c => c.id === snippetState.activeConfigId);
+            const section = config ? config.sections.find(s => s.id === sectionId) : null;
+
+            if (!section) return;
+
+            section.snippets = section.snippets.filter(sn => sn.id !== snippetId);
+            saveSnippetData();
+            renderSnippetConfigContent();
+        }
+
+        // Export/Import snippet data
+        function exportSnippetData() {
+            const data = {
+                configurations: snippetState.configurations,
+                exportDate: new Date().toISOString()
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `snippets_export_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function importSnippetData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.configurations && Array.isArray(data.configurations)) {
+                        if (confirm('This will replace all existing snippet configurations. Continue?')) {
+                            snippetState.configurations = data.configurations;
+                            snippetState.activeConfigId = data.configurations.length > 0 ? data.configurations[0].id : null;
+                            saveSnippetData();
+                            renderSnippetConfigTabs();
+                            renderSnippetConfigContent();
+                            alert('Snippets imported successfully!');
+                        }
+                    } else {
+                        alert('Invalid snippet data format.');
+                    }
+                } catch (err) {
+                    alert('Error reading file: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        // Get active configuration for the drawer
+        function getActiveSnippetConfig() {
+            return snippetState.configurations.find(c => c.id === snippetState.activeConfigId);
         }
 
         // Format patient initials from "F.L." to "L, F -"
@@ -12353,28 +13686,34 @@
             overlay.classList.toggle('open');
             panel.classList.toggle('open');
 
-            // Auto-fill BFR and UF Goal from active patient data when opening
-            if (panel.classList.contains('open') && state.activePatientId) {
-                const patient = state.patients.find(p => p.id === state.activePatientId);
-                if (patient) {
-                    // Auto-fill BFR if patient has bfr data
-                    if (patient.bfr) {
-                        const bfrValue = parseFloat(patient.bfr);
-                        if (!isNaN(bfrValue)) {
-                            drawerState.bfr = bfrValue;
-                            document.getElementById('bfrValue').textContent = bfrValue;
-                            const bfrSlider = document.querySelector('#category-treatment input[type="range"]');
-                            if (bfrSlider) bfrSlider.value = bfrValue;
+            // When drawer opens, render tag filters and auto-fill data
+            if (panel.classList.contains('open')) {
+                // Render tag filters
+                renderDrawerTags();
+
+                // Auto-fill BFR and UF Goal from active patient data
+                if (state.activePatientId) {
+                    const patient = state.patients.find(p => p.id === state.activePatientId);
+                    if (patient) {
+                        // Auto-fill BFR if patient has bfr data
+                        if (patient.bfr) {
+                            const bfrValue = parseFloat(patient.bfr);
+                            if (!isNaN(bfrValue)) {
+                                drawerState.bfr = bfrValue;
+                                document.getElementById('bfrValue').textContent = bfrValue;
+                                const bfrSlider = document.querySelector('#category-treatment input[type="range"]');
+                                if (bfrSlider) bfrSlider.value = bfrValue;
+                            }
                         }
-                    }
-                    // Auto-fill UF Goal if patient has goalUF data
-                    if (patient.goalUF) {
-                        const ufValue = parseFloat(patient.goalUF);
-                        if (!isNaN(ufValue)) {
-                            drawerState.ufGoal = ufValue;
-                            document.getElementById('ufGoalValue').textContent = ufValue + ' kg';
-                            const ufSlider = document.querySelectorAll('#category-treatment input[type="range"]')[1];
-                            if (ufSlider) ufSlider.value = ufValue;
+                        // Auto-fill UF Goal if patient has goalUF data
+                        if (patient.goalUF) {
+                            const ufValue = parseFloat(patient.goalUF);
+                            if (!isNaN(ufValue)) {
+                                drawerState.ufGoal = ufValue;
+                                document.getElementById('ufGoalValue').textContent = ufValue + ' kg';
+                                const ufSlider = document.querySelectorAll('#category-treatment input[type="range"]')[1];
+                                if (ufSlider) ufSlider.value = ufValue;
+                            }
                         }
                     }
                 }
@@ -12472,16 +13811,16 @@
         function updateDrawerWeights() {
             const preWeight = parseFloat(document.getElementById('drawerPreWeight').value) || 0;
             const dryWeight = parseFloat(document.getElementById('drawerDryWeight').value) || 0;
-            
+
             if (preWeight > 0 && dryWeight > 0) {
                 // Calculate Pre Over DW
                 const preOverDW = preWeight - dryWeight;
                 document.getElementById('drawerPreOverDW').value = preOverDW.toFixed(1) + ' kg';
-                
+
                 // Calculate UF Goal (Pre Over DW + 0.4)
                 const ufGoal = preOverDW + 0.4;
                 document.getElementById('drawerUFGoal').value = ufGoal.toFixed(1) + ' kg';
-                
+
                 // Calculate Target Weight (Pre Weight - UF Goal)
                 const targetWeight = preWeight - ufGoal;
                 document.getElementById('drawerTargetWeight').value = targetWeight.toFixed(1) + ' kg';
@@ -12491,7 +13830,107 @@
                 document.getElementById('drawerTargetWeight').value = '';
             }
         }
-        
+
+        // ========== DRAWER TAG FILTER FUNCTIONS ==========
+
+        // Render tag filter list in drawer
+        function renderDrawerTags() {
+            const container = document.getElementById('drawerTagsList');
+            const clearBtn = document.getElementById('drawerTagClearBtn');
+            if (!container) return;
+
+            // Load snippet data if not already loaded
+            if (snippetState.configurations.length === 0) {
+                const saved = localStorage.getItem('hd_snippet_data');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    snippetState.configurations = data.configurations || [];
+                    snippetState.activeConfigId = data.activeConfigId || null;
+                }
+            }
+
+            updateAllTags();
+
+            if (snippetState.allTags.length === 0) {
+                container.innerHTML = '<span style="color: #94a3b8; font-style: italic; font-size: 12px;">No tags defined yet. Add tags in Operations > Snippets.</span>';
+                return;
+            }
+
+            container.innerHTML = snippetState.allTags.map(tag => `
+                <span class="drawer-tag-filter ${snippetState.selectedTags.has(tag) ? 'active' : ''}"
+                    onclick="toggleDrawerTagFilter('${tag}')">${tag}</span>
+            `).join('');
+
+            // Show/hide clear button
+            if (clearBtn) {
+                clearBtn.style.display = snippetState.selectedTags.size > 0 ? 'inline' : 'none';
+            }
+        }
+
+        // Toggle a tag filter in the drawer
+        function toggleDrawerTagFilter(tag) {
+            if (snippetState.selectedTags.has(tag)) {
+                snippetState.selectedTags.delete(tag);
+            } else {
+                snippetState.selectedTags.add(tag);
+            }
+            renderDrawerTags();
+            filterDrawerSnippetsByTags();
+        }
+
+        // Clear all tag filters
+        function clearDrawerTagFilter() {
+            snippetState.selectedTags.clear();
+            renderDrawerTags();
+            filterDrawerSnippetsByTags();
+        }
+
+        // Filter snippets in drawer based on selected tags
+        function filterDrawerSnippetsByTags() {
+            const selectedTags = Array.from(snippetState.selectedTags);
+            const allOptions = document.querySelectorAll('.drawer-body .snippet-builder-option');
+
+            // If no tags selected, show all snippets
+            if (selectedTags.length === 0) {
+                allOptions.forEach(option => {
+                    option.style.display = '';
+                });
+                // Show all categories
+                document.querySelectorAll('.drawer-body .snippet-category').forEach(cat => {
+                    cat.style.display = '';
+                });
+                return;
+            }
+
+            // Get snippets that match selected tags
+            const config = getActiveSnippetConfig();
+            if (!config) return;
+
+            const matchingTexts = new Set();
+            config.sections.forEach(section => {
+                section.snippets.forEach(snippet => {
+                    const snippetTags = snippet.tags || [];
+                    const hasMatchingTag = selectedTags.some(tag => snippetTags.includes(tag));
+                    if (hasMatchingTag) {
+                        matchingTexts.add(snippet.text);
+                    }
+                });
+            });
+
+            // Hide/show snippet options based on tag match
+            allOptions.forEach(option => {
+                const text = option.textContent.trim();
+                const shouldShow = matchingTexts.has(text);
+                option.style.display = shouldShow ? '' : 'none';
+            });
+
+            // Hide categories that have no visible snippets
+            document.querySelectorAll('.drawer-body .snippet-category').forEach(cat => {
+                const visibleOptions = cat.querySelectorAll('.snippet-builder-option:not([style*="display: none"])');
+                cat.style.display = visibleOptions.length > 0 ? '' : 'none';
+            });
+        }
+
         // Auto-update countdown timers every 30 seconds
         setInterval(() => {
             if (state.patients.length > 0) {
@@ -12630,6 +14069,17 @@
                         style="background: linear-gradient(135deg, #10b981, #059669); color: white; font-weight: 600; text-align: center;">
                         Access visible and secure. Care ongoing.
                     </div>
+                </div>
+            </div>
+
+            <!-- Tag Filter Section -->
+            <div class="drawer-tags-filter" id="drawerTagsFilter">
+                <div class="drawer-tags-filter-title">
+                    Filter by Tags
+                    <span class="drawer-tag-clear" onclick="clearDrawerTagFilter()" id="drawerTagClearBtn" style="display: none;">Clear All</span>
+                </div>
+                <div class="drawer-tags-filter-list" id="drawerTagsList">
+                    <!-- Populated by JS -->
                 </div>
             </div>
 
