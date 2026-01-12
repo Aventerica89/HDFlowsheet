@@ -25,6 +25,8 @@ $type = isset($_GET['type']) ? $_GET['type'] : 'flowsheet';
 // Set filename based on type
 if ($type === 'operations') {
     $filename = 'operations.json';
+} elseif ($type === 'snippets') {
+    $filename = 'snippets.json';
 } else {
     $filename = 'flowsheet.json';
 }

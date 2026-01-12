@@ -42,6 +42,9 @@ $dataToSave = isset($decoded['data']) ? $decoded['data'] : $decoded;
 if ($type === 'operations') {
     $filename = 'operations.json';
     $backupPrefix = 'operations_';
+} elseif ($type === 'snippets') {
+    $filename = 'snippets.json';
+    $backupPrefix = 'snippets_';
 } else {
     $filename = 'flowsheet.json';
     $backupPrefix = 'flowsheet_';
