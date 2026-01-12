@@ -7472,6 +7472,12 @@
             saveSnippetData();
             closeSnippetEditor();
             renderSnippetConfigContent();
+
+            // Update the drawer if it's open so new snippets appear immediately
+            const drawerPanel = document.getElementById('drawerPanel');
+            if (drawerPanel && drawerPanel.classList.contains('open')) {
+                renderDrawerSnippetsFromState();
+            }
         }
 
         function deleteSnippet(sectionId, snippetId) {
@@ -7485,6 +7491,12 @@
             section.snippets = section.snippets.filter(sn => sn.id !== snippetId);
             saveSnippetData();
             renderSnippetConfigContent();
+
+            // Update the drawer if it's open so deleted snippets are removed immediately
+            const drawerPanel = document.getElementById('drawerPanel');
+            if (drawerPanel && drawerPanel.classList.contains('open')) {
+                renderDrawerSnippetsFromState();
+            }
         }
 
         // Export/Import snippet data
@@ -9014,7 +9026,7 @@
             }
         }
 
-        // Universal Save All function - saves flowsheet and operations data
+        // Universal Save All function - saves flowsheet, operations, and snippet data
         async function saveAll(isAutoSave = false) {
             const saveBtn = document.getElementById('universalSaveBtn');
             const saveStatus = document.getElementById('universalSaveStatus');
@@ -9032,10 +9044,13 @@
                 // Save operations data
                 const opsResult = await saveOpsToServerAsync();
 
+                // Save snippet data
+                const snippetsResult = await saveSnippetsToServerAsync();
+
                 const now = new Date();
                 const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 
-                if (flowsheetResult.success && opsResult.success) {
+                if (flowsheetResult.success && opsResult.success && snippetsResult.success) {
                     if (saveStatus) {
                         saveStatus.textContent = `Last saved: ${timeStr}`;
                         saveStatus.className = 'universal-save-status success';
@@ -9049,6 +9064,7 @@
                     const errors = [];
                     if (!flowsheetResult.success) errors.push('flowsheet');
                     if (!opsResult.success) errors.push('operations');
+                    if (!snippetsResult.success) errors.push('snippets');
                     if (saveStatus) {
                         saveStatus.textContent = `Failed: ${errors.join(', ')}`;
                         saveStatus.className = 'universal-save-status error';
@@ -9082,6 +9098,26 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ type: 'operations', data: data })
+                });
+                const result = await response.json();
+                return { success: result.success };
+            } catch (err) {
+                return { success: false, error: err.message };
+            }
+        }
+
+        // Save snippet data to server
+        async function saveSnippetsToServerAsync() {
+            const data = {
+                configurations: snippetState.configurations,
+                activeConfigId: snippetState.activeConfigId
+            };
+
+            try {
+                const response = await fetch('api/save.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type: 'snippets', data: data })
                 });
                 const result = await response.json();
                 return { success: result.success };
@@ -9186,6 +9222,9 @@
                     saveTimestampLogs();
                 }
 
+                // Load operations and snippets data
+                await loadOpsAndSnippetsFromServer();
+
                 renderAll();
                 showSaveStatus(`Loaded data from ${data.savedAt || 'server'}`);
             } catch (error) {
@@ -9216,8 +9255,9 @@
                     throw new Error('Failed to save data to server');
                 }
 
-                // Also save operations data
+                // Also save operations and snippets data
                 await saveOpsToServerAsync();
+                await saveSnippetsToServerAsync();
 
                 if (btn) {
                     btn.innerHTML = '🔄 Reloading...';
@@ -9239,6 +9279,37 @@
                     btn.disabled = false;
                     btn.innerHTML = '🔄 Refresh App';
                 }
+            }
+        }
+
+        // Load operations and snippets data from server
+        async function loadOpsAndSnippetsFromServer() {
+            try {
+                // Load operations data
+                const opsResponse = await fetch('api/load.php?type=operations');
+                if (opsResponse.ok) {
+                    const opsData = await opsResponse.json();
+                    if (opsData.checklists) opsState.checklists = opsData.checklists;
+                    if (opsData.completions) opsState.completions = opsData.completions;
+                    saveOpsData();
+                }
+            } catch (err) {
+                console.warn('Could not load operations data:', err);
+            }
+
+            try {
+                // Load snippet data
+                const snippetsResponse = await fetch('api/load.php?type=snippets');
+                if (snippetsResponse.ok) {
+                    const snippetsData = await snippetsResponse.json();
+                    if (snippetsData.configurations) {
+                        snippetState.configurations = snippetsData.configurations;
+                        snippetState.activeConfigId = snippetsData.activeConfigId || null;
+                        saveSnippetData();
+                    }
+                }
+            } catch (err) {
+                console.warn('Could not load snippet data:', err);
             }
         }
 
@@ -9278,6 +9349,9 @@
                     timestampState.logs = data.timestampLogs;
                     saveTimestampLogs();
                 }
+
+                // Load operations and snippets data
+                await loadOpsAndSnippetsFromServer();
 
                 renderAll();
                 showSaveStatus(`Data restored from server (${data.savedAt || 'saved'})`);
@@ -13691,6 +13765,9 @@
                 // Render tag filters
                 renderDrawerTags();
 
+                // Render dynamic snippets from snippetState
+                renderDrawerSnippetsFromState();
+
                 // Auto-fill BFR and UF Goal from active patient data
                 if (state.activePatientId) {
                     const patient = state.patients.find(p => p.id === state.activePatientId);
@@ -13929,6 +14006,96 @@
                 const visibleOptions = cat.querySelectorAll('.snippet-builder-option:not([style*="display: none"])');
                 cat.style.display = visibleOptions.length > 0 ? '' : 'none';
             });
+        }
+
+        // Dynamically render drawer snippets from snippetState
+        function renderDrawerSnippetsFromState() {
+            // Load snippet data if not already loaded
+            if (snippetState.configurations.length === 0) {
+                const saved = localStorage.getItem('hd_snippet_data');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    snippetState.configurations = data.configurations || [];
+                    snippetState.activeConfigId = data.activeConfigId || null;
+                }
+            }
+
+            const config = getActiveSnippetConfig();
+            if (!config) {
+                console.log('No active snippet configuration found');
+                return;
+            }
+
+            // Find the drawer body container where dynamic snippets should be rendered
+            const drawerBody = document.querySelector('.drawer-body');
+            if (!drawerBody) return;
+
+            // Find the tag filter section - we'll insert dynamic categories after it
+            const tagFilter = document.getElementById('drawerTagsFilter');
+            if (!tagFilter) return;
+
+            // Remove all existing dynamically-generated snippet categories (but keep the static elements)
+            const existingDynamicCategories = drawerBody.querySelectorAll('.snippet-category.dynamic-category');
+            existingDynamicCategories.forEach(cat => cat.remove());
+
+            // Sort sections by order
+            const sortedSections = [...config.sections].sort((a, b) => a.order - b.order);
+
+            // Generate HTML for each section
+            sortedSections.forEach(section => {
+                // Sort snippets within each section
+                const sortedSnippets = [...section.snippets].sort((a, b) => a.order - b.order);
+
+                if (sortedSnippets.length === 0) return; // Skip empty sections
+
+                // Create category container
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'snippet-category dynamic-category';
+
+                // Generate a safe category ID from section name
+                const categoryId = `dynamic-${section.id}`;
+
+                // Create header
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'snippet-category-header';
+                headerDiv.setAttribute('data-category', categoryId);
+                headerDiv.onclick = () => toggleCategory(categoryId);
+                headerDiv.innerHTML = `
+                    <span>${section.icon || '📝'} ${section.name}</span>
+                    <span>▼</span>
+                `;
+
+                // Create body
+                const bodyDiv = document.createElement('div');
+                bodyDiv.className = 'snippet-category-body';
+                bodyDiv.id = `category-${categoryId}`;
+
+                // Add snippets to body
+                sortedSnippets.forEach(snippet => {
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = 'snippet-builder-option';
+                    optionDiv.textContent = snippet.text;
+                    optionDiv.onclick = function() {
+                        toggleSnippetOption(this.textContent.trim());
+                    };
+
+                    // Store tags as data attribute for filtering
+                    if (snippet.tags && snippet.tags.length > 0) {
+                        optionDiv.setAttribute('data-tags', JSON.stringify(snippet.tags));
+                    }
+
+                    bodyDiv.appendChild(optionDiv);
+                });
+
+                categoryDiv.appendChild(headerDiv);
+                categoryDiv.appendChild(bodyDiv);
+
+                // Append to drawer body after tag filter
+                drawerBody.appendChild(categoryDiv);
+            });
+
+            // Apply any active tag filters
+            filterDrawerSnippetsByTags();
         }
 
         // Auto-update countdown timers every 30 seconds
